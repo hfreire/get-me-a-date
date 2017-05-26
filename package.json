@@ -1,0 +1,64 @@
+{
+  "name": "get-me-a-tinder-date-service",
+  "description": "Help me get a Tinder date tonight",
+  "version": "0.0.0",
+  "author": "Hugo Freire <hugo@exec.sh>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hfreire/get-me-a-tinder-date-service.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hfreire/get-me-a-tinder-date-service/issues"
+  },
+  "homepage": "https://github.com/hfreire/get-me-a-tinder-date-service#readme",
+  "dependencies": {
+    "aws-sdk": "2.48.0",
+    "bluebird": "3.5.0",
+    "lodash": "4.17.4",
+    "modern-logger": "1.3.1",
+    "request": "2.81.0",
+    "serverful": "1.0.12",
+    "sqlite3": "^3.1.8",
+    "tinder": "1.19.0",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "7.2.3",
+    "chai": "3.5.0",
+    "chai-as-promised": "6.0.0",
+    "coveralls": "2.13.0",
+    "eslint": "3.19.0",
+    "eslint-config-standard": "10.2.1",
+    "eslint-plugin-mocha": "4.9.0",
+    "eslint-plugin-promise": "3.5.0",
+    "eslint-plugin-standard": "2.2.0",
+    "istanbul": "0.4.5",
+    "last-release-github": "1.1.1",
+    "mocha": "3.2.0",
+    "semantic-release": "6.3.2",
+    "pre-git": "3.14.0",
+    "standard": "10.0.2",
+    "testdouble": "2.1.2"
+  },
+  "config": {
+    "pre-git": {
+      "commit-msg": "conventional"
+    }
+  },
+  "release": {
+    "getLastRelease": "last-release-github"
+  },
+  "scripts": {
+    "commit": "./node_modules/.bin/commit-wizard",
+    "clean": "rm -rf coverage",
+    "lint": "node_modules/.bin/eslint .",
+    "coverage": "node_modules/.bin/istanbul cover --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
+    "test": "npm run lint && npm run coverage",
+    "semantic-release": "./node_modules/.bin/semantic-release pre && node_modules/.bin/semantic-release post",
+    "build": "pushd ./share/docker; NAME=$npm_package_name ./hooks/build; popd",
+    "push": "pushd ./share/docker; NAME=$npm_package_name ./hooks/push; popd",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "start": "node src/app.js"
+  }
+}

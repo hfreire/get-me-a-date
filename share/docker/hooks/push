@@ -1,0 +1,7 @@
+#!/bin/bash
+
+VERSION=$(if [ -z ${VERSION-} ]; then echo latest; else echo $VERSION; fi)
+
+IMAGE_NAME=$(if [ -z ${IMAGE_NAME-} ]; then echo hfreire/$NAME:$VERSION; else echo $IMAGE_NAME; fi)
+
+$(which docker) push ${IMAGE_NAME}
