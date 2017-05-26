@@ -1,5 +1,7 @@
 # Help me get a date tonight
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/hfreire/get-me-a-date.svg)](https://greenkeeper.io/)
+
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Build Status](https://travis-ci.org/hfreire/get-me-a-date.svg?branch=master)](https://travis-ci.org/hfreire/get-me-a-date)
 [![Coverage Status](https://coveralls.io/repos/github/hfreire/get-me-a-date/badge.svg?branch=master)](https://coveralls.io/github/hfreire/get-me-a-date?branch=master)
