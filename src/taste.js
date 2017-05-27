@@ -23,6 +23,38 @@ const request = Promise.promisifyAll(require('request').defaults({ encoding: nul
 
 const { parse } = require('url')
 
+const deleteFaces = function (faces) {
+  return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, faces)
+    .then(() => faces.length)
+    .catch((error) => Logger.warn(error))
+}
+
+const indexFaces = function (images) {
+  let indexedFaces = 0
+
+  return Promise.map(images, (image) => {
+    return this.rekognition.indexFaces(AWS_REKOGNITION_COLLECTION, AWS_S3_BUCKET, image)
+      .then((data) => {
+        if (!data.FaceRecords || _.isEmpty(data.FaceRecords)) {
+          return
+        }
+
+        // delete images with no or multiple faces
+        if (data.FaceRecords.length !== 1) {
+          return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, _.map(data.FaceRecords, ({ Face }) => Face.FaceId))
+            .then(() => this.s3.deleteObject(image))
+        }
+
+        indexedFaces++
+      })
+      .catch((error) => {
+        return this.s3.deleteObject(image)
+          .then(() => Logger.warn(error))
+      })
+  }, { concurrency: 5 })
+    .then(() => indexedFaces)
+}
+
 const savePhoto = function (photo) {
   if (!photo) {
     return Promise.reject(new Error('invalid arguments'))
@@ -77,64 +109,39 @@ class Taste {
   syncS3BucketAndRekognitionCollection () {
     const start = _.now()
 
-    return this.rekognition.listFaces(AWS_REKOGNITION_COLLECTION)
-      .then(({ Faces }) => {
+    return Promise.props({
+      currentFaces: this.rekognition.listFaces(AWS_REKOGNITION_COLLECTION),
+      availableImages: this.s3.listObjects('train')
+    })
+      .then(({ currentFaces, availableImages }) => {
+        const { Faces } = currentFaces
         const currentImages = _(Faces)
           .map(({ ExternalImageId }) => ExternalImageId)
           .uniq()
           .value()
 
-        return this.s3.listObjects('train')
-          .then((availableImages) => {
-            const imagesToDelete = _.difference(currentImages, availableImages)
-            const imagesToIndex = _.difference(availableImages, currentImages)
+        const imagesToDelete = _.difference(currentImages, availableImages)
+        const imagesToIndex = _.difference(availableImages, currentImages)
 
-            const facesToDelete = []
-            _.forEach(imagesToDelete, (externalImageId) => {
-              const images = _.filter(Faces, { ExternalImageId: externalImageId })
+        // TODO: optimize the code below
+        const facesToDelete = []
+        _.forEach(imagesToDelete, (externalImageId) => {
+          const images = _.filter(Faces, { ExternalImageId: externalImageId })
 
-              _.forEach(images, ({ FaceId }) => {
-                facesToDelete.push(FaceId)
-              })
-            })
+          _.forEach(images, ({ FaceId }) => {
+            facesToDelete.push(FaceId)
+          })
+        })
 
-            let deletedFaces = 0
-            const deleteFaces = function () {
-              return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, facesToDelete)
-                .then(() => {
-                  deletedFaces = facesToDelete.length
-                })
-                .catch((error) => Logger.warn(error))
-            }
+        return Promise.props({
+          deletedFaces: deleteFaces.bind(this)(imagesToDelete),
+          indexedFaces: indexFaces.bind(this)(imagesToIndex)
+        })
+          .then(({ deletedFaces, indexedFaces }) => {
+            const stop = _.now()
+            const duration = _.round((stop - start) / 1000)
 
-            let indexedFaces = 0
-            const indexFaces = function () {
-              return Promise.map(imagesToIndex, (image) => {
-                return this.rekognition.indexFaces(AWS_REKOGNITION_COLLECTION, AWS_S3_BUCKET, `${image}`)
-                  .then((data) => {
-                    if (!data.FaceRecords || _.isEmpty(data.FaceRecords)) {
-                      return
-                    }
-
-                    // delete images with no or multiple faces
-                    if (data.FaceRecords.length !== 1) {
-                      return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, _.map(data.FaceRecords, ({ Face }) => Face.FaceId))
-                        .then(() => this.s3.deleteObject(image))
-                    }
-
-                    indexedFaces++
-                  })
-                  .catch((error) => Logger.warn(error))
-              }, { concurrency: 3 })
-            }
-
-            return Promise.all([ deleteFaces.bind(this)(), indexFaces.bind(this)() ])
-              .then(() => {
-                const stop = _.now()
-                const duration = _.round((stop - start) / 1000)
-
-                return Logger.debug(`Synced reference face collection: ${Faces.length - deletedFaces + indexedFaces} faces available (time = ${duration}s, deleted = ${deletedFaces}, indexed = ${indexedFaces})`)
-              })
+            return Logger.debug(`Synced reference face collection: ${Faces.length - deletedFaces + indexedFaces} faces available (time = ${duration}s, deleted = ${deletedFaces}, indexed = ${indexedFaces})`)
           })
       })
   }
@@ -166,20 +173,22 @@ class Taste {
   }
 
   mentalSnapshot (photos) {
-    return Promise.mapSeries(photos, (photo) => {
+    return Promise.map(photos, (photo) => {
       const url = parse(photo.url)
       if (!url) {
         return
       }
 
-      const pathname = url.pathname
-
-      const srcKey = pathname
+      const srcKey = url.pathname
       const dstKey = srcKey.replace(`/${AWS_S3_BUCKET}/photos`, 'train')
 
       return this.s3.copyObject(srcKey, dstKey)
-    })
-      .then(() => this.syncS3BucketAndRekognitionCollection())
+        .then(() => dstKey)
+    }, { concurrency: 5 })
+      .then((images) => {
+        return indexFaces.bind(this)(images)
+          .then((indexedImages) => Logger.debug(`Indexed ${indexedImages} face(s)`))
+      })
   }
 }
 
