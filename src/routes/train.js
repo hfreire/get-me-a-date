@@ -7,15 +7,12 @@
 
 const { Route } = require('serverful')
 
-const _ = require('lodash')
-const Promise = require('bluebird')
-
 const Logger = require('modern-logger')
 
 const Taste = require('../taste')
-const Database = require('../database')
+const { People } = require('../database')
 
-class People extends Route {
+class Train extends Route {
   constructor () {
     super('POST', '/train/{id}', 'People', 'Returns all people')
   }
@@ -23,7 +20,7 @@ class People extends Route {
   handler (request, reply) {
     const { id } = request.params
 
-    Database.findPeopleById(id)
+    People.findById(id)
       .then((person) => {
         if (!person) {
           reply(null)
@@ -31,12 +28,11 @@ class People extends Route {
           return
         }
 
-        const urls = _.map(person.data.photos, 'url')
+        const { provider, provider_id, data } = person
+        const { photos } = data
 
-        return Taste.mentalSnapshot(urls)
-          .then(() => {
-            return Database.savePeople(person.id, person.like, true, person.provider, person.providerId, person.data)
-          })
+        return Taste.mentalSnapshot(photos)
+          .then(() => People.save(provider, provider_id, { train: true }))
       })
       .then(() => reply(null))
       .catch((error) => {
@@ -51,4 +47,4 @@ class People extends Route {
   }
 }
 
-module.exports = new People()
+module.exports = new Train()

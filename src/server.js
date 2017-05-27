@@ -7,77 +7,80 @@
 
 const FIND_DATES_PERIOD = process.env.FIND_DATES_PERIOD || 10 * 60 * 1000
 
+const { Serverful } = require('serverful')
+
 const _ = require('lodash')
 const Promise = require('bluebird')
-
-const { Serverful } = require('serverful')
 
 const Logger = require('modern-logger')
 
 const Tinder = require('./providers/tinder')
+const { NotAuthorizedError } = require('./providers/errors')
 
 const Taste = require('./taste')
-const Database = require('./database')
+const { SQLite, People } = require('./database')
 
 const uuidV4 = require('uuid/v4')
 
+const checkRecommendationOut = (provider, rec) => {
+  const providerId = rec._id
+  const person = {}
+
+  return Promise.props({ photos: Taste.checkPhotosOut(rec.photos) })
+    .then(({ photos }) => {
+      person.id = uuidV4()
+      person.provider = provider
+      person.provider_id = providerId
+      person.like = photos.like
+      person.photos_similarity_mean = photos.faceSimilarityMean
+      person.data = rec
+
+      return People.save(provider, providerId, person)
+        .then(() => person)
+    })
+}
+
 const findDates = function () {
   return Tinder.getRecommendations()
-    .then(({ results }) => {
-      Logger.info(`Got ${results.length} recommendations`)
+    .then((recs) => {
+      const provider = 'tinder'
 
-      return Promise.mapSeries(results, (result) => {
-        const { name, photos, _id } = result
+      Logger.info(`Got ${recs.length} recommendations from ${_.capitalize(provider)}`)
 
-        Logger.info(`Started checking ${name} out with ${photos.length} photos`)
-
-        return Promise.props({
-          photos: Taste.checkPhotosOut(photos)
-        })
-          .then(({ photos }) => {
-            const meta = {
-              id: uuidV4(),
-              provider: 'tinder',
-              photos: {}
-            }
-
-            meta.photos.similarity_mean = _.round(_.mean(_.without(photos, 0, undefined)), 2) || 0
-
-            Logger.info(`${name} face is ${meta.photos.similarity_mean}% similar with target group`)
-
-            meta.like = !_.isEmpty(photos) && meta.photos.similarity_mean > 0
-
-            result.meta = meta
-
-            return Database.savePeople(meta.id, meta.like, false, meta.provider, _id, result)
-              .finally(() => Logger.info(`${name} got a ${meta.like ? 'like :+1:' : 'pass :-1:'}`))
+      return Promise.map(recs, (rec) => {
+        return checkRecommendationOut(provider, rec)
+          .then(({ photos_similarity_mean, data, like }) => {
+            // eslint-disable-next-line camelcase
+            return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
           })
           .catch((error) => Logger.warn(error))
-      })
+      }, { concurrency: 5 })
     })
+    .catch(NotAuthorizedError, () => Tinder.authorize())
+    .catch((error) => Logger.error(error))
 }
 
 class Server extends Serverful {
   start () {
-    return super.start()
-      .then(() => Database.start())
-      .then(() => Taste.start())
-
-      .then(() => Tinder.authenticate())
+    return Promise.all([ super.start(), SQLite.start().then(() => Tinder.authorize()), Taste.bootstrap() ])
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           this.findDates()
         }
       })
-
   }
 
   findDates () {
+    const startDate = _.now()
+
     Logger.info('Started finding dates')
 
     return findDates.bind(this)()
       .finally(() => {
-        Logger.info('Finished finding dates')
+        const stopDate = _.now()
+        const duration = _.round((stopDate - startDate) / 1000, 1)
+
+        Logger.info(`Finished finding dates (time = ${duration}s)`)
 
         this.timeout = setTimeout(() => this.findDates(), FIND_DATES_PERIOD)
       })

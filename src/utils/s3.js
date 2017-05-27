@@ -7,19 +7,42 @@
 
 const _ = require('lodash')
 const Promise = require('bluebird')
+const retry = require('bluebird-retry')
+const Brakes = require('brakes')
+
+const Health = require('health-checkup')
 
 const AWS = require('aws-sdk')
 
-const defaultOptions = {}
+const defaultOptions = {
+  retry: { max_tries: 2, interval: 1000, throw_original: true },
+  breaker: { timeout: 3000, threshold: 80, circuitDuration: 30000 }
+}
 
 class S3 {
   constructor (options = {}) {
-    this.options = _.defaults(options, defaultOptions)
+    this._options = _.defaults(options, defaultOptions)
 
-    const { region, accessKeyId, secretAccessKey } = this.options
+    const { region, accessKeyId, secretAccessKey } = this._options
     AWS.config.update({ region, accessKeyId, secretAccessKey })
 
-    this.s3 = Promise.promisifyAll(new AWS.S3())
+    this._s3 = Promise.promisifyAll(new AWS.S3())
+
+    this._breaker = new Brakes(this._options.breaker)
+
+    this._s3.putObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.putObjectAsync(params), this._options.retry))
+    this._s3.copyObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.copyObjectAsync(params), this._options.retry))
+    this._s3.getObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.getObjectAsync(params), this._options.retry))
+    this._s3.deleteObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.deleteObjectAsync(params), this._options.retry))
+    this._s3.listObjectsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.listObjectsAsync(params), this._options.retry))
+
+    Health.addCheck('s3', () => new Promise((resolve, reject) => {
+      if (this._breaker.isOpen()) {
+        return reject(new Error(`circuit breaker is open`))
+      } else {
+        return resolve()
+      }
+    }))
   }
 
   putObject (key, data) {
@@ -27,20 +50,39 @@ class S3 {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const params = { Bucket: this.options.bucket, Key: key, Body: data }
+    const params = { Bucket: this._options.bucket, Key: key, Body: data }
 
-    return this.s3.putObjectAsync(params)
+    return this._s3.putObjectCircuitBreaker.exec(params)
+  }
+
+  copyObject (srcKey, dstKey) {
+    if (!srcKey || !dstKey) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    const params = { Bucket: this._options.bucket, CopySource: srcKey, Key: dstKey }
+
+    return this._s3.copyObjectCircuitBreaker.exec(params)
   }
 
   getObject (key) {
     if (!key) {
       return Promise.reject(new Error('invalid arguments'))
-
     }
 
-    const params = { Bucket: this.options.bucket, Key: key }
+    const params = { Bucket: this._options.bucket, Key: key }
 
-    return this.s3.getObjectAsync(params)
+    return this._s3.getObjectCircuitBreaker.exec(params)
+  }
+
+  deleteObject (key) {
+    if (!key) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    const params = { Bucket: this._options.bucket, Key: key }
+
+    return this._s3.deleteObjectCircuitBreaker.exec(params)
   }
 
   listObjects (prefix, maxKeys = 1000) {
@@ -48,17 +90,10 @@ class S3 {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    return this.s3.listObjectsAsync({
-      Bucket: this.options.bucket,
-      Prefix: prefix,
-      MaxKeys: maxKeys
-    })
-      .then((data) => {
-        return _(data.Contents)
-          .filter(({ Key }) => Key.split(`${prefix}/`).length > 1 && Key.split(`${prefix}/`)[ 1 ] !== '')
-          .map(({ Key }) => Key.split(`${prefix}/`)[ 1 ])
-          .value()
-      })
+    const params = { Bucket: this._options.bucket, Prefix: prefix, MaxKeys: maxKeys }
+
+    return this._s3.listObjectsCircuitBreaker.exec(params)
+      .then((data) => _.map(data.Contents, ({ Key }) => Key))
   }
 }
 

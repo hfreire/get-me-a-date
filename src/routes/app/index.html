@@ -49,6 +49,10 @@
         .like:before {
             background: rgba(0, 255, 0, 0.5);
         }
+
+        .train:before {
+            background: rgba(255, 255, 0, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -59,7 +63,10 @@
         <p>{{ p.data.bio }} </p>
         <ul class="no-bullet">
             <li ng-repeat="photo in p.data.photos">
-                <img ng-src="{{ photo.url }}" width="100"/>
+                <img ng-src="{{ photo.url }}"
+                     tooltip="Similarity: {{photo.similarity}}%"
+                     tooltip-placement="bottom"
+                     width="100"/>
             </li>
         </ul>
         <button class="button" ng-class="{disabled: p.train}" ng-click="train()">Train</button>
@@ -68,8 +75,8 @@
     <ul class="no-bullet">
         <li ng-repeat="p in people">
             <div class="tint"
-                 ng-class="{pass: !p.like, like: p.like}"
-                 tooltip="Similarity: {{p.data.meta.photos.similarity_mean}}%"
+                 ng-class="{pass: !p.like, like: p.like, train: p.train}"
+                 tooltip="Similarity: {{p.photos_similarity_mean}}%"
                  tooltip-placement="bottom"
                  ng-click="open(p)">
                 <img ng-src="{{ p.data.photos[0].url }}" width="45"/>

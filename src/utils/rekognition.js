@@ -10,24 +10,22 @@ const Promise = require('bluebird')
 
 const AWS = require('aws-sdk')
 
-const request = Promise.promisifyAll(require('request').defaults({ encoding: null }))
-
 const defaultOptions = {}
 
 class Rekognition {
   constructor (options = {}) {
-    this.options = _.defaults(options, defaultOptions)
+    this._options = _.defaults(options, defaultOptions)
 
-    const { region, accessKeyId, secretAccessKey } = this.options
+    const { region, accessKeyId, secretAccessKey } = this._options
     AWS.config.update({ region, accessKeyId, secretAccessKey })
 
-    this.rekognition = Promise.promisifyAll(new AWS.Rekognition())
+    this._rekognition = Promise.promisifyAll(new AWS.Rekognition())
   }
 
   listCollections () {
     const params = {}
 
-    return this.rekognition.listCollectionsAsync(params)
+    return this._rekognition.listCollectionsAsync(params)
       .then((data) => data.CollectionIds)
   }
 
@@ -38,7 +36,7 @@ class Rekognition {
 
     const params = { CollectionId: collectionId }
 
-    return this.rekognition.createCollectionAsync(params)
+    return this._rekognition.createCollectionAsync(params)
   }
 
   indexFaces (collectionId, bucket, key) {
@@ -48,7 +46,7 @@ class Rekognition {
 
     const params = {
       CollectionId: collectionId,
-      ExternalImageId: key.split('/')[ key.split('/').length - 1 ],
+      ExternalImageId: Buffer.from(key).toString('base64'),
       Image: {
         S3Object: {
           Bucket: bucket,
@@ -57,7 +55,7 @@ class Rekognition {
       }
     }
 
-    return this.rekognition.indexFacesAsync(params)
+    return this._rekognition.indexFacesAsync(params)
   }
 
   listFaces (collectionId) {
@@ -67,7 +65,13 @@ class Rekognition {
 
     const params = { CollectionId: collectionId }
 
-    return this.rekognition.listFacesAsync(params)
+    return this._rekognition.listFacesAsync(params)
+      .then((data) => {
+        return Promise.mapSeries(data.Faces, (face) => {
+          face.ExternalImageId = Buffer.from(face.ExternalImageId, 'base64').toString('ascii')
+        })
+          .then(() => data)
+      })
   }
 
   deleteFaces (collectionId, faceIds) {
@@ -84,51 +88,42 @@ class Rekognition {
       FaceIds: faceIds
     }
 
-    return this.rekognition.deleteFacesAsync(params)
+    return this._rekognition.deleteFacesAsync(params)
   }
 
-  detectFaces (imageUrl) {
-    if (!imageUrl) {
+  detectFaces (image) {
+    if (!image) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    return request.getAsync(imageUrl)
-      .then(({ body }) => {
-        const params = { Image: { Bytes: body } }
+    const params = { Image: { Bytes: image } }
 
-        return this.rekognition.detectFacesAsync(params)
-      })
+    return this._rekognition.detectFacesAsync(params)
   }
 
-  detectLabels (imageUrl) {
-    if (!imageUrl) {
+  detectLabels (image) {
+    if (!image) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    return request.getAsync(imageUrl)
-      .then(({ body }) => {
-        const params = { Image: { Bytes: body } }
+    const params = { Image: { Bytes: image } }
 
-        return this.rekognition.detectLabelsAsync(params)
-      })
+    return this._rekognition.detectLabelsAsync(params)
   }
 
-  searchFacesByImage (collectionId, imageUrl) {
-    if (!collectionId || !imageUrl) {
+  searchFacesByImage (collectionId, image) {
+    if (!collectionId || !image) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    return request.getAsync(imageUrl)
-      .then(({ body }) => {
-        const params = {
-          CollectionId: collectionId,
-          FaceMatchThreshold: 10,
-          MaxFaces: 5,
-          Image: { Bytes: body }
-        }
+    const params = {
+      CollectionId: collectionId,
+      FaceMatchThreshold: 10,
+      MaxFaces: 5,
+      Image: { Bytes: image }
+    }
 
-        return this.rekognition.searchFacesByImageAsync(params)
-      })
+    return this._rekognition.searchFacesByImageAsync(params)
   }
 }
 

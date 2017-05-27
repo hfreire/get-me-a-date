@@ -17,7 +17,7 @@ class People extends Route {
   }
 
   handler (request, reply) {
-    Database.findAllPeople()
+    Database.People.findAll()
       .then((people) => reply(null, people))
       .catch((error) => {
         Logger.error(error)
