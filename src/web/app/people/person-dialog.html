@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<h2>{{ person.data.name }}, {{ today | amDifference : person.data.birth_date : 'years' }}</h2>
+<h3>{{ occupation }}</h3>
+<h4>{{ person.data.description }}</h4>
+<md-dialog-content>
+    <p>{{ person.data.bio }} </p>
+    <ul class="no-bullet">
+        <li *ngFor="let photo of person.data.photos">
+            <img [src]="photo.url"
+                 mdTooltip="Similarity: {{photo.similarity}}%"
+                 tooltipPosition="bottom"
+                 width="100"/>
+        </li>
+    </ul>
+</md-dialog-content>
+<md-dialog-actions [attr.align]="actionsAlignment">
+    <button md-raised-button md-button *ngIf="!person.train" (click)="trainPerson()">Train</button>
+    <button md-button *ngIf="person.train" (click)="untrainPerson()">Untrain</button>
+</md-dialog-actions>

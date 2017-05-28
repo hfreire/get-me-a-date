@@ -1,0 +1,34 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get me a date</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="node_modules/@angular/material/prebuilt-themes/indigo-pink.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script src="node_modules/core-js/client/shim.min.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+
+    <script src="systemjs.config.js"></script>
+    <script>
+      System.import('main.js')
+        .catch(function (error) {
+          console.error(error)
+        })
+    </script>
+</head>
+<body>
+<app></app>
+</body>
+</html>

@@ -1,0 +1,4 @@
+node_modules
+*.js
+!systemjs.config.js
+*.js.map

@@ -13,6 +13,7 @@ const queryAllPeople = function (query) {
   return SQLite.all(query)
     .mapSeries((row) => {
       row.created_date = new Date(row.created_date)
+      row.train = !!row.train
       row.data = JSON.parse(row.data)
       return row
     })
@@ -68,6 +69,7 @@ class People {
         }
 
         person.created_date = new Date(person.created_date)
+        person.train = !!person.train
         person.data = JSON.parse(person.data)
 
         return person
