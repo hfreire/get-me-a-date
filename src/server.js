@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const ENVIRONMENT = process.env.ENVIRONMENT || 'local'
 const FIND_DATES_PERIOD = process.env.FIND_DATES_PERIOD || 10 * 60 * 1000
 
 const { Serverful } = require('serverful')
@@ -62,6 +63,10 @@ const findDates = function () {
 
 class Server extends Serverful {
   start () {
+    if (ENVIRONMENT === 'local') {
+      return Promise.all([ super.start(), SQLite.start() ])
+    }
+
     return Promise.all([ super.start(), SQLite.start().then(() => Tinder.authorize()), Taste.bootstrap() ])
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {

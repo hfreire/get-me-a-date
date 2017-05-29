@@ -13,7 +13,7 @@ const { join } = require('path')
 
 class Web extends Route {
   constructor () {
-    super('GET', '/', 'www', 'www')
+    super('GET', '/', 'web', 'web')
   }
 
   auth () {
@@ -21,19 +21,34 @@ class Web extends Route {
   }
 
   toRoute () {
-    return _(super.toRoute())
-      .omit('config.handler')
-      .merge({
-        method: 'GET',
-        path: '/{param*}',
-        handler: {
-          directory: {
-            path: join(__dirname, '../web'),
-            index: true
+    return [
+      _(super.toRoute())
+        .omit('config.handler')
+        .merge({
+          method: 'GET',
+          path: '/{param*}',
+          handler: {
+            directory: {
+              path: join(__dirname, '../web'),
+              index: true
+            }
           }
-        }
-      })
-      .value()
+        })
+        .value(),
+      _(super.toRoute())
+        .omit('config.handler')
+        .merge({
+          method: 'GET',
+          path: '/node_modules/{param*}',
+          handler: {
+            directory: {
+              path: join(__dirname, '../../node_modules'),
+              index: true
+            }
+          }
+        })
+        .value()
+    ]
   }
 }
 

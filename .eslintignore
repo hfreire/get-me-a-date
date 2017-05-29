@@ -2,4 +2,5 @@
 node_modules
 coverage
 share
-src/web/app
+src/web/*
+!src/web/systemjs.config.js

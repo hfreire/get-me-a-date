@@ -2,5 +2,8 @@ coverage
 node_modules
 .idea
 *.iml
+src/web/*.js
+!src/web/systemjs.config.js
+src/web/*.js.map
 tmp
 
