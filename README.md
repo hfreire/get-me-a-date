@@ -1,4 +1,4 @@
-# Help me get a date tonight
+# Help :cry: me get a :man::woman: date :first_quarter_moon_with_face: tonight
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Build Status](https://travis-ci.org/hfreire/get-me-a-date.svg?branch=master)](https://travis-ci.org/hfreire/get-me-a-date)
@@ -25,6 +25,7 @@ PORT | The port to be used by the HTTP server | false | `3000`
 API_KEYS | The secret keys that should be used when securing endpoints | false | `undefined`
 ENVIRONMENT | The environment the app is running on | false | `undefined`
 ROLLBAR_API_KEY | The server API key used to talk with Rollbar | false | `undefined`
+SO_TIMEOUT | Node socket timeout. Defaults to 2 minutes. Set to false to disable socket timeouts. | false | `undefined`
 
 ### How to build
 Clone the GitHub repo
