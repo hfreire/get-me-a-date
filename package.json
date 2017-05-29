@@ -41,7 +41,7 @@
     "nightmare": "2.10.0",
     "random-http-useragent": "1.1.0",
     "request": "2.81.0",
-    "serverful": "1.0.22",
+    "serverful": "1.0.23",
     "sqlite3": "3.1.8",
     "tinder": "1.19.0",
     "uuid": "3.0.1"
