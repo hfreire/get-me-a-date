@@ -1,4 +1,4 @@
-# Help :cry: me get a :man::woman: date :first_quarter_moon_with_face: tonight
+# :heart_eyes: Help me get a :cupid: date tonight :first_quarter_moon_with_face:
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Build Status](https://travis-ci.org/hfreire/get-me-a-date.svg?branch=master)](https://travis-ci.org/hfreire/get-me-a-date)
