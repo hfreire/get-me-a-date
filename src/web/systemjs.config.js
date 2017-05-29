@@ -5,10 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-/**
- * System configuration for Angular samples
- * Adjust as necessary for your application needs.
- */
 (function (global) {
   System.config({
     paths: {

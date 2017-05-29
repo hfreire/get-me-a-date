@@ -62,12 +62,12 @@ const findDates = function () {
 
 class Server extends Serverful {
   start () {
-    return Promise.all([ super.start(), SQLite.start() ])//.then(() => Tinder.authorize()), Taste.bootstrap() ])
-    /*.then(() => {
+    return Promise.all([ super.start(), SQLite.start().then(() => Tinder.authorize()), Taste.bootstrap() ])
+      .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           this.findDates()
         }
-     })*/
+      })
   }
 
   findDates () {
