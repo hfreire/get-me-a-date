@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "src/web",
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
