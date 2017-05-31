@@ -14,8 +14,8 @@ export class PeopleService {
   constructor (private http: Http) {
   }
 
-  getAll () {
-    return this.http.get('/people')
+  getAll (page: number = 1, limit: number = 25) {
+    return this.http.get(`/people?page=${page}&limit=${limit}`)
       .map((res) => res.json())
   }
 

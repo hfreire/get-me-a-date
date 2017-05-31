@@ -9,15 +9,41 @@ import { NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { HttpModule } from '@angular/http'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
-import { MdButtonModule, MdDialogModule, MdTooltipModule } from '@angular/material'
+import {
+  MdButtonModule,
+  MdCardModule,
+  MdDialogModule,
+  MdGridListModule,
+  MdIconModule,
+  MdProgressSpinnerModule,
+  MdSidenavModule,
+  MdToolbarModule,
+  MdTooltipModule
+} from '@angular/material'
 
 import { MomentModule } from 'angular2-moment'
+import { NgxPaginationModule } from 'ngx-pagination'
 
 import { AppComponent } from './app.component'
 import { PersonDialogComponent } from './people/person-dialog.component'
 
 @NgModule({
-  imports: [ BrowserModule, HttpModule, NoopAnimationsModule, MdDialogModule, MdTooltipModule, MdButtonModule, MomentModule ],
+  imports: [
+    BrowserModule,
+    HttpModule,
+    NoopAnimationsModule,
+    MdDialogModule,
+    MdTooltipModule,
+    MdButtonModule,
+    MdGridListModule,
+    MdToolbarModule,
+    MdProgressSpinnerModule,
+    MdSidenavModule,
+    MdCardModule,
+    MomentModule,
+    MdIconModule,
+    NgxPaginationModule
+  ],
   declarations: [ AppComponent, PersonDialogComponent ],
   entryComponents: [ PersonDialogComponent ],
   bootstrap: [ AppComponent ]

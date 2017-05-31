@@ -5,23 +5,28 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+body {
+  margin: 0;
+}
+
 ul.no-bullet {
   padding-left: 0;
 }
 
 ul.no-bullet > li {
   display: inline-block;
+  margin-bottom: -4px;
 }
 
 .tint {
-  max-height: 50px;
+  max-height: 42px;
   position: relative;
   float: left;
   cursor: pointer;
 }
 
 .tint > img {
-  width: 50px;
+  width: 42px;
 }
 
 .tint:before {

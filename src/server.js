@@ -65,6 +65,51 @@ class Server extends Serverful {
   start () {
     if (ENVIRONMENT === 'local') {
       return Promise.all([ super.start(), SQLite.start() ])
+      /* .then(() => {
+       const AWS_REGION = process.env.AWS_REGION
+       const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
+       const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
+       const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET
+       const S3 = require('./utils/s3')
+       const s3 = new S3({
+       region: AWS_REGION,
+       bucket: AWS_S3_BUCKET,
+       accessKeyId: AWS_ACCESS_KEY_ID,
+       secretAccessKey: AWS_SECRET_ACCESS_KEY
+       })
+       const request = Promise.promisifyAll(require('request').defaults({ encoding: null }))
+       let i = 0
+       return People.findAll(1, 600)
+       .then(({ results }) => results)
+       .mapSeries((person) => {
+       i++
+       console.log(i)
+       const { data } = person
+       const { photos } = data
+
+       if (photos.length === 0) {
+       return
+       }
+
+       const thumbnail = _.find(photos[0].processedFiles, { width: 84, height: 84 })
+
+       const url = require('url').parse(thumbnail.url)
+       if (!url) {
+       return Promise.reject(new Error('invalid photo url'))
+       }
+
+       return request.getAsync(url.href)
+       .then(({ body }) => {
+       return s3.putObject(`photos/tinder${url.pathname}`, body)
+       .then(() => {
+       data.photos[0].thumbnailUrl = `https://s3-${AWS_REGION}.amazonaws.com/${AWS_S3_BUCKET}/photos/tinder${url.pathname}`
+
+       return People.save(person.provider, person.provider_id, { data })
+       })
+       })
+       .delay(1000)
+       })
+       }) */
     }
 
     return Promise.all([ super.start(), SQLite.start().then(() => Tinder.authorize()), Taste.bootstrap() ])

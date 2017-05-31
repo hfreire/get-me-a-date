@@ -16,9 +16,11 @@ class People extends Route {
     super('GET', '/people', 'People', 'Returns all people')
   }
 
-  handler (request, reply) {
-    Database.People.findAll()
-      .then((people) => reply(null, people))
+  handler ({ query = {} }, reply) {
+    const { page = 1, limit = 25 } = query
+
+    Database.People.findAll(page, limit)
+      .then(({ results, totalCount }) => reply({ results, totalCount }))
       .catch((error) => {
         Logger.error(error)
 
@@ -28,6 +30,14 @@ class People extends Route {
 
   auth () {
     return false
+  }
+
+  plugins () {
+    return {
+      pagination: {
+        enabled: true
+      }
+    }
   }
 }
 

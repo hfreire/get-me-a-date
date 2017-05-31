@@ -6,6 +6,7 @@
  */
 
 const _ = require('lodash')
+const Promise = require('bluebird')
 
 const SQLite = require('./sqlite')
 
@@ -57,8 +58,13 @@ class People {
       })
   }
 
-  findAll () {
-    return queryAllPeople.bind(this)('SELECT * FROM people ORDER BY created_date DESC')
+  findAll (page = 1, limit = 25) {
+    const offset = (page - 1) * limit
+
+    return Promise.props({
+      results: queryAllPeople.bind(this)(`SELECT * FROM people ORDER BY created_date DESC LIMIT ${limit} OFFSET ${offset}`),
+      totalCount: SQLite.get('SELECT COUNT(*) as count FROM people').then(({ count }) => count)
+    })
   }
 
   findById (id) {
