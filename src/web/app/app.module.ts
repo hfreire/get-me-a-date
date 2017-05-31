@@ -17,6 +17,7 @@ import {
   MdIconModule,
   MdProgressSpinnerModule,
   MdSidenavModule,
+  MdSlideToggleModule,
   MdToolbarModule,
   MdTooltipModule
 } from '@angular/material'
@@ -25,7 +26,9 @@ import { MomentModule } from 'angular2-moment'
 import { NgxPaginationModule } from 'ngx-pagination'
 
 import { AppComponent } from './app.component'
-import { PersonDialogComponent } from './people/person-dialog.component'
+import { PeopleComponent, PersonDialogComponent } from './people'
+import { ChannelsComponent } from './channels'
+import { CapitalizePipe } from './capitalize.pipe'
 
 @NgModule({
   imports: [
@@ -42,10 +45,11 @@ import { PersonDialogComponent } from './people/person-dialog.component'
     MdCardModule,
     MomentModule,
     MdIconModule,
+    MdSlideToggleModule,
     NgxPaginationModule
   ],
-  declarations: [ AppComponent, PersonDialogComponent ],
-  entryComponents: [ PersonDialogComponent ],
+  declarations: [ AppComponent, CapitalizePipe, PersonDialogComponent, PeopleComponent, ChannelsComponent ],
+  entryComponents: [ PersonDialogComponent, PeopleComponent, ChannelsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

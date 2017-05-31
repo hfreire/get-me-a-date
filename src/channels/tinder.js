@@ -21,18 +21,37 @@ const { NotAuthorizedError } = require('./errors')
 const { TinderClient } = require('tinder')
 
 const { Facebook } = require('../auth')
-const { Auth } = require('../database')
+const { Channel, Auth } = require('../database')
+
+const createTinderChannelIfNeeded = function () {
+  return Channel.findByName(this._options.channel.name)
+    .then((channel) => {
+      if (!channel) {
+        return Channel.save(this._options.channel.name, this._options.channel)
+      }
+    })
+}
+
+const findOrAuthorizeTinderIfNeeded = function (channel) {
+  return Auth.findById(channel.auth_id)
+    .then((auth) => {
+      if (!auth) {
+        return facebookAuthorizeTinderApp.bind(this)()
+          .then(() => {
+            const token = this._tinder.getAuthToken()
+
+            return Auth.save(undefined, { token })
+              .then(({ id }) => Channel.save(channel.name, { auth_id: id }))
+          })
+      }
+
+      return auth
+    })
+}
 
 const facebookAuthorizeTinderApp = function () {
   return this._facebook.authorizeApp(FACEBOOK_USER_EMAIL, FACEBOOK_USER_PASSWORD, FACEBOOK_TINDER_APP_AUTHZ_URL)
-    .then(({ accessToken, facebookUserId }) => {
-      return this._tinder.authorizeCircuitBreaker.exec(accessToken, facebookUserId)
-        .then(() => {
-          const apiToken = this._tinder.getAuthToken()
-
-          return Auth.save('tinder', { provider: 'tinder', api_token: apiToken })
-        })
-    })
+    .then(({ accessToken, facebookUserId }) => this._tinder.authorizeCircuitBreaker.exec(accessToken, facebookUserId))
 }
 
 const handleError = function (error) {
@@ -40,7 +59,8 @@ const handleError = function (error) {
     case 'Unauthorized':
       this._tinder.setAuthToken()
 
-      return Auth.deleteByProvider('tinder')
+      return Channel.findByName('tinder')
+        .then((channel) => Auth.deleteById(channel.auth_id))
         .then(() => {
           throw new NotAuthorizedError()
         })
@@ -50,6 +70,7 @@ const handleError = function (error) {
 }
 
 const defaultOptions = {
+  channel: { name: 'tinder', is_enabled: false },
   retry: { max_tries: 2, interval: 1000, throw_original: true },
   breaker: { timeout: 5000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
 }
@@ -75,14 +96,17 @@ class Tinder {
     }))
   }
 
-  authorize () {
-    return Auth.findByProvider('tinder')
-      .then((auth) => {
-        if (!_.has(auth, 'api_token')) {
-          return facebookAuthorizeTinderApp.bind(this)()
-        }
+  init () {
+    return createTinderChannelIfNeeded.bind(this)()
+  }
 
-        this._tinder.setAuthToken(auth.api_token)
+  authorize () {
+    return Channel.findByName(this._options.channel.name)
+      .then((channel) => {
+        return findOrAuthorizeTinderIfNeeded.bind(this)(channel)
+          .then(({ token }) => {
+            this._tinder.setAuthToken(token)
+          })
       })
   }
 

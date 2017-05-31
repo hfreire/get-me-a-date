@@ -5,9 +5,5 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-module.exports = {
-  SQLite: require('./sqlite'),
-  People: require('./people'),
-  Channel: require('./channel'),
-  Auth: require('./auth')
-}
+export * from './channels.component'
+export * from './channels.service'

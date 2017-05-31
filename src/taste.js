@@ -147,28 +147,34 @@ class Taste {
   }
 
   checkPhotosOut (photos) {
-    return Promise.map(photos, (photo) => {
-      return savePhoto.bind(this)(photo)
-        .then((image) => this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image))
-        .then(({ FaceMatches }) => {
-          photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
+    const thumbnail = _.find(photos[ 0 ].processedFiles, { width: 84, height: 84 })
+    return savePhoto.bind(this)(thumbnail)
+      .then(() => {
+        photos[ 0 ].thumbnailUrl = thumbnail.url
 
-          return photo.similarity
-        })
-        .catch(() => {
-          photo.similarity = 0
+        return Promise.map(photos, (photo) => {
+          return savePhoto.bind(this)(photo)
+            .then((image) => this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image))
+            .then(({ FaceMatches }) => {
+              photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
 
-          return photo.similarity
-        })
-    }, { concurrency: 3 })
-      .then((faceSimilarities) => {
-        const faceSimilarityMax = _.max(faceSimilarities)
-        const faceSimilarityMin = _.min(faceSimilarities)
-        const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
+              return photo.similarity
+            })
+            .catch(() => {
+              photo.similarity = 0
 
-        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 80
+              return photo.similarity
+            })
+        }, { concurrency: 3 })
+          .then((faceSimilarities) => {
+            const faceSimilarityMax = _.max(faceSimilarities)
+            const faceSimilarityMin = _.min(faceSimilarities)
+            const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
 
-        return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like }
+            const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 80
+
+            return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like }
+          })
       })
   }
 

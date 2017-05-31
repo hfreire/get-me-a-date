@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const ENVIRONMENT = process.env.ENVIRONMENT || 'local'
 const FIND_DATES_PERIOD = process.env.FIND_DATES_PERIOD || 10 * 60 * 1000
 
 const { Serverful } = require('serverful')
@@ -15,11 +14,11 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const Tinder = require('./providers/tinder')
-const { NotAuthorizedError } = require('./providers/errors')
+const Tinder = require('./channels/tinder')
+const { NotAuthorizedError } = require('./channels/errors')
 
 const Taste = require('./taste')
-const { SQLite, People } = require('./database')
+const { SQLite, People, Channel } = require('./database')
 
 const uuidV4 = require('uuid/v4')
 
@@ -42,14 +41,28 @@ const checkRecommendationOut = (provider, rec) => {
 }
 
 const findDates = function () {
-  return Tinder.getRecommendations()
-    .then((recs) => {
-      const provider = 'tinder'
+  return Channel.findAll()
+    .mapSeries(({ name, is_enabled }) => {
+      // eslint-disable-next-line camelcase
+      if (!is_enabled) {
+        return
+      }
 
-      Logger.info(`Got ${recs.length} recommendations from ${_.capitalize(provider)}`)
+      return findDatesByChannel.bind(this)(name)
+    })
+}
+
+const findDatesByChannel = function (channelName) {
+  if (!this._channels[ channelName ]) {
+    return Promise.resolve()
+  }
+
+  return this._channels[ channelName ].getRecommendations()
+    .then((recs) => {
+      Logger.info(`Got ${recs.length} recommendations from ${_.capitalize(channelName)}`)
 
       return Promise.map(recs, (rec) => {
-        return checkRecommendationOut(provider, rec)
+        return checkRecommendationOut(channelName, rec)
           .then(({ photos_similarity_mean, data, like }) => {
             // eslint-disable-next-line camelcase
             return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
@@ -57,62 +70,38 @@ const findDates = function () {
           .catch((error) => Logger.warn(error))
       }, { concurrency: 5 })
     })
-    .catch(NotAuthorizedError, () => Tinder.authorize())
+    .catch(NotAuthorizedError, () => this._channels[ channelName ].authorize())
     .catch((error) => Logger.error(error))
 }
 
 class Server extends Serverful {
+  constructor () {
+    super()
+
+    this._channels = {
+      'tinder': Tinder
+    }
+  }
+
   start () {
-    if (ENVIRONMENT === 'local') {
-      return Promise.all([ super.start(), SQLite.start() ])
-      /* .then(() => {
-       const AWS_REGION = process.env.AWS_REGION
-       const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
-       const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
-       const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET
-       const S3 = require('./utils/s3')
-       const s3 = new S3({
-       region: AWS_REGION,
-       bucket: AWS_S3_BUCKET,
-       accessKeyId: AWS_ACCESS_KEY_ID,
-       secretAccessKey: AWS_SECRET_ACCESS_KEY
-       })
-       const request = Promise.promisifyAll(require('request').defaults({ encoding: null }))
-       let i = 0
-       return People.findAll(1, 600)
-       .then(({ results }) => results)
-       .mapSeries((person) => {
-       i++
-       console.log(i)
-       const { data } = person
-       const { photos } = data
-
-       if (photos.length === 0) {
-       return
-       }
-
-       const thumbnail = _.find(photos[0].processedFiles, { width: 84, height: 84 })
-
-       const url = require('url').parse(thumbnail.url)
-       if (!url) {
-       return Promise.reject(new Error('invalid photo url'))
-       }
-
-       return request.getAsync(url.href)
-       .then(({ body }) => {
-       return s3.putObject(`photos/tinder${url.pathname}`, body)
-       .then(() => {
-       data.photos[0].thumbnailUrl = `https://s3-${AWS_REGION}.amazonaws.com/${AWS_S3_BUCKET}/photos/tinder${url.pathname}`
-
-       return People.save(person.provider, person.provider_id, { data })
-       })
-       })
-       .delay(1000)
-       })
-       }) */
+    const initChannels = () => {
+      return SQLite.start()
+        .then(() => Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init()))
     }
 
-    return Promise.all([ super.start(), SQLite.start().then(() => Tinder.authorize()), Taste.bootstrap() ])
+    const authorizeChannels = () => {
+      return Channel.findAll()
+        .mapSeries(({ name, is_enabled }) => {
+          // eslint-disable-next-line camelcase
+          if (!is_enabled || !this._channels[ name ]) {
+            return
+          }
+
+          return this._channels[ name ].authorize()
+        })
+    }
+
+    return Promise.all([ super.start(), initChannels().then(() => authorizeChannels()), Taste.bootstrap() ])
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           this.findDates()

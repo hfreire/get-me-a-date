@@ -12,7 +12,9 @@ System.config({
     'npm:': 'node_modules/'
   },
   map: {
-    'app': 'app',
+    app: 'app',
+    'app/people': 'app/people',
+    'app/channels': 'app/channels',
 
     '@angular/core': 'npm:@angular/core/bundles/core.umd.js',
     '@angular/common': 'npm:@angular/common/bundles/common.umd.js',
@@ -28,16 +30,24 @@ System.config({
     '@angular/material': 'npm:@angular/material/bundles/material.umd.js',
 
     // other libraries
-    'rxjs': 'npm:rxjs',
+    rxjs: 'npm:rxjs',
     'angular-in-memory-web-api': 'npm:angular-in-memory-web-api/bundles/in-memory-web-api.umd.js',
-    'moment': 'npm:moment',
+    moment: 'npm:moment',
     'angular2-moment': 'npm:angular2-moment',
-    'lodash': 'npm:lodash/lodash.js',
+    lodash: 'npm:lodash/lodash.js',
     'ngx-pagination': 'npm:ngx-pagination/dist/ngx-pagination.umd.js'
   },
   packages: {
     app: {
-      main: 'main.js',
+      main: './index.js',
+      defaultExtension: 'js'
+    },
+    'app/people': {
+      main: './index.js',
+      defaultExtension: 'js'
+    },
+    'app/channels': {
+      main: './index.js',
       defaultExtension: 'js'
     },
     rxjs: {

@@ -56,12 +56,20 @@ const createSchema = function () {
     'PRIMARY KEY (provider, provider_id)' +
     ')')
     .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS auth (' +
-      'provider VARCHAR(32) NOT NULL, ' +
+      'CREATE TABLE IF NOT EXISTS channel (' +
+      'name VARCHAR(32) NOT NULL, ' +
       'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
       'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-      'api_token TEXT NOT NULL,' +
-      'PRIMARY KEY (provider)' +
+      'is_enabled INTEGER NOT NULL DEFAULT 0,' +
+      'auth_id INTEGER NULL,' +
+      'PRIMARY KEY (name)' +
+      ')'))
+    .then(() => this._database.runAsync(
+      'CREATE TABLE IF NOT EXISTS auth (' +
+      'id INTEGER PRIMARY KEY,' +
+      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'token TEXT NOT NULL' +
       ')'))
 }
 
@@ -75,8 +83,16 @@ class SQLite {
       .then(() => createSchema.bind(this)())
   }
 
-  run (...args) {
-    return this._database.runAsync(...args)
+  run (sql, param) {
+    return new Promise((resolve, reject) => {
+      this._database.run(sql, param, function (error) {
+        if (error) {
+          return reject(error)
+        }
+
+        resolve(this)
+      })
+    })
   }
 
   get (...args) {

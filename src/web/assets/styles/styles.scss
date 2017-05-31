@@ -1,0 +1,84 @@
+/*!
+ * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+@import '../../../../node_modules/@angular/material/_theming';
+
+@include mat-core();
+$candy-app-primary: mat-palette($mat-pink, 700, 500, 900);
+$candy-app-accent: mat-palette($mat-blue-grey, A200, A100, A400);
+$candy-app-warn: mat-palette($mat-deep-orange);
+$candy-app-theme: mat-dark-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
+@include angular-material-theme($candy-app-theme);
+
+md-sidenav {
+  width: 200px;
+}
+
+.mat-sidenav-content {
+  .mat-mini-fab {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+  }
+
+}
+
+#people {
+  margin: 40px;
+
+  md-card {
+    z-index: 1;
+
+    .tint {
+      max-height: 42px;
+      position: relative;
+      float: left;
+      cursor: pointer;
+
+      &:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transition: all .3s linear;
+      }
+
+      &:hover:before {
+        background: none;
+      }
+
+      & > img {
+        width: 42px;
+      }
+    }
+
+    .pass:before {
+      background: rgba(255, 0, 0, 0.5);
+    }
+
+    .like:before {
+      background: rgba(0, 255, 0, 0.5);
+    }
+
+    .train:before {
+      background: rgba(255, 255, 0, 0.5);
+    }
+
+    .thumbnail {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      z-index: -1;
+    }
+
+    pagination-controls {
+      text-align: center;
+    }
+  }
+}

@@ -5,11 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { enableProdMode } from '@angular/core'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
-import { AppModule } from './app/app.module'
-
-enableProdMode()
+import { AppModule } from './app'
 
 platformBrowserDynamic().bootstrapModule(AppModule)

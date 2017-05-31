@@ -1,0 +1,21 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<md-sidenav-container fullscreen>
+    <md-sidenav #sidenav mode="push">
+        <channels></channels>
+    </md-sidenav>
+
+    <md-toolbar color="primary">Get me a date</md-toolbar>
+
+    <people></people>
+
+    <button md-mini-fab (click)="sidenav.toggle()" color="primary">
+        <md-icon>add</md-icon>
+    </button>
+
+</md-sidenav-container>
