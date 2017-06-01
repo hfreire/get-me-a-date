@@ -10,14 +10,14 @@ import { Http } from '@angular/http'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/retryWhen'
 import 'rxjs/add/operator/timeout'
+import 'rxjs/add/observable/interval'
 
 @Injectable()
-export class PeopleService {
-  constructor (private http: Http) {
-  }
+export class StatsService {
+  constructor (private http: Http) {}
 
   getAll (page: number = 1, limit: number = 25): Observable<any> {
-    return this.http.get(`/people?page=${page}&limit=${limit}`)
+    return this.http.get(`/stats?page=${page}&limit=${limit}`)
       .retryWhen((error: any) => error.delay(500))
       .timeout(2000)
       .map((response) => response.json())
@@ -28,14 +28,5 @@ export class PeopleService {
       .interval(5000)
       .startWith(0)
       .switchMap(() => this.getAll(page, limit))
-  }
-
-  train (id: string) {
-    console.log(id)
-
-    return this.http.post(`/train/${id}`, {})
-      .map(() => {
-        //
-      })
   }
 }

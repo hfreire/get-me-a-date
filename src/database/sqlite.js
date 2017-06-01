@@ -71,6 +71,16 @@ const createSchema = function () {
       'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
       'token TEXT NOT NULL' +
       ')'))
+    .then(() => this._database.runAsync(
+      'CREATE TABLE IF NOT EXISTS stats (' +
+      'date DATE PRIMARY KEY,' +
+      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'likes INTEGER NOT NULL DEFAULT 0,' +
+      'passes INTEGER NOT NULL DEFAULT 0,' +
+      'trains INTEGER NOT NULL DEFAULT 0,' +
+      'matches INTEGER NOT NULL DEFAULT 0' +
+      ')'))
 }
 
 class SQLite {

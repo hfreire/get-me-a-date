@@ -53,6 +53,7 @@ export class PeopleComponent {
 
   openPersonDialog (person: any) {
     const config = new MdDialogConfig()
+    config.width = '450px'
     config.data = { person }
 
     this.dialogRef = this.dialog.open(PersonDialogComponent, config)

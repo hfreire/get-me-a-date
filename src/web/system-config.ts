@@ -15,6 +15,7 @@ System.config({
     app: 'app',
     'app/people': 'app/people',
     'app/channels': 'app/channels',
+    'app/stats': 'app/stats',
 
     '@angular/core': 'npm:@angular/core/bundles/core.umd.js',
     '@angular/common': 'npm:@angular/common/bundles/common.umd.js',
@@ -35,7 +36,8 @@ System.config({
     moment: 'npm:moment',
     'angular2-moment': 'npm:angular2-moment',
     lodash: 'npm:lodash/lodash.js',
-    'ngx-pagination': 'npm:ngx-pagination/dist/ngx-pagination.umd.js'
+    'ngx-pagination': 'npm:ngx-pagination/dist/ngx-pagination.umd.js',
+    'ng2-charts': 'npm:ng2-charts/bundles/ng2-charts.umd.js'
   },
   packages: {
     app: {
@@ -47,6 +49,10 @@ System.config({
       defaultExtension: 'js'
     },
     'app/channels': {
+      main: './index.js',
+      defaultExtension: 'js'
+    },
+    'app/stats': {
       main: './index.js',
       defaultExtension: 'js'
     },

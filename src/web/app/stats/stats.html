@@ -1,0 +1,19 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<div id="stats">
+    <md-card>
+        <canvas baseChart height="50"
+                [datasets]="lineChartData"
+                [colors]="lineChartColors"
+                [labels]="lineChartLabels"
+                [options]="lineChartOptions"
+                [chartType]="lineChartType"
+                (chartHover)="chartHovered($event)"
+                (chartClick)="chartClicked($event)"></canvas>
+    </md-card>
+</div>

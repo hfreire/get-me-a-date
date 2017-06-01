@@ -10,31 +10,68 @@ const Promise = require('bluebird')
 
 const SQLite = require('./sqlite')
 
-const queryAllPeople = function (query) {
-  return SQLite.all(query)
-    .mapSeries((row) => {
-      row.created_date = new Date(row.created_date)
-      row.train = !!row.train
-      row.data = JSON.parse(row.data)
-      return row
-    })
+const transformRowToObject = function (row) {
+  if (!row) {
+    return
+  }
+
+  row.created_date = new Date(row.created_date)
+  row.updated_date = new Date(row.updated_date)
+
+  if (row.data) {
+    row.data = JSON.parse(row.data)
+  }
+
+  return row
+}
+
+const transformObjectToRow = function (object) {
+  if (!object) {
+    return
+  }
+
+  if (object.created_date instanceof Date) {
+    object.created_date = object.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+  }
+
+  if (object.updated_date instanceof Date) {
+    object.updated_date = object.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+  }
+
+  if (object.data) {
+    object.data = JSON.stringify(object.data)
+  }
+
+  return object
+}
+
+const queryAll = function (...args) {
+  return SQLite.all(...args)
+    .mapSeries((row) => transformRowToObject(row))
+}
+
+const buildWhereClause = (keys, values) => {
+  if (_.includes(keys, 'updated_date')) {
+    const index = _.indexOf(keys, 'updated_date')
+    values[ index ] = values[ index ].split(' ')[ 0 ]
+    values.splice(index, 0, values[ index ])
+  }
+
+  return keys.map((key) => {
+    if (key === 'updated_date') {
+      return `${key} > ? AND ${key} < date(?, '+1 day')`
+    }
+
+    return `${key} = ?`
+  })
+    .toString()
+    .replace(/,/g, ' AND ')
+    .replace(/date\(\? AND/, 'date(?,')
 }
 
 class People {
   save (provider, providerId, data) {
-    const _data = _.clone(data)
-
-    if (_data.created_date instanceof Date) {
-      _data.created_date = _data.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-    }
-
-    if (_data.updated_date instanceof Date) {
-      _data.updated_date = _data.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
-    }
-
-    if (_data.data) {
-      _data.data = JSON.stringify(_data.data)
-    }
+    const _data = transformObjectToRow(_.clone(data))
 
     const keys = _.keys(_data)
     const values = _.values(_data)
@@ -43,8 +80,13 @@ class People {
       .then(() => this.findByProviderAndProviderId(provider, providerId))
       .then((person) => {
         if (person) {
-          keys.push('updated_date')
-          values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+          if (_.includes(keys, 'updated_date')) {
+            const index = _.indexOf(keys, 'updated_date')
+            values[ index ] = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+          } else {
+            keys.push('updated_date')
+            values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+          }
 
           return SQLite.run(`UPDATE people SET ${keys.map((key) => `${key} = ?`)} WHERE provider = ? AND provider_id = ?`, values.concat([ provider, providerId ]))
         } else {
@@ -56,44 +98,45 @@ class People {
             })
         }
       })
+      .then(() => this.findByProviderAndProviderId(provider, providerId))
   }
 
-  findAll (page = 1, limit = 25) {
+  findAll (page = 1, limit = 25, criteria) {
     const offset = (page - 1) * limit
 
+    let queryResults
+    let queryTotalCount
+    let params = []
+    if (criteria) {
+      const _criteria = transformObjectToRow(_.clone(criteria))
+
+      const keys = _.keys(_criteria)
+      const values = _.values(_criteria)
+
+      const where = buildWhereClause(keys, values)
+
+      queryResults = `SELECT * FROM people WHERE ${where} ORDER BY updated_date DESC LIMIT ${limit} OFFSET ${offset}`
+      queryTotalCount = `SELECT COUNT(*) as count FROM people WHERE ${where}`
+      params = params.concat(values)
+    } else {
+      queryResults = `SELECT * FROM people ORDER BY updated_date DESC LIMIT ${limit} OFFSET ${offset}`
+      queryTotalCount = 'SELECT COUNT(*) as count FROM people'
+    }
+
     return Promise.props({
-      results: queryAllPeople.bind(this)(`SELECT * FROM people ORDER BY created_date DESC LIMIT ${limit} OFFSET ${offset}`),
-      totalCount: SQLite.get('SELECT COUNT(*) as count FROM people').then(({ count }) => count)
+      results: queryAll.bind(this)(queryResults, params),
+      totalCount: SQLite.get(queryTotalCount, params).then(({ count }) => count)
     })
   }
 
   findById (id) {
     return SQLite.get('SELECT * FROM people WHERE id = ?', [ id ])
-      .then((person) => {
-        if (!person) {
-          return
-        }
-
-        person.created_date = new Date(person.created_date)
-        person.train = !!person.train
-        person.data = JSON.parse(person.data)
-
-        return person
-      })
+      .then((row) => transformRowToObject(row))
   }
 
   findByProviderAndProviderId (provider, providerId) {
     return SQLite.get('SELECT * FROM people WHERE provider = ? AND provider_id = ?', [ provider, providerId ])
-      .then((person) => {
-        if (!person) {
-          return
-        }
-
-        person.created_date = new Date(person.created_date)
-        person.data = JSON.parse(person.data)
-
-        return person
-      })
+      .then((row) => transformRowToObject(row))
   }
 }
 

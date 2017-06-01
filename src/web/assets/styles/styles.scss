@@ -19,11 +19,11 @@ md-sidenav {
 
 .mat-sidenav-content {
   .mat-mini-fab {
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
   }
+}
 
+#stats {
+  margin: 40px;
 }
 
 #people {
@@ -59,11 +59,11 @@ md-sidenav {
     }
 
     .pass:before {
-      background: rgba(255, 0, 0, 0.5);
+      background: rgba(48, 48, 48, 0.8);
     }
 
     .like:before {
-      background: rgba(0, 255, 0, 0.5);
+      background: rgba(194, 24, 91, 0.6);
     }
 
     .train:before {

@@ -10,12 +10,13 @@
         <channels></channels>
     </md-sidenav>
 
-    <md-toolbar color="primary">Get me a date</md-toolbar>
+    <md-toolbar color="primary">
+        <button md-icon-button (click)="sidenav.toggle()" disableRipple="on">
+            <md-icon>menu</md-icon>
+        </button>
+        Get me a date
+    </md-toolbar>
 
+    <stats></stats>
     <people></people>
-
-    <button md-mini-fab (click)="sidenav.toggle()" color="primary">
-        <md-icon>add</md-icon>
-    </button>
-
 </md-sidenav-container>

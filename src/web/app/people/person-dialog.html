@@ -5,20 +5,23 @@
   ~ LICENSE file in the root directory of this source tree.
   -->
 
-<h2>{{ person.data.name }}, {{ today | amDifference : person.data.birth_date : 'years' }}</h2>
+<h2 md-dialog-title>{{ person.data.name }}, {{ today | amDifference : person.data.birth_date : 'years' }}</h2>
 <h3>{{ occupation }}</h3>
-<h4>{{ person.data.description }}</h4>
+<p md-line>{{ person.data.description }}</p>
+
 <md-dialog-content>
-    <p>{{ person.data.bio }} </p>
-    <ul class="no-bullet">
-        <li *ngFor="let photo of person.data.photos">
+    <p md-line>{{ person.data.bio }} </p>
+
+    <md-grid-list cols="4">
+        <md-grid-tile *ngFor="let photo of person.data.photos">
             <img [src]="photo.url"
                  mdTooltip="Similarity: {{photo.similarity}}%"
                  tooltipPosition="bottom"
                  width="100"/>
-        </li>
-    </ul>
+        </md-grid-tile>
+    </md-grid-list>
 </md-dialog-content>
+
 <md-dialog-actions [attr.align]="actionsAlignment">
     <button md-raised-button md-button *ngIf="!person.train" (click)="trainPerson()">Train</button>
     <button md-button *ngIf="person.train" (click)="untrainPerson()">Untrain</button>

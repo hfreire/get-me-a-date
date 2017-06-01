@@ -18,9 +18,22 @@ const Tinder = require('./channels/tinder')
 const { NotAuthorizedError } = require('./channels/errors')
 
 const Taste = require('./taste')
-const { SQLite, People, Channel } = require('./database')
+const { SQLite, People, Channel, Stats } = require('./database')
 
 const uuidV4 = require('uuid/v4')
+
+const updateStats = (date) => {
+  return Promise.props({
+    likes: People.findAll(1, 10000, { updated_date: date, like: 1 }),
+    passes: People.findAll(1, 10000, { updated_date: date, like: 0 }),
+    trains: People.findAll(1, 10000, { updated_date: date, train: 1 })
+  })
+    .then(({ likes, passes, trains }) => Stats.save(date, {
+      likes: likes.totalCount,
+      passes: passes.totalCount,
+      trains: trains.totalCount
+    }))
+}
 
 const checkRecommendationOut = (provider, rec) => {
   const providerId = rec._id
@@ -36,7 +49,7 @@ const checkRecommendationOut = (provider, rec) => {
       person.data = rec
 
       return People.save(provider, providerId, person)
-        .then(() => person)
+        .then((person) => person)
     })
 }
 
@@ -50,6 +63,7 @@ const findDates = function () {
 
       return findDatesByChannel.bind(this)(name)
     })
+    .then(() => updateStats(new Date()))
 }
 
 const findDatesByChannel = function (channelName) {

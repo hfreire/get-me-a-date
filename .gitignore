@@ -4,6 +4,6 @@ node_modules
 *.iml
 src/web/**/*.js
 src/web/**/*.js.map
-src/web/*.css
+src/web/**/*.css
 tmp
 

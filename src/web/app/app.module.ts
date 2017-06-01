@@ -24,10 +24,12 @@ import {
 
 import { MomentModule } from 'angular2-moment'
 import { NgxPaginationModule } from 'ngx-pagination'
+import { ChartsModule } from 'ng2-charts'
 
 import { AppComponent } from './app.component'
 import { PeopleComponent, PersonDialogComponent } from './people'
 import { ChannelsComponent } from './channels'
+import { StatsComponent } from './stats'
 import { CapitalizePipe } from './capitalize.pipe'
 
 @NgModule({
@@ -46,10 +48,11 @@ import { CapitalizePipe } from './capitalize.pipe'
     MomentModule,
     MdIconModule,
     MdSlideToggleModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    ChartsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, PersonDialogComponent, PeopleComponent, ChannelsComponent ],
-  entryComponents: [ PersonDialogComponent, PeopleComponent, ChannelsComponent ],
+  declarations: [ AppComponent, CapitalizePipe, PersonDialogComponent, PeopleComponent, ChannelsComponent, StatsComponent ],
+  entryComponents: [ PersonDialogComponent, PeopleComponent, ChannelsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

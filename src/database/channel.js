@@ -11,39 +11,39 @@ const SQLite = require('./sqlite')
 
 const queryAllChannels = function (query) {
   return SQLite.all(query)
-    .mapSeries((channel) => transformRowToChannel(channel))
+    .mapSeries((row) => transformRowToObject(row))
 }
 
-const transformRowToChannel = function (row) {
+const transformRowToObject = function (row) {
   if (!row) {
     return
   }
 
   row.created_date = new Date(row.created_date)
-  row.updated_date = new Date(row.created_date)
+  row.updated_date = new Date(row.updated_date)
 
   return row
 }
 
-const transformChannelToRow = function (channel) {
-  if (!channel) {
+const transformObjectToRow = function (object) {
+  if (!object) {
     return
   }
 
-  if (channel.created_date instanceof Date) {
-    channel.created_date = channel.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+  if (object.created_date instanceof Date) {
+    object.created_date = object.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
   }
 
-  if (channel.updated_date instanceof Date) {
-    channel.updated_date = channel.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+  if (object.updated_date instanceof Date) {
+    object.updated_date = object.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
   }
 
-  return channel
+  return object
 }
 
 class Channel {
   save (name, data) {
-    const _data = transformChannelToRow(_.clone(data))
+    const _data = transformObjectToRow(_.clone(data))
     const keys = _.keys(_data)
     const values = _.values(_data)
 
@@ -64,7 +64,7 @@ class Channel {
             })
         }
       })
-      .then(() => transformRowToChannel(_data))
+      .then(() => transformRowToObject(_data))
   }
 
   findAll () {
@@ -73,7 +73,7 @@ class Channel {
 
   findByName (name) {
     return SQLite.get('SELECT * FROM channel WHERE name = ?', [ name ])
-      .then((channel) => transformRowToChannel(channel))
+      .then((channel) => transformRowToObject(channel))
   }
 
   deleteByName (name) {
