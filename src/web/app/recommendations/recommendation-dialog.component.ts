@@ -33,7 +33,9 @@ export class RecommendationDialogComponent {
   trainRecommendation () {
     //noinspection TsLint
     this.recommendationService.train(this.recommendation.id)
-      .subscribe(() => {})
+      .subscribe(() => {
+        this.recommendation.train = true
+      })
   }
 }
 

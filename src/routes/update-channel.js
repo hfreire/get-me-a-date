@@ -11,7 +11,7 @@ const Promise = require('bluebird')
 
 const Boom = require('boom')
 
-const { Channel } = require('../database')
+const { Channels } = require('../database')
 
 class UpdateChannel extends Route {
   constructor () {
@@ -21,7 +21,7 @@ class UpdateChannel extends Route {
   handler ({ params = {}, payload }, reply) {
     const { name } = params
 
-    return Channel.findByName(name)
+    return Channels.findByName(name)
       .then((channel) => {
         if (!channel) {
           return reply(null, Boom.notFound())
@@ -29,7 +29,7 @@ class UpdateChannel extends Route {
 
         return Promise.try(() => JSON.parse(payload))
           .then((payload) => {
-            return Channel.save(name, payload)
+            return Channels.save(name, payload)
               .then((channel) => reply(null, channel))
           })
       })

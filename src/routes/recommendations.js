@@ -10,6 +10,9 @@ const { Route } = require('serverful')
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const Joi = require('joi')
+const Boom = require('boom')
+
 const Logger = require('modern-logger')
 
 const Database = require('../database')
@@ -32,7 +35,7 @@ class Recommendations extends Route {
       .catch((error) => {
         Logger.error(error)
 
-        reply(error)
+        reply(Boom.badImplementation(error.message, error))
       })
   }
 
@@ -44,6 +47,22 @@ class Recommendations extends Route {
     return {
       pagination: {
         enabled: true
+      }
+    }
+  }
+
+  validate () {
+    return {
+      query: {
+        page: Joi.string()
+          .optional()
+          .description('recommendations page number'),
+        limit: Joi.string()
+          .optional()
+          .description('recommendations page results limit'),
+        criteria: Joi.string()
+          .optional()
+          .description('recommendations criteria')
       }
     }
   }

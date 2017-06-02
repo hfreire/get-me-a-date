@@ -9,40 +9,51 @@ const { Route } = require('serverful')
 
 const Logger = require('modern-logger')
 
+const Joi = require('join')
+const Boom = require('boom')
+
 const Taste = require('../taste')
 const { Recommendations } = require('../database')
 
 class Train extends Route {
   constructor () {
-    super('POST', '/train/{id}', 'Recommendations', 'Returns all recommendations')
+    super('POST', '/train/{id}', 'Train', 'Train a recommendation')
   }
 
   handler (request, reply) {
     const { id } = request.params
 
     Recommendations.findById(id)
-      .then((person) => {
-        if (!person) {
-          reply(null)
-
+      .then((recommendation) => {
+        if (!recommendation) {
           return
         }
 
-        const { provider, provider_id, data } = person
+        const { channel, channel_id, data } = recommendation
         const { photos } = data
         return Taste.mentalSnapshot(photos)
-          .then(() => Recommendations.save(provider, provider_id, { train: true, trained_date: new Date() }))
+          .then(() => Recommendations.save(channel, channel_id, { train: true, trained_date: new Date() }))
       })
       .then(() => reply(null))
       .catch((error) => {
         Logger.error(error)
 
-        reply(error)
+        reply(Boom.badImplementation(error.message, error))
       })
   }
 
   auth () {
     return false
+  }
+
+  validate () {
+    return {
+      params: {
+        id: Joi.string()
+          .required()
+          .description('recommendation id')
+      }
+    }
   }
 }
 

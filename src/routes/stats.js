@@ -7,6 +7,8 @@
 
 const { Route } = require('serverful')
 
+const Joi = require('joi')
+
 const Database = require('../database')
 
 class Stats extends Route {
@@ -29,6 +31,19 @@ class Stats extends Route {
     return {
       pagination: {
         enabled: true
+      }
+    }
+  }
+
+  validate () {
+    return {
+      query: {
+        page: Joi.string()
+          .optional()
+          .description('page number'),
+        limit: Joi.string()
+          .optional()
+          .description('page results limit')
       }
     }
   }

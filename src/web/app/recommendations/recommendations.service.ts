@@ -33,11 +33,6 @@ export class RecommendationsService {
   }
 
   train (id: string) {
-    console.log(id)
-
     return this.http.post(`/train/${id}`, {})
-      .map(() => {
-        //
-      })
   }
 }

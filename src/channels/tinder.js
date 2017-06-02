@@ -60,7 +60,12 @@ const handleError = function (error) {
       this._tinder.setAuthToken()
 
       return Channels.findByName('tinder')
-        .then((channel) => Auth.deleteById(channel.auth_id))
+        .then((channel) => {
+          return Promise.all([
+            Channels.save('tinder', { auth_id: channel.auth_id }),
+            Auth.deleteById(channel.auth_id)
+          ])
+        })
         .then(() => {
           throw new NotAuthorizedError()
         })
