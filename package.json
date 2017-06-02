@@ -59,7 +59,7 @@
     "istanbul": "0.4.5",
     "last-release-github": "1.1.1",
     "mocha": "3.4.2",
-    "pre-git": "3.14.0",
+    "pre-git": "3.14.1",
     "semantic-release": "6.3.6",
     "standard": "10.0.2",
     "testdouble": "2.1.2",
