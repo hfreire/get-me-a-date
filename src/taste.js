@@ -35,14 +35,16 @@ const indexFaces = function (images) {
   return Promise.map(images, (image) => {
     return this.rekognition.indexFaces(AWS_REKOGNITION_COLLECTION, AWS_S3_BUCKET, image)
       .then((data) => {
-        if (!data.FaceRecords || _.isEmpty(data.FaceRecords)) {
+        if (!data.FaceRecords) {
           return
         }
 
         // delete images with no or multiple faces
         if (data.FaceRecords.length !== 1) {
           return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, _.map(data.FaceRecords, ({ Face }) => Face.FaceId))
-            .then(() => this.s3.deleteObject(image))
+            .then(() => {
+              return this.s3.deleteObject(image)
+            })
         }
 
         indexedFaces++
