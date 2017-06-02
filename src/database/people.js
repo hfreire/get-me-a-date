@@ -107,7 +107,7 @@ class People {
     let queryResults
     let queryTotalCount
     let params = []
-    if (criteria) {
+    if (!_.isEmpty(criteria)) {
       const _criteria = transformObjectToRow(_.clone(criteria))
 
       const keys = _.keys(_criteria)
@@ -127,6 +127,13 @@ class People {
       results: queryAll.bind(this)(queryResults, params),
       totalCount: SQLite.get(queryTotalCount, params).then(({ count }) => count)
     })
+      .catch((error) => {
+        if (error.code !== 'SQLITE_ERROR') {
+          throw error
+        }
+
+        return { results: [], totalCount: 0 }
+      })
   }
 
   findById (id) {

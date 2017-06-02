@@ -26,7 +26,7 @@ const updateStats = (date) => {
   return Promise.props({
     likes: People.findAll(1, 10000, { updated_date: date, like: 1 }),
     passes: People.findAll(1, 10000, { updated_date: date, like: 0 }),
-    trains: People.findAll(1, 10000, { updated_date: date, train: 1 })
+    trains: People.findAll(1, 10000, { train: 1 })
   })
     .then(({ likes, passes, trains }) => Stats.save(date, {
       likes: likes.totalCount,

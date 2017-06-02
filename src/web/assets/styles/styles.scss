@@ -32,6 +32,10 @@ md-sidenav {
   md-card {
     z-index: 1;
 
+    md-grid-list {
+      margin-top: 20px;
+    }
+
     .tint {
       max-height: 42px;
       position: relative;

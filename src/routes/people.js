@@ -7,6 +7,9 @@
 
 const { Route } = require('serverful')
 
+const _ = require('lodash')
+const Promise = require('bluebird')
+
 const Logger = require('modern-logger')
 
 const Database = require('../database')
@@ -17,9 +20,14 @@ class People extends Route {
   }
 
   handler ({ query = {} }, reply) {
-    const { page = 1, limit = 25 } = query
+    const { page = 1, limit = 25, criteria } = query
 
-    Database.People.findAll(page, limit)
+    return Promise.try(() => {
+      if (criteria) {
+        return JSON.parse(criteria)
+      }
+    })
+      .then((criteria) => Database.People.findAll(page, limit, criteria))
       .then(({ results, totalCount }) => reply({ results, totalCount }))
       .catch((error) => {
         Logger.error(error)

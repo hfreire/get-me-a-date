@@ -40,10 +40,17 @@ export class PeopleComponent {
   itemsPerPage: number = 100
   totalItems: number
 
+  criteria: any = [
+    { value: {}, label: 'Everyone' },
+    { value: { like: 1 }, label: 'Likes' },
+    { value: { like: 0 }, label: 'Passes' },
+    { value: { train: 1 }, label: 'Training' }
+  ]
+
   constructor (private peopleService: PeopleService, public dialog: MdDialog) {}
 
   public ngOnInit () {
-    this.getPage(this.currentPage, this.itemsPerPage)
+    this.getPage()
   }
 
   public isLoaded (event: Event) {
@@ -59,10 +66,10 @@ export class PeopleComponent {
     this.dialogRef = this.dialog.open(PersonDialogComponent, config)
   }
 
-  getPage (page: number, limit: number = this.itemsPerPage) {
+  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria?: any) {
     this.loadedPage = false
 
-    this.peopleService.getAll(page, limit)
+    this.peopleService.getAll(page, limit, criteria)
       .subscribe(({ results, meta }) => {
         this.currentPage = page
         this.people = results
@@ -70,5 +77,9 @@ export class PeopleComponent {
 
         this.loadedPage = true
       })
+  }
+
+  setPageCriteria ({ value }: any) {
+    this.getPage(undefined, undefined, value)
   }
 }

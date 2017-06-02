@@ -16,6 +16,7 @@ import {
   MdGridListModule,
   MdIconModule,
   MdProgressSpinnerModule,
+  MdSelectModule,
   MdSidenavModule,
   MdSlideToggleModule,
   MdToolbarModule,
@@ -49,6 +50,7 @@ import { CapitalizePipe } from './capitalize.pipe'
     MdIconModule,
     MdSlideToggleModule,
     NgxPaginationModule,
+    MdSelectModule,
     ChartsModule
   ],
   declarations: [ AppComponent, CapitalizePipe, PersonDialogComponent, PeopleComponent, ChannelsComponent, StatsComponent ],

@@ -7,6 +7,12 @@
 
 <div id="people">
     <md-card>
+        <md-select placeholder="Filter people" (change)="setPageCriteria($event)">
+            <md-option *ngFor="let criterion of criteria" [value]="criterion.value">
+                {{ criterion.label }}
+            </md-option>
+        </md-select>
+
         <md-grid-list cols="{{ itemsPerPage / 4 }}">
             <md-grid-tile
                     *ngFor="let person of people | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }">

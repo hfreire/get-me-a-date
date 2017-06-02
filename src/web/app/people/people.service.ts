@@ -16,8 +16,10 @@ export class PeopleService {
   constructor (private http: Http) {
   }
 
-  getAll (page: number = 1, limit: number = 25): Observable<any> {
-    return this.http.get(`/people?page=${page}&limit=${limit}`)
+  getAll (page: number = 1, limit: number = 25, criteria?: any): Observable<any> {
+    const _criteria = criteria ? `&criteria=${JSON.stringify(criteria)}` : ''
+
+    return this.http.get(`/people?page=${page}&limit=${limit}${_criteria}`)
       .retryWhen((error: any) => error.delay(500))
       .timeout(2000)
       .map((response) => response.json())
