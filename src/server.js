@@ -75,6 +75,7 @@ const findDatesByChannel = function (channelName) {
           .catch((error) => Logger.warn(error))
       }, { concurrency: 1 })
     })
+    .then(() => channel.getUpdates())
     .catch(NotAuthorizedError, () => channel.authorize())
     .catch((error) => Logger.error(error))
 }
@@ -97,7 +98,7 @@ const checkRecommendationOut = (channel, rec) => {
   const channelId = rec._id
 
   return Promise.props({
-    recommendation: findOrCreateNewRecommendation(channel.name, channelId),
+    recommendation: findOrCreateNewRecommendation(channel, channelId),
     photos: Taste.checkPhotosOut(rec.photos)
   })
     .then(({ recommendation, photos }) => {

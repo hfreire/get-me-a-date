@@ -91,6 +91,8 @@ class Tinder {
 
     this._tinder.authorizeCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.authorizeAsync(...params), this._options.retry))
     this._tinder.getRecommendationsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getRecommendationsAsync(params), this._options.retry))
+    this._tinder.getUpdatesCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getUpdatesAsync(), this._options.retry))
+    this._tinder.getHistoryCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getHistoryAsync(), this._options.retry))
 
     Health.addCheck('tinder', () => new Promise((resolve, reject) => {
       if (this._breaker.isOpen()) {
@@ -123,6 +125,31 @@ class Tinder {
     })
       .then(() => this._tinder.getRecommendationsCircuitBreaker.exec(10))
       .then(({ results }) => results)
+      .catch((error) => handleError.bind(this)(error))
+  }
+
+  getUpdates () {
+    return Promise.try(() => {
+      if (!this._tinder.getAuthToken()) {
+        throw new NotAuthorizedError()
+      }
+    })
+      .then(() => this._tinder.getUpdatesCircuitBreaker.exec())
+      .then((data) => {
+      })
+      .catch((error) => handleError.bind(this)(error))
+  }
+
+  getHistory () {
+    return Promise.try(() => {
+      if (!this._tinder.getAuthToken()) {
+        throw new NotAuthorizedError()
+      }
+    })
+      .then(() => this._tinder.getHistoryCircuitBreaker.exec())
+      .then((data) => {
+        console.log(data)
+      })
       .catch((error) => handleError.bind(this)(error))
   }
 }

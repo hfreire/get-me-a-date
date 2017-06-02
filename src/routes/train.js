@@ -9,7 +9,7 @@ const { Route } = require('serverful')
 
 const Logger = require('modern-logger')
 
-const Joi = require('join')
+const Joi = require('joi')
 const Boom = require('boom')
 
 const Taste = require('../taste')
