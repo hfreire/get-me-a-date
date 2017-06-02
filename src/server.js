@@ -35,21 +35,36 @@ const updateStats = (date) => {
     }))
 }
 
-const checkRecommendationOut = (provider, rec) => {
-  const providerId = rec._id
-  const person = {}
+const checkRecommendationOut = (channel, rec) => {
+  const channelId = rec._id
 
-  return Promise.props({ photos: Taste.checkPhotosOut(rec.photos) })
-    .then(({ photos }) => {
-      person.id = uuidV4()
-      person.provider = provider
-      person.provider_id = providerId
-      person.like = photos.like
-      person.photos_similarity_mean = photos.faceSimilarityMean
-      person.data = rec
+  return People.findByChannelAndChannelId(channel, channelId)
+    .then((person) => {
+      if (!person) {
+        return {}
+      }
 
-      return People.save(provider, providerId, person)
-        .then((person) => person)
+      return person
+    })
+    .then((person) => {
+      return Promise.props({ photos: Taste.checkPhotosOut(rec.photos) })
+        .then(({ photos }) => {
+          person.id = person.id || uuidV4()
+          person.channel = person.channel || channel
+          person.channel_id = person.channel_id || channelId
+
+          if (!person.like && photos.like) {
+            person.liked_date = new Date()
+          }
+
+          person.like = photos.like
+          person.last_checked_out_date = new Date()
+          person.photos_similarity_mean = photos.faceSimilarityMean
+          person.data = rec
+
+          return People.save(channel, channelId, person)
+            .then((person) => person)
+        })
     })
 }
 

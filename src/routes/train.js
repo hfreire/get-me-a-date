@@ -31,7 +31,7 @@ class Train extends Route {
         const { provider, provider_id, data } = person
         const { photos } = data
         return Taste.mentalSnapshot(photos)
-          .then(() => People.save(provider, provider_id, { train: true }))
+          .then(() => People.save(provider, provider_id, { train: true, trained_date: new Date() }))
       })
       .then(() => reply(null))
       .catch((error) => {

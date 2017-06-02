@@ -48,12 +48,15 @@ const createSchema = function () {
     'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'like INTEGER NOT NULL DEFAULT 0,' +
-    'photos_similarity_mean REAL NOT NULL,' +
+    'liked_date DATETIME DEFAULT NULL,' +
     'train INTEGER NOT NULL DEFAULT 0,' +
-    'provider VARCHAR(32) NOT NULL, ' +
-    'provider_id VARCHAR(64) NOT NULL, ' +
-    'data TEXT,' +
-    'PRIMARY KEY (provider, provider_id)' +
+    'trained_date DATETIME DEFAULT NULL,' +
+    'last_checked_out_date DATETIME DEFAULT NULL,' +
+    'photos_similarity_mean REAL NOT NULL,' +
+    'channel VARCHAR(32) NOT NULL, ' +
+    'channel_id VARCHAR(64) NOT NULL, ' +
+    'data TEXT NOT NULL,' +
+    'PRIMARY KEY (channel, channel_id)' +
     ')')
     .then(() => this._database.runAsync(
       'CREATE TABLE IF NOT EXISTS channel (' +
