@@ -10,6 +10,8 @@ const Promise = require('bluebird')
 
 const SQLite = require('./sqlite')
 
+const uuidV4 = require('uuid/v4')
+
 const transformRowToObject = function (row) {
   if (!row) {
     return
@@ -66,14 +68,14 @@ const queryAll = function (...args) {
 }
 
 const buildWhereClause = (keys, values) => {
-  if (_.includes(keys, 'updated_date')) {
-    const index = _.indexOf(keys, 'updated_date')
+  if (_.includes(keys, 'last_checked_out_date')) {
+    const index = _.indexOf(keys, 'last_checked_out_date')
     values[ index ] = values[ index ].split(' ')[ 0 ]
     values.splice(index, 0, values[ index ])
   }
 
   return keys.map((key) => {
-    if (key === 'updated_date') {
+    if (key === 'last_checked_out_date') {
       return `${key} > ? AND ${key} < date(?, '+1 day')`
     }
 
@@ -105,6 +107,9 @@ class People {
 
           return SQLite.run(`UPDATE people SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_id = ?`, values.concat([ channel, channelId ]))
         } else {
+          keys.push('id')
+          values.push(uuidV4())
+
           return SQLite.run(`INSERT INTO people (${keys}) VALUES (${values.map(() => '?')})`, values)
             .catch((error) => {
               if (error.code !== 'SQLITE_CONSTRAINT') {

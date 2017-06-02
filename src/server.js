@@ -20,54 +20,6 @@ const { NotAuthorizedError } = require('./channels/errors')
 const Taste = require('./taste')
 const { SQLite, People, Channel, Stats } = require('./database')
 
-const uuidV4 = require('uuid/v4')
-
-const updateStats = (date) => {
-  return Promise.props({
-    likes: People.findAll(1, 10000, { updated_date: date, like: 1 }),
-    passes: People.findAll(1, 10000, { updated_date: date, like: 0 }),
-    trains: People.findAll(1, 10000, { train: 1 })
-  })
-    .then(({ likes, passes, trains }) => Stats.save(date, {
-      likes: likes.totalCount,
-      passes: passes.totalCount,
-      trains: trains.totalCount
-    }))
-}
-
-const checkRecommendationOut = (channel, rec) => {
-  const channelId = rec._id
-
-  return People.findByChannelAndChannelId(channel, channelId)
-    .then((person) => {
-      if (!person) {
-        return {}
-      }
-
-      return person
-    })
-    .then((person) => {
-      return Promise.props({ photos: Taste.checkPhotosOut(rec.photos) })
-        .then(({ photos }) => {
-          person.id = person.id || uuidV4()
-          person.channel = person.channel || channel
-          person.channel_id = person.channel_id || channelId
-
-          if (!person.like && photos.like) {
-            person.liked_date = new Date()
-          }
-
-          person.like = photos.like
-          person.last_checked_out_date = new Date()
-          person.photos_similarity_mean = photos.faceSimilarityMean
-          person.data = rec
-
-          return People.save(channel, channelId, person)
-            .then((person) => person)
-        })
-    })
-}
-
 const findDates = function () {
   return Channel.findAll()
     .mapSeries(({ name, is_enabled }) => {
@@ -81,26 +33,81 @@ const findDates = function () {
     .then(() => updateStats(new Date()))
 }
 
+const updateStats = (date) => {
+  return Promise.props({
+    likes: People.findAll(1, 10000, { last_checked_out_date: date, like: 1 }),
+    passes: People.findAll(1, 10000, { last_checked_out_date: date, like: 0 }),
+    trains: People.findAll(1, 10000, { train: 1 })
+  })
+    .then(({ likes, passes, trains }) => Stats.save(date, {
+      likes: likes.totalCount,
+      passes: passes.totalCount,
+      trains: trains.totalCount
+    }))
+}
+
 const findDatesByChannel = function (channelName) {
   if (!this._channels[ channelName ]) {
     return Promise.resolve()
   }
 
-  return this._channels[ channelName ].getRecommendations()
+  const channel = this._channels[ channelName ]
+
+  return channel.getRecommendations()
     .then((recs) => {
       Logger.info(`Got ${recs.length} recommendations from ${_.capitalize(channelName)}`)
 
       return Promise.map(recs, (rec) => {
         return checkRecommendationOut(channelName, rec)
-          .then(({ photos_similarity_mean, data, like }) => {
-            // eslint-disable-next-line camelcase
-            return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
+          .then(({ person, photos }) => {
+            return Promise.resolve()
+              .then(() => {
+                if (person.like) {
+                  return Promise.resolve()
+                    .then(() => { person.liked_date = new Date() })
+                } else {
+                  return Promise.resolve()
+                }
+              })
+              .then(() => Logger.info(`${person.data.name} got a ${person.like ? 'like :+1:' : 'pass :-1:'}(photos = ${person.photos_similarity_mean}%)`))
+              .then(() => People.save(person.channel, person.channel_id, person))
           })
           .catch((error) => Logger.warn(error))
-      }, { concurrency: 5 })
+      }, { concurrency: 1 })
     })
-    .catch(NotAuthorizedError, () => this._channels[ channelName ].authorize())
+    .catch(NotAuthorizedError, () => channel.authorize())
     .catch((error) => Logger.error(error))
+}
+
+const findOrCreateNewPerson = (channel, channelId) => {
+  return People.findByChannelAndChannelId(channel, channelId)
+    .then((person) => {
+      if (!person) {
+        return {
+          channel,
+          channel_id: channelId
+        }
+      }
+
+      return person
+    })
+}
+
+const checkRecommendationOut = (channel, rec) => {
+  const channelId = rec._id
+
+  return Promise.props({
+    person: findOrCreateNewPerson(channel.name, channelId),
+    photos: Taste.checkPhotosOut(rec.photos)
+  })
+    .then(({ person, photos }) => {
+      person.last_checked_out_date = new Date()
+      person.data = rec
+      person.like = photos.like
+      person.photos_similarity_mean = photos.faceSimilarityMean
+
+      return { person, photos }
+    })
 }
 
 class Server extends Serverful {
