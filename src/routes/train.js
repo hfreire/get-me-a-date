@@ -10,17 +10,17 @@ const { Route } = require('serverful')
 const Logger = require('modern-logger')
 
 const Taste = require('../taste')
-const { People } = require('../database')
+const { Recommendations } = require('../database')
 
 class Train extends Route {
   constructor () {
-    super('POST', '/train/{id}', 'People', 'Returns all people')
+    super('POST', '/train/{id}', 'Recommendations', 'Returns all recommendations')
   }
 
   handler (request, reply) {
     const { id } = request.params
 
-    People.findById(id)
+    Recommendations.findById(id)
       .then((person) => {
         if (!person) {
           reply(null)
@@ -31,7 +31,7 @@ class Train extends Route {
         const { provider, provider_id, data } = person
         const { photos } = data
         return Taste.mentalSnapshot(photos)
-          .then(() => People.save(provider, provider_id, { train: true, trained_date: new Date() }))
+          .then(() => Recommendations.save(provider, provider_id, { train: true, trained_date: new Date() }))
       })
       .then(() => reply(null))
       .catch((error) => {

@@ -13,7 +13,7 @@ System.config({
   },
   map: {
     app: 'app',
-    'app/people': 'app/people',
+    'app/recommendations': 'app/recommendations',
     'app/channels': 'app/channels',
     'app/stats': 'app/stats',
 
@@ -44,7 +44,7 @@ System.config({
       main: './index.js',
       defaultExtension: 'js'
     },
-    'app/people': {
+    'app/recommendations': {
       main: './index.js',
       defaultExtension: 'js'
     },

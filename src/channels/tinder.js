@@ -21,13 +21,13 @@ const { NotAuthorizedError } = require('./errors')
 const { TinderClient } = require('tinder')
 
 const { Facebook } = require('../auth')
-const { Channel, Auth } = require('../database')
+const { Channels, Auth } = require('../database')
 
 const createTinderChannelIfNeeded = function () {
-  return Channel.findByName(this._options.channel.name)
+  return Channels.findByName(this._options.channel.name)
     .then((channel) => {
       if (!channel) {
-        return Channel.save(this._options.channel.name, this._options.channel)
+        return Channels.save(this._options.channel.name, this._options.channel)
       }
     })
 }
@@ -41,7 +41,7 @@ const findOrAuthorizeTinderIfNeeded = function (channel) {
             const token = this._tinder.getAuthToken()
 
             return Auth.save(undefined, { token })
-              .then(({ id }) => Channel.save(channel.name, { auth_id: id }))
+              .then(({ id }) => Channels.save(channel.name, { auth_id: id }))
           })
       }
 
@@ -59,7 +59,7 @@ const handleError = function (error) {
     case 'Unauthorized':
       this._tinder.setAuthToken()
 
-      return Channel.findByName('tinder')
+      return Channels.findByName('tinder')
         .then((channel) => Auth.deleteById(channel.auth_id))
         .then(() => {
           throw new NotAuthorizedError()
@@ -101,7 +101,7 @@ class Tinder {
   }
 
   authorize () {
-    return Channel.findByName(this._options.channel.name)
+    return Channels.findByName(this._options.channel.name)
       .then((channel) => {
         return findOrAuthorizeTinderIfNeeded.bind(this)(channel)
           .then(({ token }) => {

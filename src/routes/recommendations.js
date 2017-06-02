@@ -14,9 +14,9 @@ const Logger = require('modern-logger')
 
 const Database = require('../database')
 
-class People extends Route {
+class Recommendations extends Route {
   constructor () {
-    super('GET', '/people', 'People', 'Returns all people')
+    super('GET', '/recommendations', 'Recommendations', 'Returns all recommendations')
   }
 
   handler ({ query = {} }, reply) {
@@ -27,7 +27,7 @@ class People extends Route {
         return JSON.parse(criteria)
       }
     })
-      .then((criteria) => Database.People.findAll(page, limit, criteria))
+      .then((criteria) => Database.Recommendations.findAll(page, limit, criteria))
       .then(({ results, totalCount }) => reply({ results, totalCount }))
       .catch((error) => {
         Logger.error(error)
@@ -49,4 +49,4 @@ class People extends Route {
   }
 }
 
-module.exports = new People()
+module.exports = new Recommendations()

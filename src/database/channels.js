@@ -41,7 +41,7 @@ const transformObjectToRow = function (object) {
   return object
 }
 
-class Channel {
+class Channels {
   save (name, data) {
     const _data = transformObjectToRow(_.clone(data))
     const keys = _.keys(_data)
@@ -81,4 +81,4 @@ class Channel {
   }
 }
 
-module.exports = new Channel()
+module.exports = new Channels()

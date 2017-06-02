@@ -7,8 +7,8 @@
 
 module.exports = {
   SQLite: require('./sqlite'),
-  People: require('./people'),
-  Channel: require('./channel'),
+  Recommendations: require('./recommendations'),
+  Channels: require('./channels'),
   Auth: require('./auth'),
   Stats: require('./stats')
 }

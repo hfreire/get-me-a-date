@@ -18,10 +18,10 @@ const Tinder = require('./channels/tinder')
 const { NotAuthorizedError } = require('./channels/errors')
 
 const Taste = require('./taste')
-const { SQLite, People, Channel, Stats } = require('./database')
+const { SQLite, Recommendations, Channels, Stats } = require('./database')
 
 const findDates = function () {
-  return Channel.findAll()
+  return Channels.findAll()
     .mapSeries(({ name, is_enabled }) => {
       // eslint-disable-next-line camelcase
       if (!is_enabled) {
@@ -35,9 +35,9 @@ const findDates = function () {
 
 const updateStats = (date) => {
   return Promise.props({
-    likes: People.findAll(1, 10000, { last_checked_out_date: date, like: 1 }),
-    passes: People.findAll(1, 10000, { last_checked_out_date: date, like: 0 }),
-    trains: People.findAll(1, 10000, { train: 1 })
+    likes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 1 }),
+    passes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 0 }),
+    trains: Recommendations.findAll(1, 10000, { train: 1 })
   })
     .then(({ likes, passes, trains }) => Stats.save(date, {
       likes: likes.totalCount,
@@ -59,18 +59,18 @@ const findDatesByChannel = function (channelName) {
 
       return Promise.map(recs, (rec) => {
         return checkRecommendationOut(channelName, rec)
-          .then(({ person, photos }) => {
+          .then(({ recommendation, photos }) => {
             return Promise.resolve()
               .then(() => {
-                if (person.like) {
+                if (recommendation.like) {
                   return Promise.resolve()
-                    .then(() => { person.liked_date = new Date() })
+                    .then(() => { recommendation.liked_date = new Date() })
                 } else {
                   return Promise.resolve()
                 }
               })
-              .then(() => Logger.info(`${person.data.name} got a ${person.like ? 'like :+1:' : 'pass :-1:'}(photos = ${person.photos_similarity_mean}%)`))
-              .then(() => People.save(person.channel, person.channel_id, person))
+              .then(() => Logger.info(`${recommendation.data.name} got a ${recommendation.like ? 'like :+1:' : 'pass :-1:'}(photos = ${recommendation.photos_similarity_mean}%)`))
+              .then(() => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
           })
           .catch((error) => Logger.warn(error))
       }, { concurrency: 1 })
@@ -79,17 +79,17 @@ const findDatesByChannel = function (channelName) {
     .catch((error) => Logger.error(error))
 }
 
-const findOrCreateNewPerson = (channel, channelId) => {
-  return People.findByChannelAndChannelId(channel, channelId)
-    .then((person) => {
-      if (!person) {
+const findOrCreateNewRecommendation = (channel, channelId) => {
+  return Recommendations.findByChannelAndChannelId(channel, channelId)
+    .then((recommendation) => {
+      if (!recommendation) {
         return {
           channel,
           channel_id: channelId
         }
       }
 
-      return person
+      return recommendation
     })
 }
 
@@ -97,16 +97,16 @@ const checkRecommendationOut = (channel, rec) => {
   const channelId = rec._id
 
   return Promise.props({
-    person: findOrCreateNewPerson(channel.name, channelId),
+    recommendation: findOrCreateNewRecommendation(channel.name, channelId),
     photos: Taste.checkPhotosOut(rec.photos)
   })
-    .then(({ person, photos }) => {
-      person.last_checked_out_date = new Date()
-      person.data = rec
-      person.like = photos.like
-      person.photos_similarity_mean = photos.faceSimilarityMean
+    .then(({ recommendation, photos }) => {
+      recommendation.last_checked_out_date = new Date()
+      recommendation.data = rec
+      recommendation.like = photos.like
+      recommendation.photos_similarity_mean = photos.faceSimilarityMean
 
-      return { person, photos }
+      return { recommendation, photos }
     })
 }
 
@@ -126,7 +126,7 @@ class Server extends Serverful {
     }
 
     const authorizeChannels = () => {
-      return Channel.findAll()
+      return Channels.findAll()
         .mapSeries(({ name, is_enabled }) => {
           // eslint-disable-next-line camelcase
           if (!is_enabled || !this._channels[ name ]) {

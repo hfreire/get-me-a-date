@@ -15,7 +15,7 @@ class GetChannels extends Route {
   }
 
   handler (request, reply) {
-    return Database.Channel.findAll()
+    return Database.Channels.findAll()
       .then((channels) => reply(null, channels))
   }
 

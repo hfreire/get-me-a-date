@@ -7,16 +7,16 @@
 
 import { Component } from '@angular/core'
 
-import { PeopleService } from './people.service'
-import { PersonDialogComponent } from './person-dialog.component'
+import { RecommendationsService } from './recommendations.service'
+import { RecommendationDialogComponent } from './recommendation-dialog.component'
 
 import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 
 @Component({
-  selector: 'people',
-  templateUrl: '/app/people/people.html',
-  providers: [ PeopleService ],
+  selector: 'recommendations',
+  templateUrl: '/app/recommendations/recommendations.html',
+  providers: [ RecommendationsService ],
   animations: [
     trigger('fadeInOut', [
       state('in', style({ opacity: 1, visibility: 'visible' })),
@@ -27,27 +27,27 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     ])
   ]
 })
-export class PeopleComponent {
+export class RecommendationsComponent {
   loadedPage = false
 
   fadeInState = 'in'
   fadeOutState = 'out'
 
-  people: any = []
-  person: any
-  dialogRef: MdDialogRef<PersonDialogComponent>
+  recommendations: any = []
+  recommendation: any
+  dialogRef: MdDialogRef<RecommendationDialogComponent>
   currentPage: number = 1
   itemsPerPage: number = 100
   totalItems: number
 
   criteria: any = [
-    { value: {}, label: 'Everyone' },
+    { value: {}, label: 'All' },
     { value: { like: 1 }, label: 'Likes' },
     { value: { like: 0 }, label: 'Passes' },
     { value: { train: 1 }, label: 'Training' }
   ]
 
-  constructor (private peopleService: PeopleService, public dialog: MdDialog) {}
+  constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
   public ngOnInit () {
     this.getPage()
@@ -58,21 +58,21 @@ export class PeopleComponent {
     this.fadeOutState = 'in'
   }
 
-  openPersonDialog (person: any) {
+  openPersonDialog (recommendation: any) {
     const config = new MdDialogConfig()
     config.width = '450px'
-    config.data = { person }
+    config.data = { recommendation }
 
-    this.dialogRef = this.dialog.open(PersonDialogComponent, config)
+    this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
   }
 
   getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria?: any) {
     this.loadedPage = false
 
-    this.peopleService.getAll(page, limit, criteria)
+    this.recommendationService.getAll(page, limit, criteria)
       .subscribe(({ results, meta }) => {
         this.currentPage = page
-        this.people = results
+        this.recommendations = results
         this.totalItems = meta.totalCount
 
         this.loadedPage = true

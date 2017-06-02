@@ -43,7 +43,7 @@ const createFile = function () {
 
 const createSchema = function () {
   return this._database.runAsync(
-    'CREATE TABLE IF NOT EXISTS people (' +
+    'CREATE TABLE IF NOT EXISTS recommendations (' +
     'id VARCHAR(36) NOT NULL, ' +
     'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +

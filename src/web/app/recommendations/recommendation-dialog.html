@@ -5,15 +5,16 @@
   ~ LICENSE file in the root directory of this source tree.
   -->
 
-<h2 md-dialog-title>{{ person.data.name }}, {{ today | amDifference : person.data.birth_date : 'years' }}</h2>
+<h2 md-dialog-title>{{ recommendation.data.name }}, {{ today | amDifference : recommendation.data.birth_date : 'years'
+    }}</h2>
 <h3>{{ occupation }}</h3>
-<p md-line>{{ person.data.description }}</p>
+<p md-line>{{ recommendation.data.description }}</p>
 
 <md-dialog-content>
-    <p md-line>{{ person.data.bio }} </p>
+    <p md-line>{{ recommendation.data.bio }} </p>
 
     <md-grid-list cols="4">
-        <md-grid-tile *ngFor="let photo of person.data.photos">
+        <md-grid-tile *ngFor="let photo of recommendation.data.photos">
             <img [src]="photo.url"
                  mdTooltip="Similarity: {{photo.similarity}}%"
                  tooltipPosition="bottom"
@@ -23,6 +24,6 @@
 </md-dialog-content>
 
 <md-dialog-actions [attr.align]="actionsAlignment">
-    <button md-raised-button md-button *ngIf="!person.train" (click)="trainPerson()">Train</button>
-    <button md-button *ngIf="person.train" (click)="untrainPerson()">Untrain</button>
+    <button md-raised-button md-button *ngIf="!recommendation.train" (click)="trainPerson()">Train</button>
+    <button md-button *ngIf="recommendation.train" (click)="untrainPerson()">Untrain</button>
 </md-dialog-actions>

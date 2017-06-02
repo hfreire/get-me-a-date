@@ -86,7 +86,7 @@ const buildWhereClause = (keys, values) => {
     .replace(/date\(\? AND/, 'date(?,')
 }
 
-class People {
+class Recommendations {
   save (channel, channelId, data) {
     const _data = transformObjectToRow(_.clone(data))
 
@@ -105,12 +105,12 @@ class People {
             values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
           }
 
-          return SQLite.run(`UPDATE people SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_id = ?`, values.concat([ channel, channelId ]))
+          return SQLite.run(`UPDATE recommendations SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_id = ?`, values.concat([ channel, channelId ]))
         } else {
           keys.push('id')
           values.push(uuidV4())
 
-          return SQLite.run(`INSERT INTO people (${keys}) VALUES (${values.map(() => '?')})`, values)
+          return SQLite.run(`INSERT INTO recommendations (${keys}) VALUES (${values.map(() => '?')})`, values)
             .catch((error) => {
               if (error.code !== 'SQLITE_CONSTRAINT') {
                 throw error
@@ -135,12 +135,12 @@ class People {
 
       const where = buildWhereClause(keys, values)
 
-      queryResults = `SELECT * FROM people WHERE ${where} ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
-      queryTotalCount = `SELECT COUNT(*) as count FROM people WHERE ${where}`
+      queryResults = `SELECT * FROM recommendations WHERE ${where} ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
+      queryTotalCount = `SELECT COUNT(*) as count FROM recommendations WHERE ${where}`
       params = params.concat(values)
     } else {
-      queryResults = `SELECT * FROM people ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
-      queryTotalCount = 'SELECT COUNT(*) as count FROM people'
+      queryResults = `SELECT * FROM recommendations ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
+      queryTotalCount = 'SELECT COUNT(*) as count FROM recommendations'
     }
 
     return Promise.props({
@@ -157,14 +157,14 @@ class People {
   }
 
   findById (id) {
-    return SQLite.get('SELECT * FROM people WHERE id = ?', [ id ])
+    return SQLite.get('SELECT * FROM recommendations WHERE id = ?', [ id ])
       .then((row) => transformRowToObject(row))
   }
 
   findByChannelAndChannelId (channel, channelId) {
-    return SQLite.get('SELECT * FROM people WHERE channel = ? AND channel_id = ?', [ channel, channelId ])
+    return SQLite.get('SELECT * FROM recommendations WHERE channel = ? AND channel_id = ?', [ channel, channelId ])
       .then((row) => transformRowToObject(row))
   }
 }
 
-module.exports = new People()
+module.exports = new Recommendations()

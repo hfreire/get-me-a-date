@@ -28,7 +28,7 @@ import { NgxPaginationModule } from 'ngx-pagination'
 import { ChartsModule } from 'ng2-charts'
 
 import { AppComponent } from './app.component'
-import { PeopleComponent, PersonDialogComponent } from './people'
+import { RecommendationDialogComponent, RecommendationsComponent } from './recommendations'
 import { ChannelsComponent } from './channels'
 import { StatsComponent } from './stats'
 import { CapitalizePipe } from './capitalize.pipe'
@@ -53,8 +53,8 @@ import { CapitalizePipe } from './capitalize.pipe'
     MdSelectModule,
     ChartsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, PersonDialogComponent, PeopleComponent, ChannelsComponent, StatsComponent ],
-  entryComponents: [ PersonDialogComponent, PeopleComponent, ChannelsComponent, StatsComponent ],
+  declarations: [ AppComponent, CapitalizePipe, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, StatsComponent ],
+  entryComponents: [ RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

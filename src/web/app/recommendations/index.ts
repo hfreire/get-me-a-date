@@ -5,6 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export * from './people.component'
-export * from './person-dialog.component'
-export * from './people.service'
+export * from './recommendations.component'
+export * from './recommendation-dialog.component'
+export * from './recommendations.service'
