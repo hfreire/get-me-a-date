@@ -71,8 +71,8 @@ const handleError = function (error) {
 
 const defaultOptions = {
   channel: { name: 'tinder', is_enabled: false },
-  retry: { max_tries: 2, interval: 1000, throw_original: true },
-  breaker: { timeout: 5000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
+  retry: { max_tries: 2, interval: 1000, timeout: 12000, throw_original: true },
+  breaker: { timeout: 16000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
 }
 
 class Tinder {
