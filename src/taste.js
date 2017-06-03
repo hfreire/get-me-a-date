@@ -148,7 +148,7 @@ class Taste {
       })
   }
 
-  firstSight (photo) {
+  mentalSnapshot (photo) {
     const thumbnail = _.find(photo.processedFiles, { width: 84, height: 84 })
 
     return savePhoto.bind(this)(thumbnail)
@@ -160,7 +160,7 @@ class Taste {
   checkPhotosOut (photos) {
     return Promise.map(photos, (photo) => {
       if (photo.similarity_date) {
-        return // do not s3 and rekognition photos that have already been checked out
+        return photo.similarity // do not s3 and rekognition photos that have already been checked out
       }
 
       return savePhoto.bind(this)(photo)

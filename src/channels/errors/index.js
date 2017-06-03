@@ -6,5 +6,6 @@
  */
 
 module.exports = {
-  NotAuthorizedError: require('./not-authorized-error')
+  NotAuthorizedError: require('./not-authorized-error'),
+  OutOfLikesError: require('./out-of-likes-error')
 }

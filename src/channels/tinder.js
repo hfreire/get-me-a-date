@@ -16,9 +16,11 @@ const Promise = require('bluebird')
 const retry = require('bluebird-retry')
 const Brakes = require('brakes')
 
+const Logger = require('modern-logger')
+
 const Health = require('health-checkup')
 
-const { NotAuthorizedError } = require('./errors')
+const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderClient } = require('tinder')
 
@@ -59,17 +61,26 @@ const facebookAuthorizeTinderApp = function () {
 const handleError = function (error) {
   switch (error.message) {
     case 'Unauthorized':
-      this._tinder.setAuthToken()
-
-      return Channels.findByName('tinder')
-        .then((channel) => {
-          return Promise.all([
-            Channels.save('tinder', { auth_id: channel.auth_id }),
-            Auth.deleteById(channel.auth_id)
-          ])
-        })
+      return Logger.debug(`${_.capitalize(this.name)} got unauthorized`)
         .then(() => {
-          throw new NotAuthorizedError()
+          this._tinder.setAuthToken()
+
+          return Channels.findByName('tinder')
+            .then((channel) => {
+              return Promise.all([
+                Channels.save('tinder', { auth_id: channel.auth_id }),
+                Auth.deleteById(channel.auth_id)
+              ])
+            })
+            .then(() => {
+              throw new NotAuthorizedError()
+            })
+        })
+    case 'Out of likes':
+      return Logger.debug(`${_.capitalize(this.name)} is out of likes`)
+        .then(() => {
+          this._outOfLikesAt = _.now()
+          throw new OutOfLikesError()
         })
     default:
       throw error
@@ -161,12 +172,28 @@ class Tinder extends Channel {
       return Promise.reject(new Error('invalid arguments'))
     }
 
+    if (this._outOfLikesAt) {
+      if ((_.now() - this._outOfLikesAt) < 60 * 60 * 1000) {
+        throw new OutOfLikesError()
+      } else {
+        delete this._outOfLikesAt
+      }
+    }
+
     return Promise.try(() => {
       if (!this._tinder.getAuthToken()) {
         throw new NotAuthorizedError()
       }
     })
       .then(() => this._tinder.likeCircuitBreaker.exec(userId))
+      .then(({ match, likes_remaining }) => {
+        // eslint-disable-next-line camelcase
+        if (!likes_remaining) {
+          throw new Error('Out of likes')
+        }
+
+        return match
+      })
       .catch((error) => handleError.bind(this)(error))
   }
 }

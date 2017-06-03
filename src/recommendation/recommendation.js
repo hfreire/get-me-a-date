@@ -10,8 +10,6 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const Logger = require('modern-logger')
-
 const { AlreadyCheckedOutEarlierError } = require('./errors')
 
 const Taste = require('../taste')
@@ -45,13 +43,13 @@ class Recommendation {
 
     return findOrCreateNewRecommendation(channel, channelRecommendationId)
       .then((recommendation) => {
-        if (recommendation.last_checked_out_date) {
+        /* if (recommendation.last_checked_out_date) {
           return Promise.reject(new AlreadyCheckedOutEarlierError())
-        }
+         } */
 
-        return Taste.firstSight(channelRecommendation.photos[ 0 ])
+        return Promise.resolve()
           .then(() => {
-            const photosToCheckOut = _.union(_.get(recommendation, 'data.photos', []), channelRecommendation.photos, 'id')
+            const photosToCheckOut = _.unionBy(_.get(recommendation, 'data.photos', []), channelRecommendation.photos, 'id')
 
             return Promise.props({
               photos: Taste.checkPhotosOut(photosToCheckOut)
@@ -61,10 +59,14 @@ class Recommendation {
                 recommendation.data = channelRecommendation
                 recommendation.like = photos.like
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
-
-                return recommendation
               })
           })
+          .then(() => {
+            if (!recommendation.data.photos[ 0 ].thumbnailUrl) {
+              return Taste.mentalSnapshot(recommendation.data.photos[ 0 ])
+            }
+          })
+          .then(() => recommendation)
       })
   }
 
@@ -77,14 +79,12 @@ class Recommendation {
       .then(() => {
         if (recommendation.like) {
           return channel.like(recommendation.channel_id)
-            .then(({ match, likes_remaining }) => {
+            .then((match) => {
               recommendation.liked_date = new Date()
               recommendation.match = !!match
               if (match) {
                 recommendation.match_id = match._id
               }
-
-              return Logger.info(`Likes remaining: ${likes_remaining}`)
             })
             .then(() => recommendation)
         }

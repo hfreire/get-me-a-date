@@ -16,7 +16,7 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Tinder, NotAuthorizedError } = require('./channels')
+const { Tinder, NotAuthorizedError, OutOfLikesError } = require('./channels')
 const Taste = require('./taste')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { SQLite, Recommendations, Channels, Stats } = require('./database')
@@ -54,7 +54,16 @@ const findDatesByChannel = (channel) => {
       return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
         .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {
           return Recommendation.checkOut(channel, channelRecommendation)
-          // .then((recommendation) => Recommendation.likeOrPass(channel, recommendation))
+            .then((recommendation) => {
+              return Recommendation.likeOrPass(channel, recommendation)
+                .catch(OutOfLikesError, () => {
+                  recommendation.like = 0
+
+                  skipped++
+
+                  return recommendation
+                })
+            })
             .then((recommendation) => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
             .then(({ like, photos_similarity_mean, match, data }) => {
               if (match) {
