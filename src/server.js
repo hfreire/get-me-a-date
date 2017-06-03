@@ -20,6 +20,7 @@ const Tinder = require('./channels/tinder')
 const { NotAuthorizedError } = require('./channels/errors')
 
 const Taste = require('./taste')
+const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { SQLite, Recommendations, Channels, Stats } = require('./database')
 
 const findDates = function () {
@@ -30,25 +31,33 @@ const findDates = function () {
         return
       }
 
-      return findDatesByChannel.bind(this)(name)
+      if (!this._channels[ name ]) {
+        return Promise.resolve()
+      }
+
+      const channel = this._channels[ name ]
+
+      return Logger.info(`Started finding dates in ${_.capitalize(name)}`)
+        .then(() => findDatesByChannel(channel))
+        .then(({ received, skipped, failed }) => Logger.info(`Finished finding dates in ${_.capitalize(name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     })
     .then(() => updateStats(new Date()))
 }
 
-const findDatesByChannel = function (channelName) {
-  if (!this._channels[ channelName ]) {
-    return Promise.resolve()
-  }
-
-  const channel = this._channels[ channelName ]
+const findDatesByChannel = (channel) => {
+  let received = 0
+  let skipped = 0
+  let failed = 0
 
   return channel.getRecommendations()
     .then((channelRecommendations) => {
-      Logger.info(`Got ${channelRecommendations.length} recommendations from ${_.capitalize(channelName)}`)
+      received = channelRecommendations.length
+
+      Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
 
       return Promise.map(channelRecommendations, (channelRecommendation) => {
-        return checkRecommendationOut(channel, channelRecommendation)
-        // .then((recommendation) => likeOrPassRecommendation(channel, recommendation))
+        return Recommendation.checkOut(channel, channelRecommendation)
+        // .then((recommendation) => Recommendation.likeOrPass(channel, recommendation))
           .then((recommendation) => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
           .then(({ like, photos_similarity_mean, match, data }) => {
             if (match) {
@@ -57,79 +66,17 @@ const findDatesByChannel = function (channelName) {
               return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
             }
           })
-          .catch((error) => Logger.warn(error))
+          .catch(AlreadyCheckedOutEarlierError, () => { skipped++ })
+          .catch((error) => {
+            failed++
+
+            return Logger.warn(error)
+          })
       }, { concurrency: 2 })
     })
+    .then(() => { return { received, skipped, failed } })
     .catch(NotAuthorizedError, () => channel.authorize())
     .catch((error) => Logger.error(error))
-}
-
-const checkRecommendationOut = (channel, channelRecommendation) => {
-  if (!channel || !channelRecommendation) {
-    return Promise.reject(new Error('invalid arguments'))
-  }
-
-  const channelRecommendationId = channelRecommendation._id
-
-  return Taste.firstSight(channelRecommendation.photos[ 0 ])
-    .then(() => findOrCreateNewRecommendation(channel, channelRecommendationId))
-    .then((recommendation) => {
-      const photosToCheckOut = _.union(_.get(recommendation, 'data.photos', []), channelRecommendation.photos, 'id')
-
-      return Promise.props({
-        photos: Taste.checkPhotosOut(photosToCheckOut)
-      })
-        .then(({ photos }) => {
-          recommendation.last_checked_out_date = new Date()
-          recommendation.data = channelRecommendation
-          recommendation.like = photos.like
-          recommendation.photos_similarity_mean = photos.faceSimilarityMean
-
-          return recommendation
-        })
-    })
-}
-
-const findOrCreateNewRecommendation = (channel, channelRecommendationId) => {
-  if (!channel || !channelRecommendationId) {
-    return Promise.reject(new Error('invalid arguments'))
-  }
-
-  const channelName = channel.name
-
-  return Recommendations.findByChannelAndChannelId(channel.name, channelRecommendationId)
-    .then((recommendation) => {
-      if (!recommendation) {
-        return { channel: channelName, channel_id: channelRecommendationId }
-      }
-
-      return recommendation
-    })
-}
-
-const likeOrPassRecommendation = (channel, recommendation) => {
-  if (!channel || !recommendation) {
-    return Promise.reject(new Error('invalid arguments'))
-  }
-
-  return Promise.resolve()
-    .then(() => {
-      if (recommendation.like) {
-        return channel.like(recommendation.channel_id)
-          .then(({ match, likes_remaining }) => {
-            recommendation.liked_date = new Date()
-            recommendation.match = !!match
-            if (match) {
-              recommendation.match_id = match._id
-            }
-
-            return Logger.info(`Likes remaining: ${likes_remaining}`)
-          })
-          .then(() => recommendation)
-      }
-
-      return recommendation
-    })
 }
 
 const updateStats = (date) => {
