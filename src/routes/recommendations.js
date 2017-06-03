@@ -7,7 +7,6 @@
 
 const { Route } = require('serverful')
 
-const _ = require('lodash')
 const Promise = require('bluebird')
 
 const Joi = require('joi')
