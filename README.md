@@ -7,11 +7,12 @@
 [![](https://img.shields.io/github/release/hfreire/get-me-a-date.svg)](https://github.com/hfreire/get-me-a-date/releases)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<p align="center"><img src="share/github/overview.png" width="540"></p>
+Uses [AWS Rekognition]() deep learning-based image recognition to help you automate your [Tinder]() date discovery.
+
+<p align="center"><img src="share/github/overview.png" width="720"></p>
 
 ### Features
 * Launch :rocket: inside a Docker container :whale: so you don't need to manage the dependencies :raised_hands: :white_check_mark:
-* Quickly deploy :runner: and easily scale :two_men_holding_hands: the number of servers by using Rancher :white_check_mark:
 
 ### How to use
 
