@@ -16,9 +16,7 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const Tinder = require('./channels/tinder')
-const { NotAuthorizedError } = require('./channels/errors')
-
+const { Tinder, NotAuthorizedError } = require('./channels')
 const Taste = require('./taste')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { SQLite, Recommendations, Channels, Stats } = require('./database')
@@ -53,26 +51,25 @@ const findDatesByChannel = (channel) => {
     .then((channelRecommendations) => {
       received = channelRecommendations.length
 
-      Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
+      return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
+        .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {
+          return Recommendation.checkOut(channel, channelRecommendation)
+          // .then((recommendation) => Recommendation.likeOrPass(channel, recommendation))
+            .then((recommendation) => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
+            .then(({ like, photos_similarity_mean, match, data }) => {
+              if (match) {
+                return Logger.info(`${data.name} is a :fire: (photos = ${photos_similarity_mean}%)`)
+              } else {
+                return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
+              }
+            })
+            .catch(AlreadyCheckedOutEarlierError, () => { skipped++ })
+            .catch((error) => {
+              failed++
 
-      return Promise.map(channelRecommendations, (channelRecommendation) => {
-        return Recommendation.checkOut(channel, channelRecommendation)
-        // .then((recommendation) => Recommendation.likeOrPass(channel, recommendation))
-          .then((recommendation) => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
-          .then(({ like, photos_similarity_mean, match, data }) => {
-            if (match) {
-              return Logger.info(`${data.name} is a :fire: (photos = ${photos_similarity_mean}%)`)
-            } else {
-              return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
-            }
-          })
-          .catch(AlreadyCheckedOutEarlierError, () => { skipped++ })
-          .catch((error) => {
-            failed++
-
-            return Logger.warn(error)
-          })
-      }, { concurrency: 2 })
+              return Logger.warn(error)
+            })
+        }, { concurrency: 2 }))
     })
     .then(() => { return { received, skipped, failed } })
     .catch(NotAuthorizedError, () => channel.authorize())
