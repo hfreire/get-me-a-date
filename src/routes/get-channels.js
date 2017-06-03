@@ -7,23 +7,16 @@
 
 const { Route } = require('serverful')
 
-const Logger = require('modern-logger')
-
 const Database = require('../database')
 
-class People extends Route {
+class GetChannels extends Route {
   constructor () {
-    super('GET', '/people', 'People', 'Returns all people')
+    super('GET', '/channels', 'Channels', 'Returns all channels')
   }
 
   handler (request, reply) {
-    Database.People.findAll()
-      .then((people) => reply(null, people))
-      .catch((error) => {
-        Logger.error(error)
-
-        reply(error)
-      })
+    return Database.Channels.findAll()
+      .then((channels) => reply(null, channels))
   }
 
   auth () {
@@ -31,4 +24,4 @@ class People extends Route {
   }
 }
 
-module.exports = new People()
+module.exports = new GetChannels()

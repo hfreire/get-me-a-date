@@ -5,8 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
-
-import { AppModule } from './app'
-
-platformBrowserDynamic().bootstrapModule(AppModule)
+export * from './app.module'

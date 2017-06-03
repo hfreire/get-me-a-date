@@ -20,6 +20,10 @@ class Web extends Route {
     return false
   }
 
+  tags () {
+    return []
+  }
+
   toRoute () {
     return [
       _(super.toRoute())

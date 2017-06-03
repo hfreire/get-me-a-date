@@ -15,8 +15,8 @@ const Health = require('health-checkup')
 const AWS = require('aws-sdk')
 
 const defaultOptions = {
-  retry: { max_tries: 2, interval: 1000, timeout: 8000, throw_original: true },
-  breaker: { timeout: 3000, threshold: 80, circuitDuration: 30000 }
+  retry: { max_tries: 3, interval: 1000, timeout: 12000, throw_original: true },
+  breaker: { timeout: 16000, threshold: 80, circuitDuration: 30000 }
 }
 
 class Rekognition {

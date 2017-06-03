@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<h2 md-dialog-title>{{ recommendation.data.name }}, {{ today | amDifference : recommendation.data.birth_date : 'years'
+    }}</h2>
+<h3>{{ occupation }}</h3>
+<p md-line>{{ recommendation.data.description }}</p>
+
+<md-dialog-content>
+    <p md-line>{{ recommendation.data.bio }} </p>
+
+    <md-grid-list cols="4">
+        <md-grid-tile *ngFor="let photo of recommendation.data.photos">
+            <img [src]="photo.url"
+                 mdTooltip="Similarity: {{photo.similarity}}%"
+                 tooltipPosition="bottom"
+                 width="100"/>
+        </md-grid-tile>
+    </md-grid-list>
+</md-dialog-content>
+
+<md-dialog-actions [attr.align]="actionsAlignment">
+    <button md-raised-button md-button *ngIf="!recommendation.train" (click)="trainRecommendation()">Train</button>
+    <button md-button *ngIf="recommendation.train" (click)="untrainRecommendation()">Untrain</button>
+</md-dialog-actions>

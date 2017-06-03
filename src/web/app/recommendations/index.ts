@@ -5,8 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
-
-import { AppModule } from './app'
-
-platformBrowserDynamic().bootstrapModule(AppModule)
+export * from './recommendations.component'
+export * from './recommendation-dialog.component'
+export * from './recommendations.service'

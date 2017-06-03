@@ -35,14 +35,16 @@ const indexFaces = function (images) {
   return Promise.map(images, (image) => {
     return this.rekognition.indexFaces(AWS_REKOGNITION_COLLECTION, AWS_S3_BUCKET, image)
       .then((data) => {
-        if (!data.FaceRecords || _.isEmpty(data.FaceRecords)) {
+        if (!data.FaceRecords) {
           return
         }
 
         // delete images with no or multiple faces
         if (data.FaceRecords.length !== 1) {
           return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, _.map(data.FaceRecords, ({ Face }) => Face.FaceId))
-            .then(() => this.s3.deleteObject(image))
+            .then(() => {
+              return this.s3.deleteObject(image)
+            })
         }
 
         indexedFaces++
@@ -146,12 +148,26 @@ class Taste {
       })
   }
 
+  firstSight (photo) {
+    const thumbnail = _.find(photo.processedFiles, { width: 84, height: 84 })
+
+    return savePhoto.bind(this)(thumbnail)
+      .then(() => {
+        photo.thumbnailUrl = thumbnail.url
+      })
+  }
+
   checkPhotosOut (photos) {
     return Promise.map(photos, (photo) => {
+      if (photo.similarity_date) {
+        return // do not s3 and rekognition photos that have already been checked out
+      }
+
       return savePhoto.bind(this)(photo)
         .then((image) => this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image))
         .then(({ FaceMatches }) => {
           photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
+          photo.similarity_date = new Date().toISOString()
 
           return photo.similarity
         })
@@ -166,13 +182,13 @@ class Taste {
         const faceSimilarityMin = _.min(faceSimilarities)
         const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
 
-        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 80
+        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 73
 
         return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like }
       })
   }
 
-  mentalSnapshot (photos) {
+  acquireTaste (photos) {
     return Promise.map(photos, (photo) => {
       const url = parse(photo.url)
       if (!url) {

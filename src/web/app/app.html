@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<md-sidenav-container fullscreen>
+    <md-sidenav #sidenav mode="push">
+        <channels></channels>
+    </md-sidenav>
+
+    <md-toolbar color="primary">
+        <button md-icon-button (click)="sidenav.toggle()" disableRipple="on">
+            <md-icon>menu</md-icon>
+        </button>
+        Get me a date
+    </md-toolbar>
+
+    <stats></stats>
+    <recommendations></recommendations>
+</md-sidenav-container>

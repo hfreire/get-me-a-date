@@ -43,25 +43,48 @@ const createFile = function () {
 
 const createSchema = function () {
   return this._database.runAsync(
-    'CREATE TABLE IF NOT EXISTS people (' +
+    'CREATE TABLE IF NOT EXISTS recommendations (' +
     'id VARCHAR(36) NOT NULL, ' +
     'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'like INTEGER NOT NULL DEFAULT 0,' +
-    'photos_similarity_mean REAL NOT NULL,' +
+    'liked_date DATETIME DEFAULT NULL,' +
     'train INTEGER NOT NULL DEFAULT 0,' +
-    'provider VARCHAR(32) NOT NULL, ' +
-    'provider_id VARCHAR(64) NOT NULL, ' +
-    'data TEXT,' +
-    'PRIMARY KEY (provider, provider_id)' +
+    'trained_date DATETIME DEFAULT NULL,' +
+    'last_checked_out_date DATETIME DEFAULT NULL,' +
+    'photos_similarity_mean REAL NOT NULL,' +
+    'match INTEGER NOT NULL DEFAULT 0,' +
+    'match_id VARCHAR(64) DEFAULT NULL,' +
+    'channel VARCHAR(32) NOT NULL, ' +
+    'channel_id VARCHAR(64) NOT NULL, ' +
+    'data TEXT NOT NULL,' +
+    'PRIMARY KEY (channel, channel_id)' +
     ')')
     .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS auth (' +
-      'provider VARCHAR(32) NOT NULL, ' +
+      'CREATE TABLE IF NOT EXISTS channel (' +
+      'name VARCHAR(32) NOT NULL, ' +
       'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
       'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-      'api_token TEXT NOT NULL,' +
-      'PRIMARY KEY (provider)' +
+      'is_enabled INTEGER NOT NULL DEFAULT 0,' +
+      'auth_id INTEGER NULL,' +
+      'PRIMARY KEY (name)' +
+      ')'))
+    .then(() => this._database.runAsync(
+      'CREATE TABLE IF NOT EXISTS auth (' +
+      'id INTEGER PRIMARY KEY,' +
+      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'token TEXT NOT NULL' +
+      ')'))
+    .then(() => this._database.runAsync(
+      'CREATE TABLE IF NOT EXISTS stats (' +
+      'date DATE PRIMARY KEY,' +
+      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'likes INTEGER NOT NULL DEFAULT 0,' +
+      'passes INTEGER NOT NULL DEFAULT 0,' +
+      'trains INTEGER NOT NULL DEFAULT 0,' +
+      'matches INTEGER NOT NULL DEFAULT 0' +
       ')'))
 }
 
@@ -75,8 +98,16 @@ class SQLite {
       .then(() => createSchema.bind(this)())
   }
 
-  run (...args) {
-    return this._database.runAsync(...args)
+  run (sql, param) {
+    return new Promise((resolve, reject) => {
+      this._database.run(sql, param, function (error) {
+        if (error) {
+          return reject(error)
+        }
+
+        resolve(this)
+      })
+    })
   }
 
   get (...args) {

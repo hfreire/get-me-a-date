@@ -5,8 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
+class Channel {
+  constructor (name) {
+    this._name = name
+  }
 
-import { AppModule } from './app'
+  get name () {
+    return this._name
+  }
+}
 
-platformBrowserDynamic().bootstrapModule(AppModule)
+module.exports = Channel

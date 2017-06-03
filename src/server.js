@@ -5,7 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const ENVIRONMENT = process.env.ENVIRONMENT || 'local'
+/* eslint-disable camelcase */
+
 const FIND_DATES_PERIOD = process.env.FIND_DATES_PERIOD || 10 * 60 * 1000
 
 const { Serverful } = require('serverful')
@@ -15,59 +16,109 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const Tinder = require('./providers/tinder')
-const { NotAuthorizedError } = require('./providers/errors')
-
+const { Tinder, NotAuthorizedError } = require('./channels')
 const Taste = require('./taste')
-const { SQLite, People } = require('./database')
-
-const uuidV4 = require('uuid/v4')
-
-const checkRecommendationOut = (provider, rec) => {
-  const providerId = rec._id
-  const person = {}
-
-  return Promise.props({ photos: Taste.checkPhotosOut(rec.photos) })
-    .then(({ photos }) => {
-      person.id = uuidV4()
-      person.provider = provider
-      person.provider_id = providerId
-      person.like = photos.like
-      person.photos_similarity_mean = photos.faceSimilarityMean
-      person.data = rec
-
-      return People.save(provider, providerId, person)
-        .then(() => person)
-    })
-}
+const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
+const { SQLite, Recommendations, Channels, Stats } = require('./database')
 
 const findDates = function () {
-  return Tinder.getRecommendations()
-    .then((recs) => {
-      const provider = 'tinder'
+  return Channels.findAll()
+    .mapSeries(({ name, is_enabled }) => {
+      // eslint-disable-next-line camelcase
+      if (!is_enabled) {
+        return
+      }
 
-      Logger.info(`Got ${recs.length} recommendations from ${_.capitalize(provider)}`)
+      if (!this._channels[ name ]) {
+        return Promise.resolve()
+      }
 
-      return Promise.map(recs, (rec) => {
-        return checkRecommendationOut(provider, rec)
-          .then(({ photos_similarity_mean, data, like }) => {
-            // eslint-disable-next-line camelcase
-            return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
-          })
-          .catch((error) => Logger.warn(error))
-      }, { concurrency: 5 })
+      const channel = this._channels[ name ]
+
+      return Logger.info(`Started finding dates in ${_.capitalize(name)}`)
+        .then(() => findDatesByChannel(channel))
+        .then(({ received, skipped, failed }) => Logger.info(`Finished finding dates in ${_.capitalize(name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     })
-    .catch(NotAuthorizedError, () => Tinder.authorize())
+    .then(() => updateStats(new Date()))
+}
+
+const findDatesByChannel = (channel) => {
+  let received = 0
+  let skipped = 0
+  let failed = 0
+
+  return channel.getRecommendations()
+    .then((channelRecommendations) => {
+      received = channelRecommendations.length
+
+      return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
+        .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {
+          return Recommendation.checkOut(channel, channelRecommendation)
+          // .then((recommendation) => Recommendation.likeOrPass(channel, recommendation))
+            .then((recommendation) => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
+            .then(({ like, photos_similarity_mean, match, data }) => {
+              if (match) {
+                return Logger.info(`${data.name} is a :fire: (photos = ${photos_similarity_mean}%)`)
+              } else {
+                return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
+              }
+            })
+            .catch(AlreadyCheckedOutEarlierError, () => { skipped++ })
+            .catch((error) => {
+              failed++
+
+              return Logger.warn(error)
+            })
+        }, { concurrency: 2 }))
+    })
+    .then(() => { return { received, skipped, failed } })
+    .catch(NotAuthorizedError, () => channel.authorize())
     .catch((error) => Logger.error(error))
 }
 
+const updateStats = (date) => {
+  return Promise.props({
+    likes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 1 }),
+    passes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 0 }),
+    trains: Recommendations.findAll(1, 10000, { train: 1 }),
+    matches: Recommendations.findAll(1, 10000, { last_checked_out_date: date, match: 1 })
+  })
+    .then(({ likes, passes, trains, matches }) => Stats.save(date, {
+      likes: likes.totalCount,
+      passes: passes.totalCount,
+      trains: trains.totalCount,
+      matches: matches.totalCount
+    }))
+}
+
 class Server extends Serverful {
+  constructor () {
+    super()
+
+    this._channels = {
+      'tinder': Tinder
+    }
+  }
+
   start () {
-    if (ENVIRONMENT === 'local') {
-      return Promise.all([ super.start(), SQLite.start() ])
+    const initChannels = () => {
+      return SQLite.start()
+        .then(() => Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init()))
     }
 
-    return Promise.all([ super.start(), SQLite.start().then(() => Tinder.authorize()), Taste.bootstrap() ])
+    const authorizeChannels = () => {
+      return Channels.findAll()
+        .mapSeries(({ name, is_enabled }) => {
+          // eslint-disable-next-line camelcase
+          if (!is_enabled || !this._channels[ name ]) {
+            return
+          }
+
+          return this._channels[ name ].authorize()
+        })
+    }
+
+    return Promise.all([ super.start(), initChannels().then(() => authorizeChannels()), Taste.bootstrap() ])
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           this.findDates()

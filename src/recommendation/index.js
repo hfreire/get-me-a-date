@@ -6,9 +6,6 @@
  */
 
 module.exports = {
-  SQLite: require('./sqlite'),
-  Recommendations: require('./recommendations'),
-  Channels: require('./channels'),
-  Auth: require('./auth'),
-  Stats: require('./stats')
+  Recommendation: require('./recommendation'),
+  AlreadyCheckedOutEarlierError: require('./errors').AlreadyCheckedOutEarlierError
 }
