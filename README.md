@@ -7,7 +7,7 @@
 [![](https://img.shields.io/github/release/hfreire/get-me-a-date.svg)](https://github.com/hfreire/get-me-a-date/releases)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Uses [AWS Rekognition]() deep learning-based image recognition to help you automate your [Tinder]() date discovery.
+Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based image recognition to help you automate your [Tinder](https://tinder.com) date discovery.
 
 <p align="center"><img src="share/github/overview.png" width="720"></p>
 
