@@ -148,39 +148,47 @@ class Taste {
       })
   }
 
-  checkPhotosOut (photos) {
-    const thumbnail = _.find(photos[ 0 ].processedFiles, { width: 84, height: 84 })
+  firstSight (photo) {
+    const thumbnail = _.find(photo.processedFiles, { width: 84, height: 84 })
+
     return savePhoto.bind(this)(thumbnail)
       .then(() => {
-        photos[ 0 ].thumbnailUrl = thumbnail.url
-
-        return Promise.map(photos, (photo) => {
-          return savePhoto.bind(this)(photo)
-            .then((image) => this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image))
-            .then(({ FaceMatches }) => {
-              photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
-
-              return photo.similarity
-            })
-            .catch(() => {
-              photo.similarity = 0
-
-              return photo.similarity
-            })
-        }, { concurrency: 3 })
-          .then((faceSimilarities) => {
-            const faceSimilarityMax = _.max(faceSimilarities)
-            const faceSimilarityMin = _.min(faceSimilarities)
-            const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
-
-            const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 80
-
-            return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like }
-          })
+        photo.thumbnailUrl = thumbnail.url
       })
   }
 
-  mentalSnapshot (photos) {
+  checkPhotosOut (photos) {
+    return Promise.map(photos, (photo) => {
+      if (photo.similarity_date) {
+        return // do not s3 and rekognition photos that have already been checked out
+      }
+
+      return savePhoto.bind(this)(photo)
+        .then((image) => this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image))
+        .then(({ FaceMatches }) => {
+          photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
+          photo.similarity_date = new Date().toISOString()
+
+          return photo.similarity
+        })
+        .catch(() => {
+          photo.similarity = 0
+
+          return photo.similarity
+        })
+    }, { concurrency: 3 })
+      .then((faceSimilarities) => {
+        const faceSimilarityMax = _.max(faceSimilarities)
+        const faceSimilarityMin = _.min(faceSimilarities)
+        const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
+
+        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 73
+
+        return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like }
+      })
+  }
+
+  acquireTaste (photos) {
     return Promise.map(photos, (photo) => {
       const url = parse(photo.url)
       if (!url) {

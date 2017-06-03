@@ -53,6 +53,8 @@ const createSchema = function () {
     'trained_date DATETIME DEFAULT NULL,' +
     'last_checked_out_date DATETIME DEFAULT NULL,' +
     'photos_similarity_mean REAL NOT NULL,' +
+    'match INTEGER NOT NULL DEFAULT 0,' +
+    'match_id VARCHAR(64) DEFAULT NULL,' +
     'channel VARCHAR(32) NOT NULL, ' +
     'channel_id VARCHAR(64) NOT NULL, ' +
     'data TEXT NOT NULL,' +

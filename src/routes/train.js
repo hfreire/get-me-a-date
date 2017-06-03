@@ -31,7 +31,7 @@ class Train extends Route {
 
         const { channel, channel_id, data } = recommendation
         const { photos } = data
-        return Taste.mentalSnapshot(photos)
+        return Taste.acquireTaste(photos)
           .then(() => Recommendations.save(channel, channel_id, { train: true, trained_date: new Date() }))
       })
       .then(() => reply(null))

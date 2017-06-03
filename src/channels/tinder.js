@@ -9,6 +9,8 @@ const FACEBOOK_USER_EMAIL = process.env.FACEBOOK_USER_EMAIL
 const FACEBOOK_USER_PASSWORD = process.env.FACEBOOK_USER_PASSWORD
 const FACEBOOK_TINDER_APP_AUTHZ_URL = 'https://www.facebook.com/v2.6/dialog/oauth?redirect_uri=fb464891386855067%3A%2F%2Fauthorize%2F&state=%7B%22challenge%22%3A%22q1WMwhvSfbWHvd8xz5PT6lk6eoA%253D%22%2C%220_auth_logger_id%22%3A%2254783C22-558A-4E54-A1EE-BB9E357CC11F%22%2C%22com.facebook.sdk_client_state%22%3Atrue%2C%223_method%22%3A%22sfvc_auth%22%7D&scope=user_birthday%2Cuser_photos%2Cuser_education_history%2Cemail%2Cuser_relationship_details%2Cuser_friends%2Cuser_work_history%2Cuser_likes&response_type=token%2Csigned_request&default_audience=friends&return_scopes=true&auth_type=rerequest&client_id=464891386855067&ret=login&sdk=ios&logger_id=54783C22-558A-4E54-A1EE-BB9E357CC11F#_=_'
 
+const Channel = require('./channel')
+
 const _ = require('lodash')
 const Promise = require('bluebird')
 const retry = require('bluebird-retry')
@@ -80,8 +82,10 @@ const defaultOptions = {
   breaker: { timeout: 16000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
 }
 
-class Tinder {
+class Tinder extends Channel {
   constructor (options = {}) {
+    super('tinder')
+
     this._options = _.defaults(options, defaultOptions)
 
     this._tinder = Promise.promisifyAll(new TinderClient())
@@ -93,6 +97,7 @@ class Tinder {
     this._tinder.getRecommendationsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getRecommendationsAsync(params), this._options.retry))
     this._tinder.getUpdatesCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getUpdatesAsync(), this._options.retry))
     this._tinder.getHistoryCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getHistoryAsync(), this._options.retry))
+    this._tinder.likeCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.likeAsync(params), this._options.retry))
 
     Health.addCheck('tinder', () => new Promise((resolve, reject) => {
       if (this._breaker.isOpen()) {
@@ -135,8 +140,6 @@ class Tinder {
       }
     })
       .then(() => this._tinder.getUpdatesCircuitBreaker.exec())
-      .then((data) => {
-      })
       .catch((error) => handleError.bind(this)(error))
   }
 
@@ -150,6 +153,20 @@ class Tinder {
       .then((data) => {
         console.log(data)
       })
+      .catch((error) => handleError.bind(this)(error))
+  }
+
+  like (userId) {
+    if (!userId) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    return Promise.try(() => {
+      if (!this._tinder.getAuthToken()) {
+        throw new NotAuthorizedError()
+      }
+    })
+      .then(() => this._tinder.likeCircuitBreaker.exec(userId))
       .catch((error) => handleError.bind(this)(error))
   }
 }
