@@ -82,10 +82,10 @@
   },
   "scripts": {
     "commit": "./node_modules/.bin/commit-wizard",
-    "clean": "rm -rf coverage && find src/web -type f -name '*.js.map' -exec rm {} +",
+    "clean": "rm -rf coverage && find src/web -type f -name '*.js.map' -exec rm {} + && find src/web -type f -name '*.js' -exec rm {} +",
     "lint": "node_modules/.bin/eslint . && node_modules/.bin/tslint 'src/web/**/*.ts'",
-    "coverage": "node_modules/.bin/istanbul cover --excludes src/web/**/*.js --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
-    "test": "npm run lint && npm run coverage",
+    "coverage": "node_modules/.bin/istanbul cover --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
+    "test": "npm run clean && npm run lint && npm run coverage",
     "compile:ts": "./node_modules/.bin/tsc",
     "compile:sass": "./node_modules/.bin/node-sass -o src/web/assets/styles/ src/web/assets/styles/styles.scss",
     "compile": "npm run compile:ts && npm run compile:sass",
