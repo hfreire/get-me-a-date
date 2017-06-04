@@ -19,6 +19,7 @@ export class StatsComponent {
   public lineChartData: Array<any> = [
     { label: 'Likes', data: [] },
     { label: 'Passes', data: [] },
+    { label: 'Matches', data: [] },
     { label: 'Training', data: [] }
   ]
   public lineChartLabels: Array<any>
@@ -41,6 +42,13 @@ export class StatsComponent {
       pointHoverBorderColor: 'rgba(77,83,96,1)'
     },
     {
+      borderColor: 'rgba(255, 86, 7, 1)',
+      pointBackgroundColor: 'rgba(255, 86, 7, 1)',
+      pointBorderColor: 'rgba(212, 203, 207, 1)',
+      pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
+      pointHoverBorderColor: 'rgba(255, 86, 7, 1)'
+    },
+    {
       borderColor: 'rgba(255, 255, 0, 1)',
       pointBackgroundColor: 'rgba(255, 255, 0, 1)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
@@ -61,7 +69,8 @@ export class StatsComponent {
         this.lineChartLabels = _.map(results, 'date')
         this.lineChartData[ 0 ].data = _.map(results, 'likes')
         this.lineChartData[ 1 ].data = _.map(results, 'passes')
-        this.lineChartData[ 2 ].data = _.map(results, 'trains')
+        this.lineChartData[ 2 ].data = _.map(results, 'matches')
+        this.lineChartData[ 3 ].data = _.map(results, 'trains')
       })
   }
 }

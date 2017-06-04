@@ -44,6 +44,7 @@ export class RecommendationsComponent {
     { value: {}, label: 'All' },
     { value: { like: 1 }, label: 'Likes' },
     { value: { like: 0 }, label: 'Passes' },
+    { value: { match: 1 }, label: 'Matches' },
     { value: { train: 1 }, label: 'Training' }
   ]
 
