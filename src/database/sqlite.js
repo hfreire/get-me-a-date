@@ -67,6 +67,7 @@ const createSchema = function () {
       'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
       'is_enabled INTEGER NOT NULL DEFAULT 0,' +
       'auth_id INTEGER NULL,' +
+      'last_activity_date DATETIME DEFAULT CURRENT_TIMESTAMP,' +
       'PRIMARY KEY (name)' +
       ')'))
     .then(() => this._database.runAsync(
