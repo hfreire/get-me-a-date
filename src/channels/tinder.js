@@ -108,7 +108,7 @@ class Tinder extends Channel {
     this._tinder.getRecommendationsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getRecommendationsAsync(params), this._options.retry))
     this._tinder.getUpdatesCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getUpdatesAsync(), this._options.retry))
     this._tinder.getHistoryCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getHistoryAsync(), this._options.retry))
-    this._tinder.likeCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.likeAsync(params), this._options.retry))
+    this._tinder.likeCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.likeAsync(...params), this._options.retry))
 
     Health.addCheck('tinder', () => new Promise((resolve, reject) => {
       if (this._breaker.isOpen()) {
@@ -167,7 +167,7 @@ class Tinder extends Channel {
       .catch((error) => handleError.bind(this)(error))
   }
 
-  like (userId) {
+  like (userId, photoId, contentHash, sNumber) {
     if (!userId) {
       return Promise.reject(new Error('invalid arguments'))
     }
@@ -185,7 +185,7 @@ class Tinder extends Channel {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => this._tinder.likeCircuitBreaker.exec(userId))
+      .then(() => this._tinder.likeCircuitBreaker.exec(userId, photoId, contentHash, sNumber))
       .then(({ match, likes_remaining }) => {
         // eslint-disable-next-line camelcase
         if (!likes_remaining) {

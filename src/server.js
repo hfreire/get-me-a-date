@@ -81,7 +81,10 @@ const findDatesByChannel = (channel) => {
         }, { concurrency: 2 }))
     })
     .then(() => { return { received, skipped, failed } })
-    .catch(NotAuthorizedError, () => channel.authorize())
+    .catch(NotAuthorizedError, () => {
+      return channel.authorize()
+        .then(() => findDatesByChannel(channel))
+    })
     .catch((error) => Logger.error(error))
 }
 

@@ -57,6 +57,7 @@ class Recommendation {
               .then(({ photos }) => {
                 recommendation.last_checked_out_date = new Date()
                 recommendation.data = channelRecommendation
+                recommendation.data.photos = photosToCheckOut
                 recommendation.like = photos.like
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
               })
@@ -78,7 +79,7 @@ class Recommendation {
     return Promise.resolve()
       .then(() => {
         if (recommendation.like) {
-          return channel.like(recommendation.channel_id)
+          return channel.like(recommendation.channel_id, recommendation.data.photos[ 0 ].id, recommendation.data.content_hash, recommendation.data.s_number)
             .then((match) => {
               recommendation.liked_date = new Date()
               recommendation.match = !!match

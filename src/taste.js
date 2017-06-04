@@ -173,6 +173,7 @@ class Taste {
         })
         .catch(() => {
           photo.similarity = 0
+          photo.similarity_date = new Date().toISOString()
 
           return photo.similarity
         })
