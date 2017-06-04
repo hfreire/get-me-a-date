@@ -43,9 +43,9 @@ class Recommendation {
 
     return findOrCreateNewRecommendation(channel, channelRecommendationId)
       .then((recommendation) => {
-        /* if (recommendation.last_checked_out_date) {
+        if (recommendation.last_checked_out_date) {
           return Promise.reject(new AlreadyCheckedOutEarlierError())
-         } */
+        }
 
         return Promise.resolve()
           .then(() => {
