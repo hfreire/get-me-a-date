@@ -41,7 +41,7 @@
     "nightmare": "2.10.0",
     "random-http-useragent": "1.1.0",
     "request": "2.81.0",
-    "serverful": "1.0.31",
+    "serverful": "1.0.33",
     "rxjs": "5.4.0",
     "sqlite3": "3.1.8",
     "systemjs": "0.20.13",
