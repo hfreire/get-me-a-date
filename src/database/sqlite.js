@@ -45,18 +45,19 @@ const createSchema = function () {
   return this._database.runAsync(
     'CREATE TABLE IF NOT EXISTS recommendations (' +
     'id VARCHAR(36) NOT NULL, ' +
+    'channel VARCHAR(32) NOT NULL, ' +
+    'channel_id VARCHAR(64) NOT NULL, ' +
     'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
     'like INTEGER NOT NULL DEFAULT 0,' +
     'liked_date DATETIME DEFAULT NULL,' +
+    'match INTEGER NOT NULL DEFAULT 0,' +
+    'match_id VARCHAR(64) DEFAULT NULL,' +
+    'matched_date DATETIME DEFAULT NULL,' +
     'train INTEGER NOT NULL DEFAULT 0,' +
     'trained_date DATETIME DEFAULT NULL,' +
     'last_checked_out_date DATETIME DEFAULT NULL,' +
     'photos_similarity_mean REAL NOT NULL,' +
-    'match INTEGER NOT NULL DEFAULT 0,' +
-    'match_id VARCHAR(64) DEFAULT NULL,' +
-    'channel VARCHAR(32) NOT NULL, ' +
-    'channel_id VARCHAR(64) NOT NULL, ' +
     'data TEXT NOT NULL,' +
     'PRIMARY KEY (channel, channel_id)' +
     ')')

@@ -169,8 +169,8 @@ class Tinder extends Channel {
       .then((data) => {
         const last_activity_date = new Date()
 
-        // return Channels.save(this.name, { last_activity_date })
-        //  .then(() => data)
+        return Channels.save(this.name, { last_activity_date })
+          .then(() => data)
 
         return data
       })

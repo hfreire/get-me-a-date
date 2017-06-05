@@ -56,13 +56,17 @@ const findOrCreateNewRecommendation = (channel, channelRecommendationId) => {
     })
 }
 
-const findOrCreateNewRecommendationFromMatch = (channel, channelRecommendationId, matchId) => {
-  return findOrCreateNewRecommendation(channel, channelRecommendationId, matchId)
+const findOrCreateNewRecommendationFromMatch = (channel, channelRecommendationId, match) => {
+  return findOrCreateNewRecommendation(channel, channelRecommendationId)
     .then((recommendation) => {
       if (!recommendation.match) {
         recommendation.like = true
         recommendation.match = true
-        recommendation.match_id = matchId
+        recommendation.match_id = match._id
+
+        if (match.created_date) {
+          recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
+        }
 
         return Recommendations.save(channel.name, channelRecommendationId, recommendation)
       }
@@ -150,7 +154,7 @@ class Dates {
     const checkRecommendations = function (channel) {
       return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} `)
         .then(() => this.checkRecommendations(channel))
-        .then(({ received, skipped, failed }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} (received = ${received}, skipped = ${skipped}, failed = ${failed}`))
+        .then(({ received, skipped, failed }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     }
 
     const checkUpdates = function (channel) {
@@ -232,9 +236,7 @@ class Dates {
 
             messages += match.messages.length
 
-            const matchId = match._id
-
-            return findOrCreateNewRecommendationFromMatch(channel, channelRecommendationId, matchId)
+            return findOrCreateNewRecommendationFromMatch(channel, channelRecommendationId, match)
               .then((recommendation) => saveMessages(channel, accountUserId, recommendation.id, match.messages))
           })
       })
