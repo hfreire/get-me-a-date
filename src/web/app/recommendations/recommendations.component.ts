@@ -47,6 +47,7 @@ export class RecommendationsComponent {
     { value: { match: 1 }, label: 'Matches' },
     { value: { train: 1 }, label: 'Training' }
   ]
+  currentCriteria: any = this.criteria[ 0 ].value
 
   constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
@@ -67,7 +68,7 @@ export class RecommendationsComponent {
     this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
   }
 
-  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria?: any) {
+  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria) {
     this.loadedPage = false
 
     this.recommendationService.getAll(page, limit, criteria)
@@ -81,6 +82,8 @@ export class RecommendationsComponent {
   }
 
   setPageCriteria ({ value }: any) {
-    this.getPage(undefined, undefined, value)
+    this.currentCriteria = value
+
+    this.getPage(undefined, undefined)
   }
 }
