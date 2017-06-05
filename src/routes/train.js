@@ -7,13 +7,15 @@
 
 const { Route } = require('serverful')
 
+const Promise = require('bluebird')
+
 const Logger = require('modern-logger')
 
 const Joi = require('joi')
 const Boom = require('boom')
 
-const Taste = require('../taste')
 const { Recommendations } = require('../database')
+const { Recommendation } = require('../recommendation')
 
 class Train extends Route {
   constructor () {
@@ -26,13 +28,14 @@ class Train extends Route {
     Recommendations.findById(id)
       .then((recommendation) => {
         if (!recommendation) {
-          return
+          return Promise.reject(new Error())
         }
 
-        const { channel, channel_id, data } = recommendation
-        const { photos } = data
-        return Taste.acquireTaste(photos)
-          .then(() => Recommendations.save(channel, channel_id, { train: true, trained_date: new Date() }))
+        const channelName = recommendation.channel
+        const channelRecommendationId = recommendation.channel_id
+
+        return Recommendation.fallInLove(recommendation)
+          .then((recommendation) => Recommendations.save(channelName, channelRecommendationId, recommendation))
       })
       .then(() => reply(null))
       .catch((error) => {

@@ -171,8 +171,6 @@ class Tinder extends Channel {
 
         return Channels.save(this.name, { last_activity_date })
           .then(() => data)
-
-        return data
       })
       .catch((error) => handleError.bind(this)(error))
   }
@@ -227,6 +225,7 @@ class Tinder extends Channel {
       }
     })
       .then(() => this._tinder.getUserCircuitBreaker.exec(userId))
+      .then(({ results }) => results)
       .catch((error) => handleError.bind(this)(error))
   }
 }

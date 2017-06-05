@@ -16,32 +16,13 @@ const Taste = require('../taste')
 
 const { Recommendations } = require('../database')
 
-const findOrCreateNewRecommendation = (channel, channelRecommendationId) => {
-  if (!channel || !channelRecommendationId) {
-    return Promise.reject(new Error('invalid arguments'))
-  }
-
-  const channelName = channel.name
-
-  return Recommendations.findByChannelAndChannelId(channel.name, channelRecommendationId)
-    .then((recommendation) => {
-      if (!recommendation) {
-        return { channel: channelName, channel_id: channelRecommendationId }
-      }
-
-      return recommendation
-    })
-}
-
 class Recommendation {
-  checkOut (channel, channelRecommendation) {
-    if (!channel || !channelRecommendation) {
+  checkOut (channel, channelRecommendationId, channelRecommendation) {
+    if (!channel || !channelRecommendationId) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const channelRecommendationId = channelRecommendation._id
-
-    return findOrCreateNewRecommendation(channel, channelRecommendationId)
+    return this.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
       .then((recommendation) => {
         if (recommendation.last_checked_out_date) {
           return Promise.reject(new AlreadyCheckedOutEarlierError())
@@ -55,9 +36,10 @@ class Recommendation {
               photos: Taste.checkPhotosOut(photosToCheckOut)
             })
               .then(({ photos }) => {
+                channelRecommendation.photos = photosToCheckOut
+
                 recommendation.last_checked_out_date = new Date()
                 recommendation.data = channelRecommendation
-                recommendation.data.photos = photosToCheckOut
                 recommendation.like = photos.like
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
               })
@@ -91,6 +73,57 @@ class Recommendation {
         }
 
         return recommendation
+      })
+  }
+
+  fallInLove (recommendation) {
+    if (!recommendation) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    if (recommendation.train) {
+      return Promise.resolve()
+    }
+
+    const { photos } = recommendation.data
+
+    return Taste.acquireTaste(photos)
+      .then(() => _.merge(recommendation, {
+        train: true,
+        trained_date: new Date()
+      }))
+  }
+
+  findOrCreateNewRecommendation (channel, channelRecommendationId, channelRecommendation) {
+    if (!channel || !channelRecommendationId) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    const channelName = channel.name
+
+    return Recommendations.findByChannelAndChannelId(channelName, channelRecommendationId)
+      .then((recommendation) => {
+        if (recommendation) {
+          return recommendation
+        }
+
+        return Promise.resolve()
+          .then(() => {
+            if (channelRecommendation) {
+              return channelRecommendation
+            }
+
+            return channel.getUser(channelRecommendationId)
+          })
+          .then((channelRecommendation) => {
+            const recommendation = {
+              channel: channel.name,
+              channel_id: channelRecommendationId,
+              data: channelRecommendation
+            }
+
+            return Recommendations.save(channel.name, channelRecommendationId, recommendation)
+          })
       })
   }
 }

@@ -78,6 +78,22 @@ const savePhoto = function (photo) {
     })
 }
 
+const compareFace = function (photo, image) {
+  return this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image)
+    .then(({ FaceMatches }) => {
+      photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
+      photo.similarity_date = new Date().toISOString()
+
+      return photo.similarity
+    })
+    .catch(() => {
+      photo.similarity = 0
+      photo.similarity_date = new Date().toISOString()
+
+      return photo.similarity
+    })
+}
+
 class Taste {
   constructor () {
     this.rekognition = new Rekognition({
@@ -164,19 +180,7 @@ class Taste {
       }
 
       return savePhoto.bind(this)(photo)
-        .then((image) => this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image))
-        .then(({ FaceMatches }) => {
-          photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
-          photo.similarity_date = new Date().toISOString()
-
-          return photo.similarity
-        })
-        .catch(() => {
-          photo.similarity = 0
-          photo.similarity_date = new Date().toISOString()
-
-          return photo.similarity
-        })
+        .then((image) => compareFace.bind(this)(photo, image))
     }, { concurrency: 3 })
       .then((faceSimilarities) => {
         const faceSimilarityMax = _.max(faceSimilarities)
