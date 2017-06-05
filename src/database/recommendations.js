@@ -85,6 +85,24 @@ const queryAll = function (...args) {
 }
 
 const buildWhereClause = (keys, values) => {
+  if (_.includes(keys, 'liked_date')) {
+    const index = _.indexOf(keys, 'liked_date')
+    values[ index ] = values[ index ].split(' ')[ 0 ]
+    values.splice(index, 0, values[ index ])
+  }
+
+  if (_.includes(keys, 'matched_date')) {
+    const index = _.indexOf(keys, 'matched_date')
+    values[ index ] = values[ index ].split(' ')[ 0 ]
+    values.splice(index, 0, values[ index ])
+  }
+
+  if (_.includes(keys, 'trained_date')) {
+    const index = _.indexOf(keys, 'trained_date')
+    values[ index ] = values[ index ].split(' ')[ 0 ]
+    values.splice(index, 0, values[ index ])
+  }
+
   if (_.includes(keys, 'last_checked_out_date')) {
     const index = _.indexOf(keys, 'last_checked_out_date')
     values[ index ] = values[ index ].split(' ')[ 0 ]
@@ -92,6 +110,18 @@ const buildWhereClause = (keys, values) => {
   }
 
   return keys.map((key) => {
+    if (key === 'liked_date') {
+      return `${key} > ? AND ${key} < date(?, '+1 day')`
+    }
+
+    if (key === 'matched_date') {
+      return `${key} > ? AND ${key} < date(?, '+1 day')`
+    }
+
+    if (key === 'trained_date') {
+      return `${key} > ? AND ${key} < date(?, '+1 day')`
+    }
+
     if (key === 'last_checked_out_date') {
       return `${key} > ? AND ${key} < date(?, '+1 day')`
     }

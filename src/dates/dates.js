@@ -250,10 +250,10 @@ class Dates {
 
   updateStats (date) {
     return Promise.props({
-      likes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 1 }),
+      likes: Recommendations.findAll(1, 10000, { liked_date: date, like: 1 }),
       passes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 0 }),
-      trains: Recommendations.findAll(1, 10000, { train: 1 }),
-      matches: Recommendations.findAll(1, 10000, { last_checked_out_date: date, match: 1 })
+      trains: Recommendations.findAll(1, 10000, { trained_date: date, train: 1 }),
+      matches: Recommendations.findAll(1, 10000, { matched_date: date, match: 1 })
     })
       .then(({ likes, passes, trains, matches }) => Stats.save(date, {
         likes: likes.totalCount,
