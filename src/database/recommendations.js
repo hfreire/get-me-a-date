@@ -19,9 +19,18 @@ const transformRowToObject = function (row) {
 
   row.created_date = new Date(row.created_date)
   row.updated_date = new Date(row.updated_date)
-  row.liked_date = new Date(row.liked_date)
-  row.trained_date = new Date(row.trained_date)
-  row.last_checked_out_date = new Date(row.last_checked_out_date)
+
+  if (row.liked_date) {
+    row.liked_date = new Date(row.liked_date)
+  }
+
+  if (row.trained_date) {
+    row.trained_date = new Date(row.trained_date)
+  }
+
+  if (row.last_checked_out_date) {
+    row.last_checked_out_date = new Date(row.last_checked_out_date)
+  }
 
   if (row.data) {
     row.data = JSON.parse(row.data)

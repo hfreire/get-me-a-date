@@ -15,7 +15,82 @@ const Logger = require('modern-logger')
 const { Tinder } = require('../channels')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('../recommendation')
-const { SQLite, Recommendations, Channels, Stats } = require('../database')
+const { SQLite, Recommendations, Channels, Stats, Messages } = require('../database')
+
+const findAccount = (channel) => {
+  return Channels.findByName(channel.name)
+    .then(({ user_id }) => {
+      if (!user_id) {
+        return channel.getAccount()
+          .then(({ user }) => {
+            const user_id = user._id
+
+            return Channels.save(channel.name, { user_id })
+              .then(() => {
+                return { user_id }
+              })
+          })
+      }
+
+      return { user_id }
+    })
+}
+
+const findOrCreateNewRecommendation = (channel, channelRecommendationId) => {
+  return Recommendations.findByChannelAndChannelId(channel.name, channelRecommendationId)
+    .then((recommendation) => {
+      if (!recommendation) {
+        return channel.getUser(channelRecommendationId)
+          .then((channelRecommendation) => {
+            const recommendation = {
+              channel: channel.name,
+              channel_id: channelRecommendationId,
+              data: channelRecommendation
+            }
+
+            return Recommendations.save(channel.name, channelRecommendationId, recommendation)
+          })
+      }
+
+      return recommendation
+    })
+}
+
+const findOrCreateNewRecommendationFromMatch = (channel, channelRecommendationId, matchId) => {
+  return findOrCreateNewRecommendation(channel, channelRecommendationId, matchId)
+    .then((recommendation) => {
+      if (!recommendation.match) {
+        recommendation.like = true
+        recommendation.match = true
+        recommendation.match_id = matchId
+
+        return Recommendations.save(channel.name, channelRecommendationId, recommendation)
+      }
+
+      return recommendation
+    })
+}
+
+const saveMessages = (channel, accountUserId, recommendationId, messages) => {
+  return Promise.try(() => {
+    const _messages = []
+
+    _.forEach(messages, ({ _id, message, from, sent_date }) => {
+      const _message = {
+        channel: channel.name,
+        channel_message_id: _id,
+        recommendation_id: recommendationId,
+        sent_date: new Date(sent_date.replace(/T/, ' ').replace(/\..+/, '')),
+        text: message,
+        is_from_recommendation: from !== accountUserId
+      }
+      _messages.push(_message)
+    })
+
+    return _messages
+  })
+    .mapSeries((message) => Messages.save(message.channel, message.channel_message_id, message))
+}
 
 class Dates {
   constructor () {
@@ -47,6 +122,12 @@ class Dates {
   }
 
   find () {
+    const findByChannel = function (channel) {
+      return Logger.info(`Started finding dates in ${_.capitalize(channel.name)}`)
+        .then(() => this.findByChannel(channel))
+        .finally(() => Logger.info(`Finished finding dates in ${_.capitalize(channel.name)}`))
+    }
+
     return Channels.findAll()
       .mapSeries(({ name, is_enabled }) => {
         // eslint-disable-next-line camelcase
@@ -60,14 +141,29 @@ class Dates {
 
         const channel = this._channels[ name ]
 
-        return Logger.info(`Started finding dates in ${_.capitalize(name)}`)
-          .then(() => this.findByChannel(channel))
-          .then(({ received, skipped, failed }) => Logger.info(`Finished finding dates in ${_.capitalize(name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
+        return findByChannel.bind(this)(channel)
       })
       .then(() => this.updateStats(new Date()))
   }
 
   findByChannel (channel) {
+    const checkRecommendations = function (channel) {
+      return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} `)
+        .then(() => this.checkRecommendations(channel))
+        .then(({ received, skipped, failed }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} (received = ${received}, skipped = ${skipped}, failed = ${failed}`))
+    }
+
+    const checkUpdates = function (channel) {
+      return Logger.info(`Started checking updates from ${_.capitalize(channel.name)} `)
+        .then(() => this.checkUpdates(channel))
+        .then(({ matches, messages }) => Logger.info(`Finished checking updates from ${_.capitalize(channel.name)}  (matches = ${matches}, messages = ${messages})`))
+    }
+
+    return checkRecommendations.bind(this)(channel)
+      .then(() => checkUpdates.bind(this)(channel))
+  }
+
+  checkRecommendations (channel) {
     let received = 0
     let skipped = 0
     let failed = 0
@@ -110,7 +206,42 @@ class Dates {
       .then(() => { return { received, skipped, failed } })
       .catch(NotAuthorizedError, () => {
         return channel.authorize()
-          .then(() => this.findByChannel(channel))
+          .then(() => this.checkRecommendations(channel))
+      })
+      .catch((error) => Logger.error(error))
+  }
+
+  checkUpdates (channel) {
+    let matches = 0
+    let messages = 0
+
+    return findAccount(channel)
+      .then(({ user_id }) => {
+        const accountUserId = user_id
+
+        return channel.getUpdates()
+          .then(({ matches }) => matches)
+          .mapSeries((match) => {
+            let channelRecommendationId
+            if (match.is_new_message) {
+              channelRecommendationId = match.messages[ 0 ].from !== accountUserId ? match.messages[ 0 ].from : match.messages[ 0 ].to
+            } else {
+              matches++
+              channelRecommendationId = match.person._id
+            }
+
+            messages += match.messages.length
+
+            const matchId = match._id
+
+            return findOrCreateNewRecommendationFromMatch(channel, channelRecommendationId, matchId)
+              .then((recommendation) => saveMessages(channel, accountUserId, recommendation.id, match.messages))
+          })
+      })
+      .then(() => { return { matches, messages } })
+      .catch(NotAuthorizedError, () => {
+        return channel.authorize()
+          .then(() => this.checkUpdates(channel))
       })
       .catch((error) => Logger.error(error))
   }

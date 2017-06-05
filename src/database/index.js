@@ -10,5 +10,6 @@ module.exports = {
   Recommendations: require('./recommendations'),
   Channels: require('./channels'),
   Auth: require('./auth'),
-  Stats: require('./stats')
+  Stats: require('./stats'),
+  Messages: require('./messages')
 }

@@ -66,6 +66,7 @@ const createSchema = function () {
       'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
       'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
       'is_enabled INTEGER NOT NULL DEFAULT 0,' +
+      'user_id VARCHAR(64) DEFAULT NULL,' +
       'auth_id INTEGER NULL,' +
       'last_activity_date DATETIME DEFAULT CURRENT_TIMESTAMP,' +
       'PRIMARY KEY (name)' +
@@ -86,6 +87,18 @@ const createSchema = function () {
       'passes INTEGER NOT NULL DEFAULT 0,' +
       'trains INTEGER NOT NULL DEFAULT 0,' +
       'matches INTEGER NOT NULL DEFAULT 0' +
+      ')'))
+    .then(() => this._database.runAsync(
+      'CREATE TABLE IF NOT EXISTS messages (' +
+      'channel VARCHAR(32) NOT NULL, ' +
+      'channel_message_id VARCHAR(64) NOT NULL, ' +
+      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'recommendation_id VARCHAR(36) NOT NULL, ' +
+      'sent_date DATETIME NOT NULL, ' +
+      'is_from_recommendation INTEGER NOT NULL,' +
+      'text TEXT NOT NULL,' +
+      'PRIMARY KEY (channel, channel_message_id)' +
       ')'))
 }
 

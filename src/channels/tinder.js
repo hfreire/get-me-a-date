@@ -107,10 +107,12 @@ class Tinder extends Channel {
     this._breaker = new Brakes(this._options.breaker)
 
     this._tinder.authorizeCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.authorizeAsync(...params), this._options.retry))
+    this._tinder.getAccountCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getAccountAsync(), this._options.retry))
     this._tinder.getRecommendationsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getRecommendationsAsync(params), this._options.retry))
     this._tinder.getUpdatesCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.getUpdatesAsync(...params), this._options.retry))
     this._tinder.getHistoryCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getHistoryAsync(), this._options.retry))
     this._tinder.likeCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.likeAsync(...params), this._options.retry))
+    this._tinder.getUserCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getUserAsync(params), this._options.retry))
 
     Health.addCheck('tinder', () => new Promise((resolve, reject) => {
       if (this._breaker.isOpen()) {
@@ -135,6 +137,16 @@ class Tinder extends Channel {
       })
   }
 
+  getAccount () {
+    return Promise.try(() => {
+      if (!this._tinder.getAuthToken()) {
+        throw new NotAuthorizedError()
+      }
+    })
+      .then(() => this._tinder.getAccountCircuitBreaker.exec())
+      .catch((error) => handleError.bind(this)(error))
+  }
+
   getRecommendations () {
     return Promise.try(() => {
       if (!this._tinder.getAuthToken()) {
@@ -157,8 +169,10 @@ class Tinder extends Channel {
       .then((data) => {
         const last_activity_date = new Date()
 
-        return Channels.save(this.name, { last_activity_date })
-          .then(() => data)
+        // return Channels.save(this.name, { last_activity_date })
+        //  .then(() => data)
+
+        return data
       })
       .catch((error) => handleError.bind(this)(error))
   }
@@ -199,6 +213,20 @@ class Tinder extends Channel {
 
         return match
       })
+      .catch((error) => handleError.bind(this)(error))
+  }
+
+  getUser (userId) {
+    if (!userId) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    return Promise.try(() => {
+      if (!this._tinder.getAuthToken()) {
+        throw new NotAuthorizedError()
+      }
+    })
+      .then(() => this._tinder.getUserCircuitBreaker.exec(userId))
       .catch((error) => handleError.bind(this)(error))
   }
 }
