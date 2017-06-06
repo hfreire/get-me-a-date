@@ -15,7 +15,7 @@ const Joi = require('joi')
 const Boom = require('boom')
 
 const { Recommendations } = require('../database')
-const { Recommendation } = require('../dates/recommendation')
+const { Recommendation } = require('../dates')
 
 class Train extends Route {
   constructor () {
