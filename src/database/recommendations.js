@@ -118,7 +118,7 @@ const buildWhereClause = (keys, values) => {
     }
 
     if (key === 'trained_date') {
-      return `${key} < date(?, '+1 day')`
+      return `${key} < strftime('%Y-%m-%dT%H:%M:%fZ', datetime(?, '+1 day'))`
     }
 
     if (key === 'last_checked_out_date') {
