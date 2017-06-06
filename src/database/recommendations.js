@@ -130,6 +130,7 @@ const buildWhereClause = (keys, values) => {
     .toString()
     .replace(/,/g, ' AND ')
     .replace(/datetime\(\? AND/, 'datetime(?,')
+    // eslint-disable-next-line no-regex-spaces
     .replace(/AND  datetime/, ', datetime')
 }
 
