@@ -17,8 +17,13 @@ const transformRowToObject = function (row) {
     return
   }
 
-  row.created_date = new Date(row.created_date)
-  row.updated_date = new Date(row.updated_date)
+  if (row.created_date) {
+    row.created_date = new Date(row.created_date)
+  }
+
+  if (row.updated_date) {
+    row.updated_date = new Date(row.updated_date)
+  }
 
   if (row.liked_date) {
     row.liked_date = new Date(row.liked_date)
@@ -127,6 +132,30 @@ const buildWhereClause = (keys, values) => {
     .replace(/date\(\? AND/, 'date(?,')
 }
 
+const buildSelectClause = (unique, select) => {
+  if (unique && _.includes(select, 'liked_date')) {
+    const index = _.indexOf(select, 'liked_date')
+    select[ index ] = `strftime('%Y-%m-%d',${select[ index ]}) AS liked_date`
+  }
+
+  if (unique && _.includes(select, 'matched_date')) {
+    const index = _.indexOf(select, 'matched_date')
+    select[ index ] = `strftime('%Y-%m-%d',${select[ index ]}) AS matched_date`
+  }
+
+  if (unique && _.includes(select, 'trained_date')) {
+    const index = _.indexOf(select, 'trained_date')
+    select[ index ] = `strftime('%Y-%m-%d',${select[ index ]}) AS trained_date`
+  }
+
+  if (unique && _.includes(select, 'last_checked_out_date')) {
+    const index = _.indexOf(select, 'last_checked_out_date')
+    select[ index ] = `strftime('%Y-%m-%d',${select[ index ]}) AS last_checked_out_date`
+  }
+
+  return select
+}
+
 class Recommendations {
   save (channel, channelId, data) {
     const _data = transformObjectToRow(_.clone(data))
@@ -162,12 +191,13 @@ class Recommendations {
       .then(() => this.findByChannelAndChannelId(channel, channelId))
   }
 
-  findAll (page = 1, limit = 25, criteria, sort = 'last_checked_out_date') {
+  findAll (page = 1, limit = 25, criteria = {}, select = [ '*' ], sort = 'last_checked_out_date', unique = false) {
     const offset = (page - 1) * limit
 
     let queryResults
     let queryTotalCount
     let params = []
+    let _select = buildSelectClause(unique, select)
     if (!_.isEmpty(criteria)) {
       const _criteria = transformObjectToRow(_.clone(criteria))
 
@@ -176,12 +206,12 @@ class Recommendations {
 
       const where = buildWhereClause(keys, values)
 
-      queryResults = `SELECT * FROM recommendations WHERE ${where} ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
-      queryTotalCount = `SELECT COUNT(*) as count FROM recommendations WHERE ${where}`
+      queryResults = `SELECT ${unique ? 'DISTINCT' : ''} ${_select} FROM recommendations WHERE ${where} ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
+      queryTotalCount = `SELECT ${unique ? 'DISTINCT' : ''} COUNT(*) as count FROM recommendations WHERE ${where}`
       params = params.concat(values)
     } else {
-      queryResults = `SELECT * FROM recommendations ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
-      queryTotalCount = 'SELECT COUNT(*) as count FROM recommendations'
+      queryResults = `SELECT ${unique ? 'DISTINCT' : ''} ${_select} FROM recommendations ORDER BY ${sort} DESC LIMIT ${limit} OFFSET ${offset}`
+      queryTotalCount = `SELECT ${unique ? 'DISTINCT' : ''} COUNT(*) as count FROM recommendations`
     }
 
     return Promise.props({

@@ -15,9 +15,10 @@ const Logger = require('modern-logger')
 const { Tinder } = require('../channels')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
-const { SQLite, Recommendations, Channels, Stats } = require('../database')
+const { SQLite, Recommendations, Channels } = require('../database')
 
 const { Match } = require('./match')
+const Stats = require('./stats')
 
 const findAccount = (channel) => {
   return Channels.findByName(channel.name)
@@ -74,6 +75,12 @@ class Dates {
         .finally(() => Logger.info(`Finished finding dates in ${_.capitalize(channel.name)}`))
     }
 
+    const updateStats = () => {
+      return Logger.info('Started updating stats')
+        .then(() => Stats.update())
+        .finally(() => Logger.info('Finished updating stats'))
+    }
+
     return Channels.findAll()
       .mapSeries(({ name, is_enabled }) => {
         // eslint-disable-next-line camelcase
@@ -89,19 +96,19 @@ class Dates {
 
         return findByChannel.bind(this)(channel)
       })
-      .then(() => this.updateStats(new Date()))
+      .then(() => updateStats())
   }
 
   findByChannel (channel) {
     const checkRecommendations = function (channel) {
       return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} `)
-      //.then(() => this.checkRecommendations(channel))
+      // .then(() => this.checkRecommendations(channel))
         .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     }
 
     const checkUpdates = function (channel) {
       return Logger.info(`Started checking updates from ${_.capitalize(channel.name)} `)
-        .then(() => this.checkUpdates(channel))
+      // .then(() => this.checkUpdates(channel))
         .then(({ matches = 0, messages = 0 }) => Logger.info(`Finished checking updates from ${_.capitalize(channel.name)} (matches = ${matches}, messages = ${messages})`))
     }
 
@@ -186,21 +193,6 @@ class Dates {
           .then(() => this.checkUpdates(channel))
       })
       .catch((error) => Logger.error(error))
-  }
-
-  updateStats (date) {
-    return Promise.props({
-      likes: Recommendations.findAll(1, 10000, { liked_date: date, like: 1 }),
-      passes: Recommendations.findAll(1, 10000, { last_checked_out_date: date, like: 0 }),
-      trains: Recommendations.findAll(1, 10000, { trained_date: date, train: 1 }),
-      matches: Recommendations.findAll(1, 10000, { matched_date: date, match: 1 })
-    })
-      .then(({ likes, passes, trains, matches }) => Stats.save(date, {
-        likes: likes.totalCount,
-        passes: passes.totalCount,
-        trains: trains.totalCount,
-        matches: matches.totalCount
-      }))
   }
 }
 

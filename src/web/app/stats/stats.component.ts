@@ -60,17 +60,17 @@ export class StatsComponent {
   constructor (private statsService: StatsService) {}
 
   public ngOnInit () {
-    this.getPage(1, 31)
+    this.getPage(1, 15)
   }
 
-  getPage (page: number, limit: number = 31) {
+  getPage (page: number, limit: number = 25) {
     this.statsService.getAll(page, limit)
-      .subscribe(({ results, meta }) => {
-        this.lineChartLabels = _.map(results, 'date')
-        this.lineChartData[ 0 ].data = _.map(results, 'likes')
-        this.lineChartData[ 1 ].data = _.map(results, 'passes')
-        this.lineChartData[ 2 ].data = _.map(results, 'matches')
-        this.lineChartData[ 3 ].data = _.map(results, 'trains')
+      .subscribe(({ results }) => {
+        this.lineChartLabels = _.reverse(_.map(results, 'date'))
+        this.lineChartData[ 0 ].data = _.reverse(_.map(results, 'likes'))
+        this.lineChartData[ 1 ].data = _.reverse(_.map(results, 'passes'))
+        this.lineChartData[ 2 ].data = _.reverse(_.map(results, 'matches'))
+        this.lineChartData[ 3 ].data = _.reverse(_.map(results, 'trains'))
       })
   }
 }

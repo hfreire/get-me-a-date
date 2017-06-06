@@ -74,7 +74,7 @@ class Stats {
     const offset = (page - 1) * limit
 
     return Promise.props({
-      results: queryAll.bind(this)(`SELECT * FROM stats ORDER BY date ASC LIMIT ${limit} OFFSET ${offset}`),
+      results: queryAll.bind(this)(`SELECT * FROM stats ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`),
       totalCount: SQLite.get('SELECT COUNT(*) as count FROM stats').then(({ count }) => count)
     })
   }
