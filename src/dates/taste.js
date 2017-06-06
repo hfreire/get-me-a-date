@@ -175,9 +175,7 @@ class Taste {
     const thumbnail = _.find(photo.processedFiles, { width: 84, height: 84 })
 
     return savePhoto.bind(this)(thumbnail)
-      .then(() => {
-        photo.thumbnailUrl = thumbnail.url
-      })
+      .then(() => thumbnail.url)
   }
 
   checkPhotosOut (photos) {

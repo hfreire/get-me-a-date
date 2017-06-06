@@ -45,8 +45,11 @@ class Recommendation {
               })
           })
           .then(() => {
-            if (!recommendation.data.photos[ 0 ].thumbnailUrl) {
+            if (!recommendation.thumbnail_url) {
               return Taste.mentalSnapshot(recommendation.data.photos[ 0 ])
+                .then((url) => {
+                  recommendation.thumbnail_url = url
+                })
             }
           })
           .then(() => recommendation)

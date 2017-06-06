@@ -16,20 +16,20 @@ const Logger = require('modern-logger')
 
 const Database = require('../database')
 
-class Recommendations extends Route {
+class GetRecommendations extends Route {
   constructor () {
     super('GET', '/recommendations', 'Recommendations', 'Returns all recommendations')
   }
 
   handler ({ query = {} }, reply) {
-    const { page = 1, limit = 25, criteria } = query
+    const { page = 1, limit = 25, criteria, select } = query
 
     return Promise.try(() => {
       if (criteria) {
         return JSON.parse(criteria)
       }
     })
-      .then((criteria) => Database.Recommendations.findAll(page, limit, criteria))
+      .then((criteria) => Database.Recommendations.findAll(page, limit, criteria, select))
       .then(({ results, totalCount }) => reply({ results, totalCount }))
       .catch((error) => {
         Logger.error(error)
@@ -61,10 +61,13 @@ class Recommendations extends Route {
           .description('recommendations page results limit'),
         criteria: Joi.string()
           .optional()
-          .description('recommendations criteria')
+          .description('recommendations criteria'),
+        select: Joi.array().single()
+          .optional()
+          .description('recommendations select')
       }
     }
   }
 }
 
-module.exports = new Recommendations()
+module.exports = new GetRecommendations()

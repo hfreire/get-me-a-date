@@ -47,8 +47,10 @@ const createSchema = function () {
     'id VARCHAR(36) NOT NULL, ' +
     'channel VARCHAR(32) NOT NULL, ' +
     'channel_id VARCHAR(64) NOT NULL, ' +
-    'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-    'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
+    'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
+    'name VARCHAR(32) DEFAULT NULL,' +
+    'thumbnail_url VARCHAR(512) DEFAULT NULL,' +
     'like INTEGER NOT NULL DEFAULT 0,' +
     'liked_date DATETIME DEFAULT NULL,' +
     'match INTEGER NOT NULL DEFAULT 0,' +
@@ -57,7 +59,7 @@ const createSchema = function () {
     'train INTEGER NOT NULL DEFAULT 0,' +
     'trained_date DATETIME DEFAULT NULL,' +
     'last_checked_out_date DATETIME DEFAULT NULL,' +
-    'photos_similarity_mean REAL NOT NULL,' +
+    'photos_similarity_mean REAL DEFAULT NULL,' +
     'data TEXT NOT NULL,' +
     'PRIMARY KEY (channel, channel_id)' +
     ')')

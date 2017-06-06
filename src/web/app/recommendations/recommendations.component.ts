@@ -60,18 +60,21 @@ export class RecommendationsComponent {
     this.fadeOutState = 'in'
   }
 
-  openPersonDialog (recommendation: any) {
-    const config = new MdDialogConfig()
-    config.width = '450px'
-    config.data = { recommendation }
+  openRecommendationDialog (recommendationId: string) {
+    this.recommendationService.getById(recommendationId)
+      .subscribe((recommendation) => {
+        const config = new MdDialogConfig()
+        config.width = '450px'
+        config.data = { recommendation }
 
-    this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
+        this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
+      })
   }
 
-  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria) {
+  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = [ 'id', 'name', 'thumbnail_url', 'like', 'train', 'match', 'photos_similarity_mean' ]) {
     this.loadedPage = false
 
-    this.recommendationService.getAll(page, limit, criteria)
+    this.recommendationService.getAll(page, limit, criteria, select)
       .subscribe(({ results, meta }) => {
         this.currentPage = page
         this.recommendations = results
