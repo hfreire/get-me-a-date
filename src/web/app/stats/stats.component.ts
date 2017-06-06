@@ -49,11 +49,11 @@ export class StatsComponent {
       pointHoverBorderColor: 'rgba(255, 86, 7, 1)'
     },
     {
-      borderColor: 'rgba(255, 255, 0, 1)',
-      pointBackgroundColor: 'rgba(255, 255, 0, 1)',
+      borderColor: 'rgba(0, 255, 0, 0.5)',
+      pointBackgroundColor: 'rgba(0, 255, 0, 0.5)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
       pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
-      pointHoverBorderColor: 'rgba(255, 255, 0, 1)'
+      pointHoverBorderColor: 'rgba(0, 255, 0, 0.5)'
     }
   ]
 
