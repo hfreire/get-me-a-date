@@ -99,6 +99,22 @@ body {
 }
 
 #recommendation-dialog {
+  .mat-dialog-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+
+    h2 {
+      flex: 1 1 auto;
+      margin: 0;
+      font-size: 26px;
+    }
+  }
+
+  h3 {
+    margin-top: 0;
+  }
+
   .thumbnail {
     position: absolute;
     top: 0px;
