@@ -6,5 +6,6 @@
  */
 
 module.exports = {
-  Dates: require('./dates')
+  Dates: require('./dates'),
+  Taste: require('./taste')
 }

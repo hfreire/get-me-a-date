@@ -8,7 +8,7 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const { Messages } = require('../database')
+const { Messages } = require('../../database')
 
 class Message {
   readMessages (channel, accountUserId, recommendationId, messages) {

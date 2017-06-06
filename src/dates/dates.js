@@ -14,12 +14,10 @@ const Logger = require('modern-logger')
 
 const { Tinder } = require('../channels')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
-const { Recommendation, AlreadyCheckedOutEarlierError } = require('../recommendation')
+const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { SQLite, Recommendations, Channels, Stats } = require('../database')
 
-const { Match } = require('../match')
-
-const Taste = require('../taste')
+const { Match } = require('./match')
 
 const findAccount = (channel) => {
   return Channels.findByName(channel.name)

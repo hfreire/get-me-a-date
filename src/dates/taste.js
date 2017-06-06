@@ -16,8 +16,8 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const S3 = require('./utils/s3')
-const Rekognition = require('./utils/rekognition')
+const S3 = require('../utils/s3')
+const Rekognition = require('../utils/rekognition')
 
 const request = Promise.promisifyAll(require('request').defaults({ encoding: null }))
 

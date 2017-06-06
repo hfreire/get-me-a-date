@@ -7,7 +7,7 @@
 
 const Logger = require('modern-logger')
 
-const { Recommendations } = require('../database')
+const { Recommendations } = require('../../database')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('../recommendation')
 
 const Message = require('./message')

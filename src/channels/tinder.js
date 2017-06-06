@@ -26,7 +26,7 @@ const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderClient } = require('tinder')
 
-const { Facebook } = require('../auth')
+const { Facebook } = require('./auth')
 const { Channels, Auth } = require('../database')
 
 const createTinderChannelIfNeeded = function () {

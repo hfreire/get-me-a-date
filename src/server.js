@@ -14,8 +14,7 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Dates } = require('./dates')
-const Taste = require('./taste')
+const { Dates, Taste } = require('./dates')
 
 const findDates = function () {
   const startDate = _.now()
