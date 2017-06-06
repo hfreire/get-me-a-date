@@ -110,7 +110,6 @@ class Tinder extends Channel {
     this._tinder.getAccountCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getAccountAsync(), this._options.retry))
     this._tinder.getRecommendationsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getRecommendationsAsync(params), this._options.retry))
     this._tinder.getUpdatesCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.getUpdatesAsync(...params), this._options.retry))
-    this._tinder.getHistoryCircuitBreaker = this._breaker.slaveCircuit(() => retry(() => this._tinder.getHistoryAsync(), this._options.retry))
     this._tinder.likeCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._tinder.likeAsync(...params), this._options.retry))
     this._tinder.getUserCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._tinder.getUserAsync(params), this._options.retry))
 
@@ -165,23 +164,17 @@ class Tinder extends Channel {
       }
     })
       .then(() => Channels.findByName(this.name))
-      .then(({ last_activity_date }) => this._tinder.getUpdatesCircuitBreaker.exec(last_activity_date))
+      .then(({ last_activity_date }) => {
+        const lastActivityDate = !last_activity_date ? undefined : last_activity_date
+
+        return this._tinder.getUpdatesCircuitBreaker.exec(lastActivityDate)
+      })
       .then((data) => {
         const last_activity_date = new Date()
 
         return Channels.save(this.name, { last_activity_date })
           .then(() => data)
       })
-      .catch((error) => handleError.bind(this)(error))
-  }
-
-  getHistory () {
-    return Promise.try(() => {
-      if (!this._tinder.getAuthToken()) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._tinder.getHistoryCircuitBreaker.exec())
       .catch((error) => handleError.bind(this)(error))
   }
 

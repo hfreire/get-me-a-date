@@ -14,11 +14,11 @@ class Auth {
     const _data = _.clone(data)
 
     if (_data.created_date instanceof Date) {
-      _data.created_date = _data.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      _data.created_date = _data.created_date.toISOString()
     }
 
     if (_data.updated_date instanceof Date) {
-      _data.updated_date = _data.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      _data.updated_date = _data.updated_date.toISOString()
     }
 
     const keys = _.keys(_data)
@@ -29,7 +29,7 @@ class Auth {
       .then((auth) => {
         if (auth) {
           keys.push('updated_date')
-          values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+          values.push(new Date().toISOString())
 
           return SQLite.run(`UPDATE auth SET ${keys.map((key) => `${key} = ?`)} WHERE id = ?`, values.concat([ id ]))
         } else {

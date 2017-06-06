@@ -21,7 +21,10 @@ const transformRowToObject = function (row) {
 
   row.created_date = new Date(row.created_date)
   row.updated_date = new Date(row.updated_date)
-  row.last_activity_date = new Date(row.last_activity_date)
+
+  if (row.last_activity_date) {
+    row.last_activity_date = new Date(row.last_activity_date)
+  }
 
   return row
 }
@@ -32,15 +35,15 @@ const transformObjectToRow = function (object) {
   }
 
   if (object.created_date instanceof Date) {
-    object.created_date = object.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.created_date = object.created_date.toISOString()
   }
 
   if (object.updated_date instanceof Date) {
-    object.updated_date = object.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.updated_date = object.updated_date.toISOString()
   }
 
   if (object.last_activity_date instanceof Date) {
-    object.last_activity_date = object.last_activity_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.last_activity_date = object.last_activity_date.toISOString()
   }
 
   return object
@@ -57,7 +60,7 @@ class Channels {
       .then((auth) => {
         if (auth) {
           keys.push('updated_date')
-          values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+          values.push(new Date().toISOString())
 
           return SQLite.run(`UPDATE channel SET ${keys.map((key) => `${key} = ?`)} WHERE name = ?`, values.concat([ name ]))
         } else {

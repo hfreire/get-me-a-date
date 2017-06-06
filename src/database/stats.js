@@ -29,11 +29,11 @@ const transformObjectToRow = function (object) {
   object.date = object.date.toISOString().replace(/T.*$/, '')
 
   if (object.created_date instanceof Date) {
-    object.created_date = object.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.created_date = object.created_date.toISOString()
   }
 
   if (object.updated_date instanceof Date) {
-    object.updated_date = object.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.updated_date = object.updated_date.toISOString()
   }
 
   return object
@@ -55,7 +55,7 @@ class Stats {
       .then((auth) => {
         if (auth) {
           keys.push('updated_date')
-          values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+          values.push(new Date().toISOString())
 
           return SQLite.run(`UPDATE stats SET ${keys.map((key) => `${key} = ?`)} WHERE date = ?`, values.concat([ _data.date ]))
         } else {

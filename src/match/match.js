@@ -50,12 +50,6 @@ class Match {
 
     return findOrCreateNewRecommendationFromMatch.bind(this)(channel, channelRecommendationId, match)
       .then((recommendation) => {
-        if (match.is_new_message) {
-          Logger.info(`${recommendation.data.name} has ${messages} :message:`)
-        } else {
-          Logger.info(`${recommendation.data.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
-        }
-
         const channelName = channel.name
         const channelRecommendation = match.person
 
@@ -66,6 +60,13 @@ class Match {
           })
           .then((recommendation) => Recommendation.fallInLove(recommendation))
           .then((recommendation) => Recommendations.save(channelName, channelRecommendationId, recommendation))
+          .then((recommendation) => {
+            if (match.is_new_message) {
+              return Logger.info(`${recommendation.data.name} has ${messages} :envelope:`)
+            } else {
+              return Logger.info(`${recommendation.data.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
+            }
+          })
       })
       .then(() => { return { messages, matches } })
   }

@@ -29,7 +29,7 @@ const deleteFaces = function (faces) {
     .catch((error) => Logger.warn(error))
 }
 
-const indexFaces = function (images) {
+const indexFacesFromImages = function (images) {
   let indexedFaces = 0
 
   return Promise.map(images, (image) => {
@@ -50,10 +50,13 @@ const indexFaces = function (images) {
         indexedFaces++
       })
       .catch((error) => {
-        return this.s3.deleteObject(image)
-          .then(() => Logger.warn(error))
+        if (_.some([ 'InvalidImageFormatException', 'InvalidParameterException' ], (message) => _.includes(error.code, message))) {
+          return this.s3.deleteObject(image)
+        }
+
+        return Logger.warn(error)
       })
-  }, { concurrency: 5 })
+  }, { concurrency: 2 })
     .then(() => indexedFaces)
 }
 
@@ -78,7 +81,7 @@ const savePhoto = function (photo) {
     })
 }
 
-const compareFace = function (photo, image) {
+const compareFacesFromImage = function (photo, image) {
   return this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image)
     .then(({ FaceMatches }) => {
       photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
@@ -86,11 +89,15 @@ const compareFace = function (photo, image) {
 
       return photo.similarity
     })
-    .catch(() => {
-      photo.similarity = 0
-      photo.similarity_date = new Date().toISOString()
+    .catch((error) => {
+      if (_.some([ 'InvalidImageFormatException', 'InvalidParameterException' ], (message) => _.includes(error.code, message))) {
+        photo.similarity = 0
+        photo.similarity_date = new Date().toISOString()
 
-      return photo.similarity
+        return photo.similarity
+      }
+
+      throw error
     })
 }
 
@@ -153,7 +160,7 @@ class Taste {
 
         return Promise.props({
           deletedFaces: deleteFaces.bind(this)(imagesToDelete),
-          indexedFaces: indexFaces.bind(this)(imagesToIndex)
+          indexedFaces: indexFacesFromImages.bind(this)(imagesToIndex)
         })
           .then(({ deletedFaces, indexedFaces }) => {
             const stop = _.now()
@@ -174,14 +181,16 @@ class Taste {
   }
 
   checkPhotosOut (photos) {
+    const photosToCompare = _.filter(photos, (photo) => !photo.similarity_date)
+
     return Promise.map(photos, (photo) => {
       if (photo.similarity_date) {
         return photo.similarity // do not s3 and rekognition photos that have already been checked out
       }
 
       return savePhoto.bind(this)(photo)
-        .then((image) => compareFace.bind(this)(photo, image))
-    }, { concurrency: 3 })
+        .then((image) => compareFacesFromImage.bind(this)(photo, image))
+    }, { concurrency: 2 })
       .then((faceSimilarities) => {
         const faceSimilarityMax = _.max(faceSimilarities)
         const faceSimilarityMin = _.min(faceSimilarities)
@@ -189,7 +198,8 @@ class Taste {
 
         const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 73
 
-        return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like }
+        return Logger.debug(`Compared ${photosToCompare.length} photo(s)`)
+          .then(() => { return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like } })
       })
   }
 
@@ -205,11 +215,9 @@ class Taste {
 
       return this.s3.copyObject(srcKey, dstKey)
         .then(() => dstKey)
-    }, { concurrency: 5 })
-      .then((images) => {
-        return indexFaces.bind(this)(images)
-          .then((indexedImages) => Logger.debug(`Indexed ${indexedImages} face(s)`))
-      })
+    }, { concurrency: 2 })
+      .then((images) => indexFacesFromImages.bind(this)(images))
+      .then((indexedFaces) => Logger.debug(`Indexed ${indexedFaces} face(s)`))
   }
 }
 

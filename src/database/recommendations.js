@@ -49,27 +49,27 @@ const transformObjectToRow = function (object) {
   }
 
   if (object.created_date instanceof Date) {
-    object.created_date = object.created_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.created_date = object.created_date.toISOString()
   }
 
   if (object.updated_date instanceof Date) {
-    object.updated_date = object.updated_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.updated_date = object.updated_date.toISOString()
   }
 
   if (object.matched_date instanceof Date) {
-    object.matched_date = object.matched_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.matched_date = object.matched_date.toISOString()
   }
 
   if (object.liked_date instanceof Date) {
-    object.liked_date = object.liked_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.liked_date = object.liked_date.toISOString()
   }
 
   if (object.trained_date instanceof Date) {
-    object.trained_date = object.trained_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.trained_date = object.trained_date.toISOString()
   }
 
   if (object.last_checked_out_date instanceof Date) {
-    object.last_checked_out_date = object.last_checked_out_date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    object.last_checked_out_date = object.last_checked_out_date.toISOString()
   }
 
   if (object.data) {
@@ -140,10 +140,10 @@ class Recommendations {
         if (person) {
           if (_.includes(keys, 'updated_date')) {
             const index = _.indexOf(keys, 'updated_date')
-            values[ index ] = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+            values[ index ] = new Date().toISOString()
           } else {
             keys.push('updated_date')
-            values.push(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            values.push(new Date().toISOString())
           }
 
           return SQLite.run(`UPDATE recommendations SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_id = ?`, values.concat([ channel, channelId ]))

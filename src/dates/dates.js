@@ -19,6 +19,8 @@ const { SQLite, Recommendations, Channels, Stats } = require('../database')
 
 const { Match } = require('../match')
 
+const Taste = require('../taste')
+
 const findAccount = (channel) => {
   return Channels.findByName(channel.name)
     .then(({ user_id }) => {
@@ -95,7 +97,7 @@ class Dates {
   findByChannel (channel) {
     const checkRecommendations = function (channel) {
       return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} `)
-      // .then(() => this.checkRecommendations(channel))
+      //.then(() => this.checkRecommendations(channel))
         .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     }
 
@@ -147,7 +149,7 @@ class Dates {
 
                 return Logger.warn(error)
               })
-          }, { concurrency: 2 }))
+          }, { concurrency: 1 }))
       })
       .then(() => { return { received, skipped, failed } })
       .catch(NotAuthorizedError, () => {
@@ -164,7 +166,14 @@ class Dates {
 
         return channel.getUpdates()
           .then(({ matches }) => matches)
-          .mapSeries((match) => Match.checkLatestNews(channel, accountUserId, match))
+          .map((match) => {
+            return Match.checkLatestNews(channel, accountUserId, match)
+              .catch((error) => {
+                Logger.warn(error)
+
+                return { messages: 0, matches: 0 }
+              })
+          }, { concurrency: 1 })
           .then((updates) => {
             return _.reduce(updates, (accumulator, update) => {
               accumulator.messages += update.messages
