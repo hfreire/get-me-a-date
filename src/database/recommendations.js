@@ -110,11 +110,11 @@ const buildWhereClause = (keys, values) => {
 
   return keys.map((key) => {
     if (key === 'liked_date') {
-      return `${key} > ? AND ${key} < date(?, '+1 day')`
+      return `${key} > ? AND ${key} < strftime('%Y-%m-%dT%H:%M:%fZ', datetime(?, '+1 day'))`
     }
 
     if (key === 'matched_date') {
-      return `${key} > ? AND ${key} < date(?, '+1 day')`
+      return `${key} > ? AND ${key} < strftime('%Y-%m-%dT%H:%M:%fZ', datetime(?, '+1 day'))`
     }
 
     if (key === 'trained_date') {
@@ -122,14 +122,15 @@ const buildWhereClause = (keys, values) => {
     }
 
     if (key === 'last_checked_out_date') {
-      return `${key} > ? AND ${key} < date(?, '+1 day')`
+      return `${key} > ? AND ${key} < strftime('%Y-%m-%dT%H:%M:%fZ', datetime(?, '+1 day'))`
     }
 
     return `${key} = ?`
   })
     .toString()
     .replace(/,/g, ' AND ')
-    .replace(/date\(\? AND/, 'date(?,')
+    .replace(/datetime\(\? AND/, 'datetime(?,')
+    .replace(/AND  datetime/, ', datetime')
 }
 
 const buildSelectClause = (unique, select) => {

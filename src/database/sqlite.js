@@ -82,8 +82,8 @@ const createSchema = function () {
     .then(() => this._database.runAsync(
       'CREATE TABLE IF NOT EXISTS stats (' +
       'date DATE PRIMARY KEY,' +
-      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
+      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
       'likes INTEGER NOT NULL DEFAULT 0,' +
       'passes INTEGER NOT NULL DEFAULT 0,' +
       'trains INTEGER NOT NULL DEFAULT 0,' +
