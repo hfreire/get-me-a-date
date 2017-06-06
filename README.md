@@ -53,9 +53,3 @@ Run the NPM script that will build the Docker image
 ```
 npm run build
 ```
-
-### TODO
-* Support multiple dating apps: ([Happn](https://www.happn.com/en/) and [Bumble](https://bumble.com)
-* Automatically message recommendation upon match
-* Use NLP model for doing small talk
-
