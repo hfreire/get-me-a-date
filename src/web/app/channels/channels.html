@@ -5,13 +5,15 @@
   ~ LICENSE file in the root directory of this source tree.
   -->
 
-<div id="channels">
-    <md-list>
-        <h3 md-subheader>Channels</h3>
-        <md-list-item *ngFor="let channel of channels">
-            <md-slide-toggle [checked]="channel.is_enabled" (change)="toggleChannel(channel)" color="primary">{{
-                channel.name | capitalize }}
-            </md-slide-toggle>
-        </md-list-item>
-    </md-list>
-</div>
+<md-card id="channels">
+    <md-card-title>Channels</md-card-title>
+    <md-card-content>
+        <md-list>
+            <md-list-item *ngFor="let channel of channels">
+                <md-slide-toggle [checked]="channel.is_enabled" (change)="toggleChannel(channel)" color="primary">{{
+                    channel.name | capitalize }}
+                </md-slide-toggle>
+            </md-list-item>
+        </md-list>
+    </md-card-content>
+</md-card>

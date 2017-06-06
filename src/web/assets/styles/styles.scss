@@ -13,13 +13,24 @@ $candy-app-warn: mat-palette($mat-deep-orange);
 $candy-app-theme: mat-dark-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
 @include angular-material-theme($candy-app-theme);
 
-md-sidenav {
+body {
+  font-family: $mat-font-family;
+}
+
+.mat-dialog-container {
+  color: rgba(165, 165, 165, 1);
+
+  .mat-line {
+    font-size: 14px;
+  }
+}
+
+.mat-sidenav {
   width: 200px;
 }
 
-.mat-sidenav-content {
-  .mat-mini-fab {
-  }
+.mat-dialog-title {
+  color: #cacaca;
 }
 
 #stats {
@@ -84,5 +95,13 @@ md-sidenav {
     pagination-controls {
       text-align: center;
     }
+  }
+}
+
+#recommendation-dialog {
+  .thumbnail {
+    position: absolute;
+    top: 0px;
+    left: 0px;
   }
 }
