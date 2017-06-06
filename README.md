@@ -12,9 +12,9 @@ Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based i
 <p align="center"><img src="share/github/overview.png" width="720"></p>
 
 ### Features
+* Supports [Tinder](https://tinder.com) dating app :white_check_mark:
 * Periodically :clock10: get dating app :girl::woman: recommendations and automatically :robot: :+1: or :-1: :white_check_mark:
 * Uses your previous matches :revolving_hearts: for machine-learning :robot: when to :+1: or :-1: future recommendations :white_check_mark: 
-* Support multiple dating apps :scream:: Currently [Tinder](https://tinder.com) ([Happn](https://www.happn.com/en/) and [Bumble](https://bumble.com) are work-in-progress) :white_check_mark:
 * Launch :rocket: inside a Docker container :whale: so you don't need to manage the dependencies :raised_hands: :white_check_mark:
 
 ### How to use
@@ -53,3 +53,9 @@ Run the NPM script that will build the Docker image
 ```
 npm run build
 ```
+
+### TODO
+* Support multiple dating apps: ([Happn](https://www.happn.com/en/) and [Bumble](https://bumble.com)
+* Automatically message recommendation upon match
+* Use NLP model for doing small talk
+
