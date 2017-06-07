@@ -48,7 +48,7 @@
     "systemjs": "0.20.13",
     "tinder": "1.19.0",
     "uuid": "3.0.1",
-    "zone.js": "0.8.11"
+    "zone.js": "0.8.12"
   },
   "devDependencies": {
     "babel-eslint": "7.2.3",
