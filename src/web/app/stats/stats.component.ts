@@ -15,12 +15,12 @@ import * as _ from 'lodash'
   providers: [ StatsService ]
 })
 export class StatsComponent {
-  // lineChart
   public lineChartData: Array<any> = [
-    { label: 'Likes', data: [] },
-    { label: 'Passes', data: [] },
-    { label: 'Matches', data: [] },
-    { label: 'Training', data: [] }
+    { label: 'Machine likes', data: [] },
+    { label: 'Human likes', data: [] },
+    { label: 'Machine passes', data: [] },
+    { label: 'Human passes', data: [] },
+    { label: 'Matches', data: [] }
   ]
   public lineChartLabels: Array<any>
   public lineChartType: string = 'line'
@@ -34,26 +34,36 @@ export class StatsComponent {
       pointHoverBorderColor: 'rgba(194, 24, 91, 1)'
     },
     {
-      backgroundColor: 'rgba(77,83,96,0.2)',
-      borderColor: 'rgba(77,83,96,1)',
-      pointBackgroundColor: 'rgba(77,83,96,1)',
+      backgroundColor: 'rgba(0, 255, 0, 0.1)',
+      borderColor: 'rgba(0, 255, 0, 1)',
+      pointBackgroundColor: 'rgba(0, 255, 0, 1)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
       pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
-      pointHoverBorderColor: 'rgba(77,83,96,1)'
+      pointHoverBorderColor: 'rgba(0, 255, 0, 1)'
     },
     {
-      borderColor: 'rgba(255, 86, 7, 1)',
-      pointBackgroundColor: 'rgba(255, 86, 7, 1)',
+      backgroundColor: 'rgba(36, 36, 36, 0.1)',
+      borderColor: 'rgba(36, 36, 36, 1)',
+      pointBackgroundColor: 'rgba(36, 36, 36, 1)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
       pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
-      pointHoverBorderColor: 'rgba(255, 86, 7, 1)'
+      pointHoverBorderColor: 'rgba(36, 36, 36, 1)'
     },
     {
-      borderColor: 'rgba(0, 255, 0, 0.5)',
-      pointBackgroundColor: 'rgba(0, 255, 0, 0.5)',
+      backgroundColor: 'rgba(255, 0, 21, 0.1)',
+      borderColor: 'rgba(255, 0, 21, 0.5)',
+      pointBackgroundColor: 'rgba(255, 0, 21, 0.5)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
       pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
-      pointHoverBorderColor: 'rgba(0, 255, 0, 0.5)'
+      pointHoverBorderColor: 'rgba(255, 0, 21, 0.5)'
+    },
+    {
+      backgroundColor: 'rgba(189, 128, 18, 0.1)',
+      borderColor: 'rgba(189, 128, 18, 1)',
+      pointBackgroundColor: 'rgba(189, 128, 18, 1)',
+      pointBorderColor: 'rgba(212, 203, 207, 1)',
+      pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
+      pointHoverBorderColor: 'rgba(189, 128, 18, 1)'
     }
   ]
 
@@ -67,10 +77,11 @@ export class StatsComponent {
     this.statsService.getAll(page, limit)
       .subscribe(({ results }) => {
         this.lineChartLabels = _.reverse(_.map(results, 'date'))
-        this.lineChartData[ 0 ].data = _.reverse(_.map(results, 'likes'))
-        this.lineChartData[ 1 ].data = _.reverse(_.map(results, 'passes'))
-        this.lineChartData[ 2 ].data = _.reverse(_.map(results, 'matches'))
-        this.lineChartData[ 3 ].data = _.reverse(_.map(results, 'trains'))
+        this.lineChartData[ 0 ].data = _.reverse(_.map(results, 'machine_likes'))
+        this.lineChartData[ 1 ].data = _.reverse(_.map(results, 'human_likes'))
+        this.lineChartData[ 2 ].data = _.reverse(_.map(results, 'machine_passes'))
+        this.lineChartData[ 3 ].data = _.reverse(_.map(results, 'human_passes'))
+        this.lineChartData[ 4 ].data = _.reverse(_.map(results, 'matches'))
       })
   }
 }

@@ -52,7 +52,9 @@ const createSchema = function () {
     'name VARCHAR(32) DEFAULT NULL,' +
     'thumbnail_url VARCHAR(512) DEFAULT NULL,' +
     'like INTEGER NOT NULL DEFAULT 0,' +
-    'liked_date DATETIME DEFAULT NULL,' +
+    'is_pass INTEGER NOT NULL DEFAULT 0,' +
+    'decision_date DATETIME DEFAULT NULL,' +
+    'is_human_decision INTEGER NOT NULL DEFAULT 0,' +
     'match INTEGER NOT NULL DEFAULT 0,' +
     'match_id VARCHAR(64) DEFAULT NULL,' +
     'matched_date DATETIME DEFAULT NULL,' +
@@ -86,10 +88,13 @@ const createSchema = function () {
       'date DATE PRIMARY KEY,' +
       'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
       'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'likes INTEGER NOT NULL DEFAULT 0,' +
-      'passes INTEGER NOT NULL DEFAULT 0,' +
+      'machine_likes INTEGER NOT NULL DEFAULT 0,' +
+      'human_likes INTEGER NOT NULL DEFAULT 0,' +
+      'machine_passes INTEGER NOT NULL DEFAULT 0,' +
+      'human_passes INTEGER NOT NULL DEFAULT 0,' +
       'trains INTEGER NOT NULL DEFAULT 0,' +
-      'matches INTEGER NOT NULL DEFAULT 0' +
+      'matches INTEGER NOT NULL DEFAULT 0,' +
+      'skips INTEGER NOT NULL DEFAULT 0' +
       ')'))
     .then(() => this._database.runAsync(
       'CREATE TABLE IF NOT EXISTS messages (' +

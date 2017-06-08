@@ -25,8 +25,8 @@ const transformRowToObject = function (row) {
     row.updated_date = new Date(row.updated_date)
   }
 
-  if (row.liked_date) {
-    row.liked_date = new Date(row.liked_date)
+  if (row.decision_date) {
+    row.decision_date = new Date(row.decision_date)
   }
 
   if (row.matched_date) {
@@ -45,6 +45,11 @@ const transformRowToObject = function (row) {
     row.data = JSON.parse(row.data)
   }
 
+  row.like = !!row.like
+  row.is_pass = !!row.is_pass
+  row.is_human_decision = !!row.is_human_decision
+  row.train = !!row.train
+
   return row
 }
 
@@ -61,12 +66,12 @@ const transformObjectToRow = function (object) {
     object.updated_date = object.updated_date.toISOString()
   }
 
-  if (object.matched_date instanceof Date) {
-    object.matched_date = object.matched_date.toISOString()
+  if (object.decision_date instanceof Date) {
+    object.decision_date = object.decision_date.toISOString()
   }
 
-  if (object.liked_date instanceof Date) {
-    object.liked_date = object.liked_date.toISOString()
+  if (object.matched_date instanceof Date) {
+    object.matched_date = object.matched_date.toISOString()
   }
 
   if (object.trained_date instanceof Date) {
@@ -90,8 +95,8 @@ const queryAll = function (...args) {
 }
 
 const buildWhereClause = (keys, values) => {
-  if (_.includes(keys, 'liked_date')) {
-    const index = _.indexOf(keys, 'liked_date')
+  if (_.includes(keys, 'decision_date')) {
+    const index = _.indexOf(keys, 'decision_date')
     values[ index ] = values[ index ].split(' ')[ 0 ]
     values.splice(index, 0, values[ index ])
   }
@@ -109,7 +114,7 @@ const buildWhereClause = (keys, values) => {
   }
 
   return keys.map((key) => {
-    if (key === 'liked_date') {
+    if (key === 'decision_date') {
       return `${key} > ? AND ${key} < strftime('%Y-%m-%dT%H:%M:%fZ', datetime(?, '+1 day'))`
     }
 
@@ -135,9 +140,9 @@ const buildWhereClause = (keys, values) => {
 }
 
 const buildSelectClause = (unique, select) => {
-  if (unique && _.includes(select, 'liked_date')) {
-    const index = _.indexOf(select, 'liked_date')
-    select[ index ] = `strftime('%Y-%m-%d',${select[ index ]}) AS liked_date`
+  if (unique && _.includes(select, 'decision_date')) {
+    const index = _.indexOf(select, 'decision_date')
+    select[ index ] = `strftime('%Y-%m-%d',${select[ index ]}) AS decision_date`
   }
 
   if (unique && _.includes(select, 'matched_date')) {

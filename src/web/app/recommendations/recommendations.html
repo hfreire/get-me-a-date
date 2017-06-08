@@ -17,7 +17,12 @@
             <md-grid-tile
                     *ngFor="let recommendation of recommendations | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }">
                 <div class="tint"
-                     [ngClass]="{pass: !recommendation.like, like: recommendation.like, train: recommendation.train}"
+                     [ngClass]="{
+                     is_machine_like: recommendation.like && !recommendation.is_human_decision,
+                     is_human_like: recommendation.like && recommendation.is_human_decision,
+                     is_machine_pass: recommendation.is_pass && !recommendation.is_human_decision,
+                     is_human_pass: recommendation.is_pass && recommendation.is_human_decision,
+                     not_decided: !recommendation.like && !recommendation.is_pass}"
                      (click)="openRecommendationDialog(recommendation.id)"
                      mdTooltip="Similarity: {{recommendation.photos_similarity_mean}}%"
                      tooltipPosition="bottom">

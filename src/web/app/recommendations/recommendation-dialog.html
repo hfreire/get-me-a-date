@@ -53,10 +53,18 @@
         </md-grid-list>
     </md-dialog-content>
 
-    <md-dialog-actions [attr.align]="actionsAlignment">
-        <button md-raised-button md-button color="primary" *ngIf="!recommendation.train"
-                (click)="trainRecommendation()">Train
+    <md-dialog-actions>
+        <button md-raised-button
+                md-button
+                md-small
+                color="primary"
+                [disabled]="recommendation.like || recommendation.is_pass"
+                (click)="like()">Like
         </button>
-        <button md-button *ngIf="recommendation.train" (click)="untrainRecommendation()">Untrain</button>
+
+        <button md-button
+                [disabled]="recommendation.like || recommendation.is_pass"
+                (click)="pass()">Pass
+        </button>
     </md-dialog-actions>
 </div>

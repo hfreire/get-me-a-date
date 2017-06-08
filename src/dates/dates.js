@@ -39,6 +39,28 @@ const findAccount = (channel) => {
     })
 }
 
+const likeOrPass = (channel, recommendation, like, pass) => {
+  if (like) {
+    return Recommendation.like(channel, recommendation)
+      .then((recommendation) => {
+        recommendation.is_human_decision = false
+        recommendation.decision_date = new Date()
+
+        return recommendation
+      })
+  } else if (pass) {
+    return Recommendation.pass(channel, recommendation)
+      .then((recommendation) => {
+        recommendation.is_human_decision = false
+        recommendation.decision_date = new Date()
+
+        return recommendation
+      })
+  }
+
+  return Promise.resolve(recommendation)
+}
+
 class Dates {
   constructor () {
     this._channels = {
@@ -130,11 +152,9 @@ class Dates {
             const channelRecommendationId = channelRecommendation._id
 
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
-              .then((recommendation) => {
-                return Recommendation.likeOrPass(channel, recommendation)
+              .then(({ recommendation, like, pass }) => {
+                return likeOrPass(channel, recommendation, like, pass)
                   .catch(OutOfLikesError, () => {
-                    recommendation.like = 0
-
                     skipped++
 
                     return recommendation

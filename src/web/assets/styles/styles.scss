@@ -73,16 +73,26 @@ body {
       }
     }
 
-    .pass:before {
-      background: rgba(48, 48, 48, 0.8);
+    .is_machine_pass:before {
+      background: rgba(36, 36, 36, 1);
     }
 
-    .like:before {
+    .is_human_pass:before {
+      background: rgba(255, 0, 21, 0.5);
+    }
+
+    .is_machine_like:before {
       background: rgba(194, 24, 91, 0.6);
     }
 
-    .train:before {
+    .is_human_like:before {
       background: rgba(0, 255, 0, 0.5);
+    }
+
+    .not_decided {
+      &:before {
+        background: rgba(48, 48, 48, 0.8);
+      }
     }
 
     .thumbnail {

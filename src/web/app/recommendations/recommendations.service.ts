@@ -41,7 +41,13 @@ export class RecommendationsService {
       .switchMap(() => this.getAll(page, limit))
   }
 
-  train (id: string) {
-    return this.http.post(`/train/${id}`, {})
+  like (id: string) {
+    return this.http.post(`/recommendations/${id}/like`, {})
+      .map((response) => response.json())
+  }
+
+  pass (id: string) {
+    return this.http.post(`/recommendations/${id}/pass`, {})
+      .map((response) => response.json())
   }
 }

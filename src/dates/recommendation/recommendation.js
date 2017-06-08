@@ -22,6 +22,9 @@ class Recommendation {
       return Promise.reject(new Error('invalid arguments'))
     }
 
+    let like
+    let pass
+
     return this.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
       .then((recommendation) => {
         if (recommendation.last_checked_out_date) {
@@ -40,8 +43,10 @@ class Recommendation {
 
                 recommendation.last_checked_out_date = new Date()
                 recommendation.data = channelRecommendation
-                recommendation.like = photos.like
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
+
+                like = photos.like
+                pass = photos.pass
               })
           })
           .then(() => {
@@ -52,31 +57,58 @@ class Recommendation {
                 })
             }
           })
-          .then(() => recommendation)
+          .then(() => {
+            return { recommendation, like, pass }
+          })
       })
   }
 
-  likeOrPass (channel, recommendation) {
+  like (channel, recommendation) {
     if (!channel || !recommendation) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    return Promise.resolve()
-      .then(() => {
-        if (recommendation.like) {
-          return channel.like(recommendation.channel_id, recommendation.data.photos[ 0 ].id, recommendation.data.content_hash, recommendation.data.s_number)
-            .then((match) => {
-              recommendation.liked_date = new Date()
-              recommendation.match = !!match
-              if (match) {
-                recommendation.match_id = match._id
-              }
-            })
-            .then(() => recommendation)
-        }
+    if (recommendation.like) {
+      return Promise.resolve()
+    }
 
-        return recommendation
+    if (recommendation.is_pass) {
+      return Promise.reject(new Error('can not like'))
+    }
+
+    const channelRecommendationId = recommendation.channel_id
+
+    const { photos, content_hash, s_number } = recommendation.data
+    const photoId = photos[ 0 ].id
+
+    return channel.like(channelRecommendationId, photoId, content_hash, s_number)
+      .then((match) => {
+        recommendation.like = true
+
+        recommendation.match = !!match
+        if (match) {
+          recommendation.match_id = match._id
+        }
       })
+      .then(() => recommendation)
+  }
+
+  pass (channel, recommendation) {
+    if (!channel || !recommendation) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    if (recommendation.is_pass) {
+      return Promise.resolve()
+    }
+
+    if (recommendation.like) {
+      return Promise.reject(new Error('can not pass'))
+    }
+
+    recommendation.is_pass = true
+
+    return Promise.resolve(recommendation)
   }
 
   fallInLove (recommendation) {
@@ -95,6 +127,14 @@ class Recommendation {
         train: true,
         trained_date: new Date()
       }))
+  }
+
+  couldDoBetter (recommendation) {
+    if (!recommendation) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    return Promise.resolve(recommendation)
   }
 
   findOrCreateNewRecommendation (channel, channelRecommendationId, channelRecommendation) {

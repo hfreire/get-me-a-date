@@ -43,7 +43,7 @@ export class RecommendationsComponent {
   criteria: any = [
     { value: {}, label: 'All' },
     { value: { like: 1 }, label: 'Likes' },
-    { value: { like: 0 }, label: 'Passes' },
+    { value: { is_pass: 1 }, label: 'Passes' },
     { value: { match: 1 }, label: 'Matches' },
     { value: { train: 1 }, label: 'Training' }
   ]
@@ -71,7 +71,7 @@ export class RecommendationsComponent {
       })
   }
 
-  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = [ 'id', 'name', 'thumbnail_url', 'like', 'train', 'match', 'photos_similarity_mean' ]) {
+  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = [ 'id', 'name', 'thumbnail_url', 'like', 'is_pass', 'train', 'is_human_decision', 'match', 'photos_similarity_mean' ]) {
     this.loadedPage = false
 
     this.recommendationService.getAll(page, limit, criteria, select)

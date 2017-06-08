@@ -55,11 +55,10 @@ class Match {
 
         return Message.readMessages(channel, accountUserId, recommendation.id, match.messages)
           .then(() => {
-            // TODO: checkOut() is putting like = 0 if a new match comes in and is not similar enough
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
               .catch(AlreadyCheckedOutEarlierError, () => recommendation)
           })
-          .then((recommendation) => Recommendation.fallInLove(recommendation))
+          .then(({ recommendation }) => Recommendation.fallInLove(recommendation))
           .then((recommendation) => Recommendations.save(channelName, channelRecommendationId, recommendation))
           .then((recommendation) => {
             if (match.is_new_message) {

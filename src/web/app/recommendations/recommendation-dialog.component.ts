@@ -48,11 +48,17 @@ export class RecommendationDialogComponent {
     this.fadeOutState = 'in'
   }
 
-  trainRecommendation () {
-    //noinspection TsLint
-    this.recommendationService.train(this.recommendation.id)
-      .subscribe(() => {
-        this.recommendation.train = true
+  like () {
+    this.recommendationService.like(this.recommendation.id)
+      .subscribe((recommendation) => {
+        this.recommendation = recommendation
+      })
+  }
+
+  pass () {
+    this.recommendationService.pass(this.recommendation.id)
+      .subscribe((recommendation) => {
+        this.recommendation = recommendation
       })
   }
 }

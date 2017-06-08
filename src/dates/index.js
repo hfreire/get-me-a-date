@@ -8,5 +8,6 @@
 module.exports = {
   Dates: require('./dates'),
   Taste: require('./taste'),
-  Recommendation: require('./recommendation').Recommendation
+  Recommendation: require('./recommendation').Recommendation,
+  Stats: require('./stats')
 }

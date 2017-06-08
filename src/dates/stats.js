@@ -11,10 +11,13 @@ const Promise = require('bluebird')
 const Database = require('../database')
 
 const stats = [
-  { name: 'likes', metric: 'liked_date', criteria: { like: 1 } },
-  { name: 'passes', metric: 'last_checked_out_date', criteria: { like: 0 } },
+  { name: 'machine_likes', metric: 'decision_date', criteria: { is_human_decision: 0, like: 1 } },
+  { name: 'human_likes', metric: 'decision_date', criteria: { is_human_decision: 1, like: 1 } },
+  { name: 'machine_passes', metric: 'decision_date', criteria: { is_human_decision: 0, is_pass: 1 } },
+  { name: 'human_passes', metric: 'decision_date', criteria: { is_human_decision: 1, is_pass: 1 } },
   { name: 'trains', metric: 'trained_date', criteria: { train: 1 } },
-  { name: 'matches', metric: 'matched_date', criteria: { match: 1 } }
+  { name: 'matches', metric: 'matched_date', criteria: { match: 1 } },
+  { name: 'skips', metric: 'last_checked_out_date', criteria: { like: 0, is_pass: 0 } }
 ]
 
 class Stats {
