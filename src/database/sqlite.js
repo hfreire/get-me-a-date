@@ -66,21 +66,21 @@ const createSchema = function () {
     'PRIMARY KEY (channel, channel_id)' +
     ')')
     .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS channel (' +
+      'CREATE TABLE IF NOT EXISTS channels (' +
       'name VARCHAR(32) NOT NULL, ' +
-      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
+      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
       'is_enabled INTEGER NOT NULL DEFAULT 0,' +
       'user_id VARCHAR(64) DEFAULT NULL,' +
       'auth_id INTEGER NULL,' +
-      'last_activity_date DATETIME DEFAULT CURRENT_TIMESTAMP,' +
+      'last_activity_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))),' +
       'PRIMARY KEY (name)' +
       ')'))
     .then(() => this._database.runAsync(
       'CREATE TABLE IF NOT EXISTS auth (' +
       'id INTEGER PRIMARY KEY,' +
-      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
+      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
       'token TEXT NOT NULL' +
       ')'))
     .then(() => this._database.runAsync(
@@ -100,8 +100,8 @@ const createSchema = function () {
       'CREATE TABLE IF NOT EXISTS messages (' +
       'channel VARCHAR(32) NOT NULL, ' +
       'channel_message_id VARCHAR(64) NOT NULL, ' +
-      'created_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
-      'updated_date DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
+      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
       'recommendation_id VARCHAR(36) NOT NULL, ' +
       'sent_date DATETIME NOT NULL, ' +
       'is_from_recommendation INTEGER NOT NULL,' +

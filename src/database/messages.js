@@ -5,72 +5,43 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const _ = require('lodash')
-const Promise = require('bluebird')
+const Database = require('./database')
 
-const SQLite = require('./sqlite')
-
-const transformRowToObject = function (row) {
-  if (!row) {
-    return
+class Messages extends Database {
+  constructor () {
+    super('messages', [ 'channel', 'channel_message_id' ])
   }
 
-  row.created_date = new Date(row.created_date)
-  row.updated_date = new Date(row.updated_date)
-  row.sent_date = new Date(row.sent_date)
+  _transformRowToObject (row) {
+    const _row = super._transformRowToObject(row)
 
-  return row
-}
+    if (!_row) {
+      return
+    }
 
-const transformObjectToRow = function (object) {
-  if (!object) {
-    return
+    if (_row.sent_date) {
+      _row.sent_date = new Date(_row.sent_date)
+    }
+
+    return _row
   }
 
-  if (object.created_date instanceof Date) {
-    object.created_date = object.created_date.toISOString()
-  }
+  _transformObjectToRow (object) {
+    const _object = super._transformObjectToRow(object)
 
-  if (object.updated_date instanceof Date) {
-    object.updated_date = object.updated_date.toISOString()
-  }
+    if (!_object) {
+      return
+    }
 
-  if (object.sent_date instanceof Date) {
-    object.sent_date = object.sent_date.toISOString()
-  }
+    if (_object.sent_date instanceof Date) {
+      _object.sent_date = _object.sent_date.toISOString()
+    }
 
-  return object
-}
-
-class Messages {
-  save (channelName, channeMessageId, data) {
-    const _data = transformObjectToRow(_.clone(data))
-    const keys = _.keys(_data)
-    const values = _.values(_data)
-
-    return Promise.resolve()
-      .then(() => this.findByChannelNameAndChannelMessageId(channelName, channeMessageId))
-      .then((row) => {
-        if (row) {
-          keys.push('updated_date')
-          values.push(new Date().toISOString())
-
-          return SQLite.run(`UPDATE messages SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_message_id = ?`, values.concat([ channelName, channeMessageId ]))
-        } else {
-          return SQLite.run(`INSERT INTO messages (${keys}) VALUES (${values.map(() => '?')})`, values)
-            .catch((error) => {
-              if (error.code !== 'SQLITE_CONSTRAINT') {
-                throw error
-              }
-            })
-        }
-      })
-      .then(() => this.findByChannelNameAndChannelMessageId(channelName, channeMessageId))
+    return _object
   }
 
   findByChannelNameAndChannelMessageId (channelName, channeMessageId) {
-    return SQLite.get('SELECT * FROM messages WHERE channel = ? AND channel_message_id = ?', [ channelName, channeMessageId ])
-      .then((row) => transformRowToObject(row))
+    return this._findByPrimaryKeys([ channelName, channeMessageId ])
   }
 }
 

@@ -29,7 +29,7 @@ class Message {
 
       return _messages
     })
-      .mapSeries((message) => Messages.save(message.channel, message.channel_message_id, message))
+      .mapSeries((message) => Messages.save([ message.channel, message.channel_message_id ], message))
   }
 }
 
