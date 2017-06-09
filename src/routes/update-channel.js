@@ -29,7 +29,7 @@ class UpdateChannel extends Route {
 
         return Promise.try(() => JSON.parse(payload))
           .then((payload) => {
-            return Channels.save(name, payload)
+            return Channels.save([ name ], payload)
               .then((channel) => reply(null, channel))
           })
       })

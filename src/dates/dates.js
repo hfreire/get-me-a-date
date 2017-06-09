@@ -28,7 +28,7 @@ const findAccount = (channel) => {
           .then(({ user }) => {
             const user_id = user._id
 
-            return Channels.save(channel.name, { user_id })
+            return Channels.save([ channel.name ], { user_id })
               .then(() => {
                 return { user_id }
               })

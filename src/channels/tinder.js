@@ -33,7 +33,7 @@ const createTinderChannelIfNeeded = function () {
   return Channels.findByName(this._options.channel.name)
     .then((channel) => {
       if (!channel) {
-        return Channels.save(this._options.channel.name, this._options.channel)
+        return Channels.save([ this._options.channel.name ], this._options.channel)
       }
     })
 }
@@ -47,7 +47,7 @@ const findOrAuthorizeTinderIfNeeded = function (channel) {
             const token = this._tinder.getAuthToken()
 
             return Auth.save(undefined, { token })
-              .then(({ id }) => Channels.save(channel.name, { auth_id: id }))
+              .then(({ id }) => Channels.save([ channel.name ], { auth_id: id }))
           })
       }
 
@@ -70,7 +70,7 @@ const handleError = function (error) {
           return Channels.findByName('tinder')
             .then((channel) => {
               return Promise.all([
-                Channels.save('tinder', { auth_id: channel.auth_id }),
+                Channels.save([ 'tinder' ], { auth_id: channel.auth_id }),
                 Auth.deleteById(channel.auth_id)
               ])
             })
@@ -172,7 +172,7 @@ class Tinder extends Channel {
       .then((data) => {
         const last_activity_date = new Date()
 
-        return Channels.save(this.name, { last_activity_date })
+        return Channels.save([ this.name ], { last_activity_date })
           .then(() => data)
       })
       .catch((error) => handleError.bind(this)(error))

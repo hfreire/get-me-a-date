@@ -5,87 +5,39 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const _ = require('lodash')
+const Database = require('./database')
 
-const SQLite = require('./sqlite')
-
-const queryAllChannels = function (query) {
-  return SQLite.all(query)
-    .mapSeries((row) => transformRowToObject(row))
-}
-
-const transformRowToObject = function (row) {
-  if (!row) {
-    return
+class Channels extends Database {
+  constructor () {
+    super('channels', [ 'name' ])
   }
 
-  row.created_date = new Date(row.created_date)
-  row.updated_date = new Date(row.updated_date)
+  _transformRowToObject (row) {
+    const _row = super._transformRowToObject(row)
 
-  if (row.last_activity_date) {
-    row.last_activity_date = new Date(row.last_activity_date)
+    if (_row.last_activity_date) {
+      _row.last_activity_date = new Date(_row.last_activity_date)
+    }
+
+    return _row
   }
 
-  return row
-}
+  _transformObjectToRow (object) {
+    const _object = super._transformObjectToRow(object)
 
-const transformObjectToRow = function (object) {
-  if (!object) {
-    return
-  }
+    if (_object.last_activity_date instanceof Date) {
+      _object.last_activity_date = _object.last_activity_date.toISOString()
+    }
 
-  if (object.created_date instanceof Date) {
-    object.created_date = object.created_date.toISOString()
-  }
-
-  if (object.updated_date instanceof Date) {
-    object.updated_date = object.updated_date.toISOString()
-  }
-
-  if (object.last_activity_date instanceof Date) {
-    object.last_activity_date = object.last_activity_date.toISOString()
-  }
-
-  return object
-}
-
-class Channels {
-  save (name, data) {
-    const _data = transformObjectToRow(_.clone(data))
-    const keys = _.keys(_data)
-    const values = _.values(_data)
-
-    return Promise.resolve()
-      .then(() => this.findByName(name))
-      .then((auth) => {
-        if (auth) {
-          keys.push('updated_date')
-          values.push(new Date().toISOString())
-
-          return SQLite.run(`UPDATE channel SET ${keys.map((key) => `${key} = ?`)} WHERE name = ?`, values.concat([ name ]))
-        } else {
-          return SQLite.run(`INSERT INTO channel (${keys}) VALUES (${values.map(() => '?')})`, values)
-            .catch((error) => {
-              if (error.code !== 'SQLITE_CONSTRAINT') {
-                throw error
-              }
-            })
-        }
-      })
-      .then(() => transformRowToObject(_data))
-  }
-
-  findAll () {
-    return queryAllChannels.bind(this)(`SELECT * FROM channel`)
+    return _object
   }
 
   findByName (name) {
-    return SQLite.get('SELECT * FROM channel WHERE name = ?', [ name ])
-      .then((channel) => transformRowToObject(channel))
+    return this._findByPrimaryKeys([ name ])
   }
 
   deleteByName (name) {
-    return SQLite.run('DELETE FROM channel WHERE name = ?', [ name ])
+    return this._deleteByPrimaryKeys([ name ])
   }
 }
 
