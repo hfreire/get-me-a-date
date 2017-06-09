@@ -56,7 +56,7 @@ class Match {
         return Message.readMessages(channel, accountUserId, recommendation.id, match.messages)
           .then(() => {
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
-              .catch(AlreadyCheckedOutEarlierError, () => recommendation)
+              .catch(AlreadyCheckedOutEarlierError, () => { return { recommendation } })
           })
           .then(({ recommendation }) => Recommendation.fallInLove(recommendation))
           .then((recommendation) => Recommendations.save(channelName, channelRecommendationId, recommendation))

@@ -34,8 +34,8 @@ const authorizeApp = function (email, password, url, userAgent) {
         return
       }
 
-      if (url.path === '/ajax/presence/reconnect.php') {
-        const match = response.match(/"user_channel":"p_(.*?)"/)
+      if (url.path === '/pull') {
+        const match = response.match(/"u":(.*),"ms"/)
         facebookUserId = match.length === 2 ? match[ 1 ] : undefined
 
         return
@@ -74,7 +74,7 @@ const defaultOptions = {
       webSecurity: false
     }
   },
-  retry: { max_tries: 2, interval: 5000, timeout: 40000, throw_original: true },
+  retry: { max_tries: 3, interval: 15000, timeout: 40000, throw_original: true },
   breaker: { timeout: 60000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
 }
 
