@@ -57,7 +57,11 @@ class Stats {
     const _criteria = _.merge({ [metric]: date }, criteria)
 
     return Database.Recommendations.findAll(1, 10000, _criteria)
-      .then(({ totalCount }) => Database.Stats.save([ date ], { [name]: totalCount }))
+      .then(({ totalCount }) => {
+        const _date = date.toISOString().replace(/T.*$/, '')
+
+        return Database.Stats.save([ _date ], { date: _date, [name]: totalCount })
+      })
   }
 }
 

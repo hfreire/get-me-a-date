@@ -14,6 +14,34 @@ class Stats extends Database {
     super('stats', [ 'date' ])
   }
 
+  _transformRowToObject (row) {
+    const _row = super._transformRowToObject(row)
+
+    if (!_row) {
+      return
+    }
+
+    if (_row.date) {
+      _row.date = new Date(_row.date)
+    }
+
+    return _row
+  }
+
+  _transformObjectToRow (object) {
+    const _object = super._transformObjectToRow(object)
+
+    if (!_object) {
+      return
+    }
+
+    if (_object.date instanceof Date) {
+      _object.date = _object.date.toISOString().replace(/T.*$/, '')
+    }
+
+    return _object
+  }
+
   findAll (page = 1, limit = 31) {
     return this._findPage(page, limit)
   }
