@@ -60,6 +60,7 @@ const createSchema = function () {
     'matched_date DATETIME DEFAULT NULL,' +
     'train INTEGER NOT NULL DEFAULT 0,' +
     'trained_date DATETIME DEFAULT NULL,' +
+    'checked_out_times INTEGER NOT NULL DEFAULT 0,' +
     'last_checked_out_date DATETIME DEFAULT NULL,' +
     'photos_similarity_mean REAL DEFAULT NULL,' +
     'data TEXT NOT NULL,' +

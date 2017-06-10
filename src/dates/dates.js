@@ -168,7 +168,11 @@ class Dates {
                   return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
                 }
               })
-              .catch(AlreadyCheckedOutEarlierError, () => { skipped++ })
+              .catch(AlreadyCheckedOutEarlierError, ({ recommendation }) => {
+                skipped++
+
+                return Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation)
+              })
               .catch((error) => {
                 failed++
 

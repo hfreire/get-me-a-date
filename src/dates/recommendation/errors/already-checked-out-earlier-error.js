@@ -6,16 +6,21 @@
  */
 
 class AlreadyCheckedOutEarlierError extends Error {
-  constructor (message) {
-    super(message)
+  constructor (recommendation) {
+    super(`recommendation id ${recommendation.id}`)
 
     this.name = this.constructor.name
+    this._recommendation = recommendation
 
     if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, this.constructor)
     } else {
-      this.stack = (new Error(message)).stack
+      this.stack = (new Error(`recommendation id ${recommendation.id}`)).stack
     }
+  }
+
+  get recommendation () {
+    return this._recommendation
   }
 }
 

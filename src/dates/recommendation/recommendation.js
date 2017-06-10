@@ -27,8 +27,10 @@ class Recommendation {
 
     return this.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
       .then((recommendation) => {
+        recommendation.checked_out_times++
+
         if (recommendation.last_checked_out_date) {
-          return Promise.reject(new AlreadyCheckedOutEarlierError())
+          return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
         }
 
         return Promise.resolve()
