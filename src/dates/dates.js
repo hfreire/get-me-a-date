@@ -210,7 +210,6 @@ class Dates {
               return accumulator
             }, { messages: 0, matches: 0 })
           })
-          .catch((error) => Logger.warn(error))
       })
       .catch(NotAuthorizedError, () => {
         return channel.authorize()
