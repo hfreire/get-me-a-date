@@ -194,7 +194,7 @@ class Taste {
         const faceSimilarityMin = _.min(faceSimilarities)
         const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
 
-        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 73
+        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 80
 
         return Logger.debug(`Compared ${photosToCompare.length} photo(s)`)
           .then(() => { return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like } })

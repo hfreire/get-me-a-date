@@ -160,7 +160,7 @@ class Dates {
                     return recommendation
                   })
               })
-              .then((recommendation) => Recommendations.save(recommendation.channel, recommendation.channel_id, recommendation))
+              .then((recommendation) => Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation))
               .then(({ like, photos_similarity_mean, match, data }) => {
                 if (match) {
                   return Logger.info(`${data.name} is a :fire:(photos = ${photos_similarity_mean}%)`)

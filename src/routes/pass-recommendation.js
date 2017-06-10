@@ -46,7 +46,7 @@ class PassRecommendation extends Route {
               })
           })
           .then((recommendation) => {
-            return Recommendations.save(channelName, channelRecommendationId, recommendation)
+            return Recommendations.save([ channelName, channelRecommendationId ], recommendation)
               .then((recommendation) => {
                 Recommendation.couldDoBetter(recommendation)
                   .then(() => Stats.updateByDate(new Date()))

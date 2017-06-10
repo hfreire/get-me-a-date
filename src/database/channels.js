@@ -23,6 +23,8 @@ class Channels extends Database {
       _row.last_activity_date = new Date(_row.last_activity_date)
     }
 
+    row.is_enabled = !!row.is_enabled
+
     return _row
   }
 

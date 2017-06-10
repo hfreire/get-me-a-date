@@ -5,94 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const Database = require('./database')
+
 const _ = require('lodash')
 const Promise = require('bluebird')
 
 const SQLite = require('./sqlite')
 
 const uuidV4 = require('uuid/v4')
-
-const transformRowToObject = function (row) {
-  if (!row) {
-    return
-  }
-
-  if (row.created_date) {
-    row.created_date = new Date(row.created_date)
-  }
-
-  if (row.updated_date) {
-    row.updated_date = new Date(row.updated_date)
-  }
-
-  if (row.decision_date) {
-    row.decision_date = new Date(row.decision_date)
-  }
-
-  if (row.matched_date) {
-    row.matched_date = new Date(row.matched_date)
-  }
-
-  if (row.trained_date) {
-    row.trained_date = new Date(row.trained_date)
-  }
-
-  if (row.last_checked_out_date) {
-    row.last_checked_out_date = new Date(row.last_checked_out_date)
-  }
-
-  if (row.data) {
-    row.data = JSON.parse(row.data)
-  }
-
-  row.like = !!row.like
-  row.is_pass = !!row.is_pass
-  row.is_human_decision = !!row.is_human_decision
-  row.train = !!row.train
-
-  return row
-}
-
-const transformObjectToRow = function (object) {
-  if (!object) {
-    return
-  }
-
-  if (object.created_date instanceof Date) {
-    object.created_date = object.created_date.toISOString()
-  }
-
-  if (object.updated_date instanceof Date) {
-    object.updated_date = object.updated_date.toISOString()
-  }
-
-  if (object.decision_date instanceof Date) {
-    object.decision_date = object.decision_date.toISOString()
-  }
-
-  if (object.matched_date instanceof Date) {
-    object.matched_date = object.matched_date.toISOString()
-  }
-
-  if (object.trained_date instanceof Date) {
-    object.trained_date = object.trained_date.toISOString()
-  }
-
-  if (object.last_checked_out_date instanceof Date) {
-    object.last_checked_out_date = object.last_checked_out_date.toISOString()
-  }
-
-  if (object.data) {
-    object.data = JSON.stringify(object.data)
-  }
-
-  return object
-}
-
-const queryAll = function (...args) {
-  return SQLite.all(...args)
-    .mapSeries((row) => transformRowToObject(row))
-}
 
 const buildWhereClause = (keys, values) => {
   if (_.includes(keys, 'decision_date')) {
@@ -163,15 +83,84 @@ const buildSelectClause = (unique, select) => {
   return select
 }
 
-class Recommendations {
-  save (channel, channelId, data) {
-    const _data = transformObjectToRow(_.clone(data))
+class Recommendations extends Database {
+  constructor () {
+    super('recommendations', [ 'channel', 'channel_id' ])
+  }
+
+  _transformRowToObject (row) {
+    const _row = super._transformRowToObject(row)
+
+    if (!_row) {
+      return
+    }
+
+    if (_row.decision_date) {
+      _row.decision_date = new Date(_row.decision_date)
+    }
+
+    if (_row.matched_date) {
+      _row.matched_date = new Date(_row.matched_date)
+    }
+
+    if (_row.trained_date) {
+      _row.trained_date = new Date(_row.trained_date)
+    }
+
+    if (_row.last_checked_out_date) {
+      _row.last_checked_out_date = new Date(_row.last_checked_out_date)
+    }
+
+    if (_row.data) {
+      _row.data = JSON.parse(_row.data)
+    }
+
+    _row.like = !!_row.like
+    _row.is_pass = !!_row.is_pass
+    _row.is_human_decision = !!_row.is_human_decision
+    _row.train = !!_row.train
+
+    return _row
+  }
+
+  _transformObjectToRow (object) {
+    const _object = super._transformObjectToRow(object)
+
+    if (!_object) {
+      return
+    }
+
+    if (_object.decision_date instanceof Date) {
+      _object.decision_date = _object.decision_date.toISOString()
+    }
+
+    if (_object.matched_date instanceof Date) {
+      _object.matched_date = _object.matched_date.toISOString()
+    }
+
+    if (_object.trained_date instanceof Date) {
+      _object.trained_date = _object.trained_date.toISOString()
+    }
+
+    if (_object.last_checked_out_date instanceof Date) {
+      _object.last_checked_out_date = _object.last_checked_out_date.toISOString()
+    }
+
+    if (_object.data) {
+      _object.data = JSON.stringify(_object.data)
+    }
+
+    return _object
+  }
+
+  save (primaryKeyValues, data) {
+    const _data = this._transformObjectToRow(_.clone(data))
 
     const keys = _.keys(_data)
     const values = _.values(_data)
 
     return Promise.resolve()
-      .then(() => this.findByChannelAndChannelId(channel, channelId))
+      .then(() => this._findByPrimaryKeys(primaryKeyValues))
       .then((person) => {
         if (person) {
           if (_.includes(keys, 'updated_date')) {
@@ -182,12 +171,12 @@ class Recommendations {
             values.push(new Date().toISOString())
           }
 
-          return SQLite.run(`UPDATE recommendations SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_id = ?`, values.concat([ channel, channelId ]))
+          return SQLite.run(`UPDATE ${this.name} SET ${keys.map((key) => `${key} = ?`)} WHERE channel = ? AND channel_id = ?`, values.concat(primaryKeyValues))
         } else {
           keys.push('id')
           values.push(uuidV4())
 
-          return SQLite.run(`INSERT INTO recommendations (${keys}) VALUES (${values.map(() => '?')})`, values)
+          return SQLite.run(`INSERT INTO ${this.name} (${keys}) VALUES (${values.map(() => '?')})`, values)
             .catch((error) => {
               if (error.code !== 'SQLITE_CONSTRAINT') {
                 throw error
@@ -195,7 +184,7 @@ class Recommendations {
             })
         }
       })
-      .then(() => this.findByChannelAndChannelId(channel, channelId))
+      .then(() => this._findByPrimaryKeys(primaryKeyValues))
   }
 
   findAll (page = 1, limit = 25, criteria = {}, select = [ '*' ], sort = 'last_checked_out_date', unique = false) {
@@ -206,7 +195,7 @@ class Recommendations {
     let params = []
     let _select = buildSelectClause(unique, select)
     if (!_.isEmpty(criteria)) {
-      const _criteria = transformObjectToRow(_.clone(criteria))
+      const _criteria = this._transformObjectToRow(_.clone(criteria))
 
       const keys = _.keys(_criteria)
       const values = _.values(_criteria)
@@ -222,7 +211,7 @@ class Recommendations {
     }
 
     return Promise.props({
-      results: queryAll.bind(this)(queryResults, params),
+      results: this._findAll(queryResults, params),
       totalCount: SQLite.get(queryTotalCount, params).then(({ count }) => count)
     })
       .catch((error) => {
@@ -235,13 +224,11 @@ class Recommendations {
   }
 
   findById (id) {
-    return SQLite.get('SELECT * FROM recommendations WHERE id = ?', [ id ])
-      .then((row) => transformRowToObject(row))
+    return this._findByKeys([ 'id' ], id)
   }
 
   findByChannelAndChannelId (channel, channelId) {
-    return SQLite.get('SELECT * FROM recommendations WHERE channel = ? AND channel_id = ?', [ channel, channelId ])
-      .then((row) => transformRowToObject(row))
+    return this._findByPrimaryKeys([ channel, channelId ])
   }
 }
 

@@ -165,7 +165,7 @@ class Recommendation {
               data: channelRecommendation
             }
 
-            return Recommendations.save(channel.name, channelRecommendationId, recommendation)
+            return Recommendations.save([ channel.name, channelRecommendationId ], recommendation)
           })
       })
   }

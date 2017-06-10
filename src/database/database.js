@@ -6,6 +6,7 @@
  */
 
 const _ = require('lodash')
+const Promise = require('bluebird')
 
 const SQLite = require('./sqlite')
 
@@ -55,9 +56,18 @@ class Database {
     return object
   }
 
-  _queryAllChannels (query) {
+  _findAll (query) {
     return SQLite.all(query)
       .mapSeries((row) => this._transformRowToObject(row))
+  }
+
+  _findPage (page = 1, limit = 10) {
+    const offset = (page - 1) * limit
+
+    return Promise.props({
+      results: this._findAll.bind(this)(`SELECT * FROM ${this.name} ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`),
+      totalCount: SQLite.get(`SELECT COUNT(*) as count FROM ${this.name}`).then(({ count }) => count)
+    })
   }
 
   _findByPrimaryKeys (values) {
@@ -78,7 +88,7 @@ class Database {
   }
 
   findAll () {
-    return this._queryAllChannels.bind(this)(`SELECT * FROM ${this.name}`)
+    return this._findAll(`SELECT * FROM ${this.name}`)
   }
 
   findById (id) {

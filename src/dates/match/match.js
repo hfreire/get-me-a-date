@@ -30,7 +30,7 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
 
       return recommendation
     })
-    .then((recommendation) => Recommendations.save(channelName, channelRecommendationId, recommendation))
+    .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
 }
 
 class Match {
@@ -59,7 +59,7 @@ class Match {
               .catch(AlreadyCheckedOutEarlierError, () => { return { recommendation } })
           })
           .then(({ recommendation }) => Recommendation.fallInLove(recommendation))
-          .then((recommendation) => Recommendations.save(channelName, channelRecommendationId, recommendation))
+          .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
           .then((recommendation) => {
             if (match.is_new_message) {
               return Logger.info(`${recommendation.data.name} has ${messages} :envelope:`)

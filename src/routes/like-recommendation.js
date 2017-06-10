@@ -46,7 +46,7 @@ class LikeRecommendation extends Route {
               })
           })
           .then((recommendation) => {
-            return Recommendations.save(channelName, channelRecommendationId, recommendation)
+            return Recommendations.save([ channelName, channelRecommendationId ], recommendation)
               .then((recommendation) => {
                 Recommendation.fallInLove(recommendation)
                   .then(() => Stats.updateByDate(new Date()))
