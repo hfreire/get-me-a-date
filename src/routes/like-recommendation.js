@@ -14,7 +14,7 @@ const Logger = require('modern-logger')
 const Joi = require('joi')
 const Boom = require('boom')
 
-const { Tinder } = require('../channels')
+const { Tinder, OutOfLikesError } = require('../channels')
 const { Recommendations, Channels } = require('../database')
 const { Recommendation, Stats } = require('../dates')
 
@@ -56,6 +56,7 @@ class LikeRecommendation extends Route {
           })
       })
       .then((recommendation) => reply(recommendation))
+      .catch(OutOfLikesError, (error) => reply(Boom.tooManyRequests(error.message)))
       .catch((error) => {
         Logger.error(error)
 

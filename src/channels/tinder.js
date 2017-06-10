@@ -81,8 +81,10 @@ const handleError = function (error) {
     case 'Out of likes':
       return Logger.debug(`${_.capitalize(this.name)} is out of likes`)
         .then(() => {
-          this._outOfLikesAt = _.now()
-          throw new OutOfLikesError()
+          return Channels.save([ this.name ], { is_out_of_likes: true, out_of_likes_date: new Date() })
+            .then(() => {
+              throw new OutOfLikesError()
+            })
         })
     default:
       throw error
@@ -183,19 +185,23 @@ class Tinder extends Channel {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    if (this._outOfLikesAt) {
-      if ((_.now() - this._outOfLikesAt) < 60 * 60 * 1000) {
-        throw new OutOfLikesError()
-      } else {
-        delete this._outOfLikesAt
-      }
-    }
-
     return Promise.try(() => {
       if (!this._tinder.getAuthToken()) {
         throw new NotAuthorizedError()
       }
     })
+      .then(() => {
+        return Channels.findByName(this.name)
+          .then(({ is_out_of_likes, out_of_likes_date }) => {
+            if (is_out_of_likes) {
+              if ((_.now() - out_of_likes_date) < 12 * 60 * 60 * 1000) {
+                throw new OutOfLikesError()
+              } else {
+                return Channels.save([ this.name ], { is_out_of_likes: false, out_of_likes_date: null })
+              }
+            }
+          })
+      })
       .then(() => this._tinder.likeCircuitBreaker.exec(userId, photoId, contentHash, sNumber))
       .then(({ match, likes_remaining }) => {
         if (!likes_remaining) {

@@ -74,6 +74,8 @@ const createSchema = function () {
       'user_id VARCHAR(64) DEFAULT NULL,' +
       'auth_id INTEGER NULL,' +
       'last_activity_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))),' +
+      'is_out_of_likes INTEGER NOT NULL DEFAULT 0,' +
+      'out_of_likes_date DATETIME DEFAULT NULL,' +
       'PRIMARY KEY (name)' +
       ')'))
     .then(() => this._database.runAsync(

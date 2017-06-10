@@ -23,7 +23,12 @@ class Channels extends Database {
       _row.last_activity_date = new Date(_row.last_activity_date)
     }
 
+    if (_row.out_of_likes_date) {
+      _row.out_of_likes_date = new Date(_row.out_of_likes_date)
+    }
+
     row.is_enabled = !!row.is_enabled
+    row.is_out_of_likes = !!row.is_out_of_likes
 
     return _row
   }
@@ -37,6 +42,10 @@ class Channels extends Database {
 
     if (_object.last_activity_date instanceof Date) {
       _object.last_activity_date = _object.last_activity_date.toISOString()
+    }
+
+    if (_object.out_of_likes_date instanceof Date) {
+      _object.out_of_likes_date = _object.out_of_likes_date.toISOString()
     }
 
     return _object
