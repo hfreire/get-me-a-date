@@ -18,17 +18,15 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
 
   return Recommendation.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
     .then((recommendation) => {
-      if (!recommendation.match) {
+      if (!recommendation.like) {
         recommendation.like = true
-        recommendation.match = true
-        recommendation.match_id = match._id
-
-        if (match.created_date) {
-          recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
-        }
       }
 
-      return recommendation
+      if (recommendation.match) {
+        return recommendation
+      }
+
+      return this.setUpMatch(recommendation, match)
     })
     .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
 }
@@ -63,12 +61,23 @@ class Match {
           .then((recommendation) => {
             if (match.is_new_message) {
               return Logger.info(`${recommendation.data.name} has ${messages} :envelope:`)
-            } else {
-              return Logger.info(`${recommendation.data.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
             }
+
+            return Logger.info(`${recommendation.data.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
           })
       })
       .then(() => { return { messages, matches } })
+  }
+
+  setUpMatch (recommendation, match) {
+    recommendation.match = true
+    recommendation.match_id = match._id
+
+    if (match.created_date) {
+      recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
+    }
+
+    return recommendation
   }
 }
 

@@ -22,14 +22,14 @@ class GetRecommendations extends Route {
   }
 
   handler ({ query = {} }, reply) {
-    const { page = 1, limit = 25, criteria, select } = query
+    const { page = 1, limit = 25, criteria, select, sort } = query
 
     return Promise.try(() => {
       if (criteria) {
         return JSON.parse(criteria)
       }
     })
-      .then((criteria) => Database.Recommendations.findAll(page, limit, criteria, select))
+      .then((criteria) => Database.Recommendations.findAll(page, limit, criteria, select, sort))
       .then(({ results, totalCount }) => reply({ results, totalCount }))
       .catch((error) => {
         Logger.error(error)
@@ -64,7 +64,10 @@ class GetRecommendations extends Route {
           .description('recommendations criteria'),
         select: Joi.array().single()
           .optional()
-          .description('recommendations select')
+          .description('recommendations select'),
+        sort: Joi.string()
+          .optional()
+          .description('recommendations sort')
       }
     }
   }

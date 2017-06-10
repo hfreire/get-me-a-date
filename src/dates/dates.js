@@ -161,11 +161,11 @@ class Dates {
                   })
               })
               .then((recommendation) => Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation))
-              .then(({ like, photos_similarity_mean, match, data }) => {
+              .then(({ like, photos_similarity_mean, match, name }) => {
                 if (match) {
-                  return Logger.info(`${data.name} is a :fire:(photos = ${photos_similarity_mean}%)`)
+                  return Logger.info(`${name} is a :fire:(photos = ${photos_similarity_mean}%)`)
                 } else {
-                  return Logger.info(`${data.name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
+                  return Logger.info(`${name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
                 }
               })
               .catch(AlreadyCheckedOutEarlierError, ({ recommendation }) => {

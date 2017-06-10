@@ -7,23 +7,29 @@
 
 <div id="recommendations">
     <md-card>
-        <md-select placeholder="Filter recommendations" (change)="setPageCriteria($event)">
+        <md-select id="filter" placeholder="Filter" (change)="setPageCriterion($event)">
             <md-option *ngFor="let criterion of criteria" [value]="criterion.value">
                 {{ criterion.label }}
+            </md-option>
+        </md-select>
+        <md-select id="sort" placeholder="Sort" (change)="setPageSort($event)">
+            <md-option *ngFor="let sort of sorts" [value]="sort.value">
+                {{ sort.label }}
             </md-option>
         </md-select>
 
         <md-grid-list cols="{{ itemsPerPage / 4 }}">
             <md-grid-tile
-                    *ngFor="let recommendation of recommendations | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }">
+                    *ngFor="let recommendation of recommendations | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }; let _index = index">
                 <div class="tint"
                      [ngClass]="{
                      is_machine_like: recommendation.like && !recommendation.is_human_decision,
                      is_human_like: recommendation.like && recommendation.is_human_decision,
                      is_machine_pass: recommendation.is_pass && !recommendation.is_human_decision,
                      is_human_pass: recommendation.is_pass && recommendation.is_human_decision,
+                     is_match: recommendation.match,
                      not_decided: !recommendation.like && !recommendation.is_pass}"
-                     (click)="openRecommendationDialog(recommendation.id)"
+                     (click)="openRecommendationDialog(recommendation.id, _index)"
                      mdTooltip="Similarity: {{recommendation.photos_similarity_mean}}%"
                      tooltipPosition="bottom">
 

@@ -56,8 +56,8 @@ class Database {
     return object
   }
 
-  _findAll (query) {
-    return SQLite.all(query)
+  _findAll (query, params) {
+    return SQLite.all(query, params)
       .mapSeries((row) => this._transformRowToObject(row))
   }
 

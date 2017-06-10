@@ -13,6 +13,7 @@ const Promise = require('bluebird')
 const { AlreadyCheckedOutEarlierError } = require('./errors')
 
 const Taste = require('../taste')
+const { Match } = require('../match')
 
 const { Recommendations } = require('../../database')
 
@@ -87,12 +88,13 @@ class Recommendation {
       .then((match) => {
         recommendation.like = true
 
-        recommendation.match = !!match
-        if (match) {
-          recommendation.match_id = match._id
+        if (!match) {
+          return recommendation
         }
+
+        return Match.setUpMatch(recommendation, match)
       })
-      .then(() => recommendation)
+      .then((recommendation) => recommendation)
   }
 
   pass (channel, recommendation) {

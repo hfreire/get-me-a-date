@@ -50,6 +50,11 @@ class LikeRecommendation extends Route {
               .then((recommendation) => {
                 Recommendation.fallInLove(recommendation)
                   .then(() => Stats.updateByDate(new Date()))
+                  .then(() => {
+                    if (recommendation.match) {
+                      return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
+                    }
+                  })
 
                 return recommendation
               })

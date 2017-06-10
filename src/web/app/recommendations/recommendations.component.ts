@@ -12,6 +12,7 @@ import { RecommendationDialogComponent } from './recommendation-dialog.component
 
 import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
 import { animate, state, style, transition, trigger } from '@angular/animations'
+import * as _ from 'lodash'
 
 @Component({
   selector: 'recommendations',
@@ -35,6 +36,7 @@ export class RecommendationsComponent {
 
   recommendations: any = []
   recommendation: any
+  recommendationProperties = [ 'id', 'name', 'thumbnail_url', 'like', 'is_pass', 'train', 'is_human_decision', 'match', 'photos_similarity_mean' ]
   dialogRef: MdDialogRef<RecommendationDialogComponent>
   currentPage: number = 1
   itemsPerPage: number = 100
@@ -44,10 +46,16 @@ export class RecommendationsComponent {
     { value: {}, label: 'All' },
     { value: { like: 1 }, label: 'Likes' },
     { value: { is_pass: 1 }, label: 'Passes' },
+    { value: { like: 0, is_pass: 0 }, label: 'Waiting' },
     { value: { match: 1 }, label: 'Matches' },
     { value: { train: 1 }, label: 'Training' }
   ]
   currentCriteria: any = this.criteria[ 0 ].value
+  sorts: any = [
+    { value: 'last_checked_out_date', label: 'Last checked out' },
+    { value: 'checked_out_times', label: 'Number of times checked out' }
+  ]
+  currentSort: any = this.sorts[ 0 ].value
 
   constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
@@ -60,7 +68,7 @@ export class RecommendationsComponent {
     this.fadeOutState = 'in'
   }
 
-  openRecommendationDialog (recommendationId: string) {
+  openRecommendationDialog (recommendationId: string, index: number) {
     this.recommendationService.getById(recommendationId)
       .subscribe((recommendation) => {
         const config = new MdDialogConfig()
@@ -68,13 +76,17 @@ export class RecommendationsComponent {
         config.data = { recommendation }
 
         this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
+        this.dialogRef.afterClosed()
+          .subscribe(() => {
+            this.recommendations[ index ] = _.pick(config.data.recommendation, this.recommendationProperties)
+          })
       })
   }
 
-  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = [ 'id', 'name', 'thumbnail_url', 'like', 'is_pass', 'train', 'is_human_decision', 'match', 'photos_similarity_mean' ]) {
+  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = this.recommendationProperties, sort: string = this.currentSort) {
     this.loadedPage = false
 
-    this.recommendationService.getAll(page, limit, criteria, select)
+    this.recommendationService.getAll(page, limit, criteria, select, sort)
       .subscribe(({ results, meta }) => {
         this.currentPage = page
         this.recommendations = results
@@ -84,8 +96,14 @@ export class RecommendationsComponent {
       })
   }
 
-  setPageCriteria ({ value }: any) {
+  setPageCriterion ({ value }: any) {
     this.currentCriteria = value
+
+    this.getPage(undefined, undefined)
+  }
+
+  setPageSort ({ value }: any) {
+    this.currentSort = value
 
     this.getPage(undefined, undefined)
   }

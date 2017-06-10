@@ -52,6 +52,7 @@ export class RecommendationDialogComponent {
     this.recommendationService.like(this.recommendation.id)
       .subscribe((recommendation) => {
         this.recommendation = recommendation
+        this.data.recommendation = recommendation
       })
   }
 
@@ -59,6 +60,7 @@ export class RecommendationDialogComponent {
     this.recommendationService.pass(this.recommendation.id)
       .subscribe((recommendation) => {
         this.recommendation = recommendation
+        this.data.recommendation = recommendation
       })
   }
 }
