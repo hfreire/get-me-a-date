@@ -53,7 +53,7 @@
   "devDependencies": {
     "babel-eslint": "7.2.3",
     "chai": "4.0.2",
-    "chai-as-promised": "6.0.0",
+    "chai-as-promised": "7.0.0",
     "coveralls": "2.13.1",
     "eslint": "3.19.0",
     "eslint-config-hfreire": "1.0.1",
