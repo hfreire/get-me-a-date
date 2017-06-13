@@ -44,6 +44,7 @@ class Recommendation {
               .then(({ photos }) => {
                 channelRecommendation.photos = photosToCheckOut
 
+                recommendation.name = channelRecommendation.name
                 recommendation.last_checked_out_date = new Date()
                 recommendation.data = channelRecommendation
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
