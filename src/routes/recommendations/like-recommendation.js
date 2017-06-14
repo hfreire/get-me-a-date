@@ -14,9 +14,9 @@ const Logger = require('modern-logger')
 const Joi = require('joi')
 const Boom = require('boom')
 
-const { Tinder, OutOfLikesError } = require('../channels')
-const { Recommendations, Channels } = require('../database')
-const { Recommendation, Stats } = require('../dates')
+const { Tinder, OutOfLikesError } = require('../../channels')
+const { Recommendations, Channels } = require('../../database')
+const { Recommendation, Stats } = require('../../dates')
 
 class LikeRecommendation extends Route {
   constructor () {
