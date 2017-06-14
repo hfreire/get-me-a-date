@@ -7,8 +7,6 @@
 
 const { Route } = require('serverful')
 
-const Promise = require('bluebird')
-
 const Logger = require('modern-logger')
 
 const Joi = require('joi')
@@ -29,7 +27,7 @@ class PassRecommendation extends Route {
     Recommendations.findById(id)
       .then((recommendation) => {
         if (!recommendation) {
-          return Promise.reject(new Error())
+          throw new Error()
         }
 
         const channelName = recommendation.channel
@@ -50,6 +48,7 @@ class PassRecommendation extends Route {
               .then((recommendation) => {
                 Recommendation.couldDoBetter(recommendation)
                   .then(() => Stats.updateByDate(new Date()))
+                  .catch((error) => Logger.error(error))
 
                 return recommendation
               })

@@ -7,8 +7,6 @@
 
 const { Route } = require('serverful')
 
-const Promise = require('bluebird')
-
 const Logger = require('modern-logger')
 
 const Joi = require('joi')
@@ -29,7 +27,7 @@ class LikeRecommendation extends Route {
     Recommendations.findById(id)
       .then((recommendation) => {
         if (!recommendation) {
-          return Promise.reject(new Error())
+          throw new Error()
         }
 
         const channelName = recommendation.channel
@@ -55,6 +53,7 @@ class LikeRecommendation extends Route {
                       return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
                     }
                   })
+                  .catch((error) => Logger.error(error))
 
                 return recommendation
               })
