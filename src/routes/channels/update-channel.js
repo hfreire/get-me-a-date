@@ -11,7 +11,7 @@ const Promise = require('bluebird')
 
 const Boom = require('boom')
 
-const { Channels } = require('../database')
+const { Channels } = require('../../database')
 
 class UpdateChannel extends Route {
   constructor () {

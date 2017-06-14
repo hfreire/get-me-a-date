@@ -31,7 +31,7 @@ PORT | The port to be used by the HTTP server | false | `3000`
 API_KEYS | The secret keys that should be used when securing endpoints | false | `undefined`
 ENVIRONMENT | The environment the app is running on | false | `undefined`
 ROLLBAR_API_KEY | The server API key used to talk with Rollbar | false | `undefined`
-SO_TIMEOUT | Node socket timeout. Defaults to 2 minutes. Set to false to disable socket timeouts. | false | `undefined`
+SO_TIMEOUT | TCP socket connection timeout | false | `120000`
 
 ### How to build
 Clone the GitHub repo

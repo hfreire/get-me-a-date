@@ -14,7 +14,7 @@ const Boom = require('boom')
 
 const Logger = require('modern-logger')
 
-const Database = require('../database')
+const Database = require('../../database')
 
 class GetRecommendations extends Route {
   constructor () {

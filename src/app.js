@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#!/usr/bin/env node
+
 const VERSION = process.env.VERSION
 const VERSION_COMMIT = process.env.VERSION_COMMIT
 const VERSION_BUILD_DATE = process.env.VERSION_BUILD_DATE

@@ -7,7 +7,10 @@
 
 const { Route } = require('serverful')
 
+const Logger = require('modern-logger')
+
 const Joi = require('joi')
+const Boom = require('boom')
 
 const Database = require('../database')
 
@@ -21,6 +24,11 @@ class Stats extends Route {
 
     Database.Stats.findAll(page, limit)
       .then(({ results, totalCount }) => reply({ results, totalCount }))
+      .catch((error) => {
+        Logger.error(error)
+
+        reply(Boom.badImplementation(error.message, error))
+      })
   }
 
   auth () {

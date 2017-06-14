@@ -5,8 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+/* eslint-disable no-unused-vars */
+
 describe('App', () => {
-  let subject // eslint-disable-line
+  let subject
   let Server
 
   afterEach(() => {

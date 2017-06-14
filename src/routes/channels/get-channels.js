@@ -7,7 +7,7 @@
 
 const { Route } = require('serverful')
 
-const Database = require('../database')
+const Database = require('../../database')
 
 class GetChannels extends Route {
   constructor () {

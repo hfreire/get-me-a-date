@@ -7,20 +7,18 @@
 
 const { Route } = require('serverful')
 
-const Promise = require('bluebird')
-
 const Logger = require('modern-logger')
 
 const Joi = require('joi')
 const Boom = require('boom')
 
-const { Tinder, OutOfLikesError } = require('../channels')
-const { Recommendations, Channels } = require('../database')
-const { Recommendation, Stats } = require('../dates')
+const { Tinder } = require('../../channels')
+const { Recommendations, Channels } = require('../../database')
+const { Recommendation, Stats } = require('../../dates')
 
-class LikeRecommendation extends Route {
+class PassRecommendation extends Route {
   constructor () {
-    super('POST', '/recommendations/{id}/like', 'Like', 'Like a recommendation')
+    super('POST', '/recommendations/{id}/pass', 'Pass', 'Pass a recommendation')
   }
 
   handler (request, reply) {
@@ -29,7 +27,7 @@ class LikeRecommendation extends Route {
     Recommendations.findById(id)
       .then((recommendation) => {
         if (!recommendation) {
-          return Promise.reject(new Error())
+          throw new Error()
         }
 
         const channelName = recommendation.channel
@@ -37,7 +35,7 @@ class LikeRecommendation extends Route {
 
         return Channels.findByName(channelName)
           .then((channel) => {
-            return Recommendation.like(Tinder, recommendation)
+            return Recommendation.pass(Tinder, recommendation)
               .then((recommendation) => {
                 recommendation.is_human_decision = true
                 recommendation.decision_date = new Date()
@@ -48,20 +46,15 @@ class LikeRecommendation extends Route {
           .then((recommendation) => {
             return Recommendations.save([ channelName, channelRecommendationId ], recommendation)
               .then((recommendation) => {
-                Recommendation.fallInLove(recommendation)
+                Recommendation.couldDoBetter(recommendation)
                   .then(() => Stats.updateByDate(new Date()))
-                  .then(() => {
-                    if (recommendation.match) {
-                      return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
-                    }
-                  })
+                  .catch((error) => Logger.error(error))
 
                 return recommendation
               })
           })
       })
       .then((recommendation) => reply(recommendation))
-      .catch(OutOfLikesError, (error) => reply(Boom.tooManyRequests(error.message)))
       .catch((error) => {
         Logger.error(error)
 
@@ -84,4 +77,4 @@ class LikeRecommendation extends Route {
   }
 }
 
-module.exports = new LikeRecommendation()
+module.exports = new PassRecommendation()
