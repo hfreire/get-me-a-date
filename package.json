@@ -59,7 +59,7 @@
     "eslint-config-hfreire": "1.0.6",
     "eslint-plugin-import": "2.3.0",
     "eslint-plugin-json": "1.2.0",
-    "eslint-plugin-mocha": "4.9.0",
+    "eslint-plugin-mocha": "4.10.0",
     "eslint-plugin-node": "5.0.0",
     "eslint-plugin-promise": "3.5.0",
     "eslint-plugin-standard": "3.0.1",
