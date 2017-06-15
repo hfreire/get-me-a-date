@@ -26,7 +26,7 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
         return recommendation
       }
 
-      return this.setUpMatch(recommendation, match)
+      return Recommendation.setUpMatch(recommendation, match)
     })
     .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
 }
@@ -67,17 +67,6 @@ class Match {
           })
       })
       .then(() => { return { messages, matches } })
-  }
-
-  setUpMatch (recommendation, match) {
-    recommendation.match = true
-    recommendation.match_id = match._id
-
-    if (match.created_date) {
-      recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
-    }
-
-    return recommendation
   }
 }
 
