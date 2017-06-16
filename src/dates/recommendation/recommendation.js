@@ -13,7 +13,6 @@ const Promise = require('bluebird')
 const { AlreadyCheckedOutEarlierError } = require('./errors')
 
 const Taste = require('../taste')
-const { Match } = require('../match')
 
 const { Recommendations } = require('../../database')
 
@@ -93,7 +92,7 @@ class Recommendation {
           return recommendation
         }
 
-        return Match.setUpMatch(recommendation, match)
+        return this.setUpMatch(recommendation, match)
       })
       .then((recommendation) => recommendation)
   }
@@ -173,6 +172,17 @@ class Recommendation {
             return Recommendations.save([ channel.name, channelRecommendationId ], recommendation)
           })
       })
+  }
+
+  setUpMatch (recommendation, match) {
+    recommendation.match = true
+    recommendation.match_id = match._id
+
+    if (match.created_date) {
+      recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
+    }
+
+    return recommendation
   }
 }
 
