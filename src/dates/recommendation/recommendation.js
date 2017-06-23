@@ -175,6 +175,10 @@ class Recommendation {
   }
 
   setUpMatch (recommendation, match) {
+    if (!recommendation || !match) {
+      throw new Error('invalid arguments')
+    }
+
     recommendation.match = true
     recommendation.match_id = match._id
 

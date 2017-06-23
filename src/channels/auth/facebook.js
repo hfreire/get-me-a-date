@@ -34,11 +34,16 @@ const authorizeApp = function (email, password, url, userAgent) {
         return
       }
 
-      if (url.path === '/pull') {
+      if (url.path === '/pull' && !facebookUserId) {
         const match = response.match(/"u":(.*),"ms"/)
-        facebookUserId = match.length === 2 ? match[ 1 ] : undefined
+        facebookUserId = (match && match.length === 2) ? match[ 1 ] : undefined
 
         return
+      }
+
+      if (_.includes(url, 'www.facebook.com/ajax/haste-response') && !facebookUserId) {
+        const match = url.match(/__user=([0-9]+)/)
+        facebookUserId = (match && match.length === 2) ? match[ 1 ] : undefined
       }
 
       if (_.includes(url, 'oauth/confirm?dpr')) {
