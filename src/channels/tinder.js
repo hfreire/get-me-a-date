@@ -11,7 +11,7 @@ const FACEBOOK_USER_EMAIL = process.env.FACEBOOK_USER_EMAIL
 const FACEBOOK_USER_PASSWORD = process.env.FACEBOOK_USER_PASSWORD
 const FACEBOOK_TINDER_APP_AUTHZ_URL = 'https://www.facebook.com/v2.6/dialog/oauth?redirect_uri=fb464891386855067%3A%2F%2Fauthorize%2F&state=%7B%22challenge%22%3A%22q1WMwhvSfbWHvd8xz5PT6lk6eoA%253D%22%2C%220_auth_logger_id%22%3A%2254783C22-558A-4E54-A1EE-BB9E357CC11F%22%2C%22com.facebook.sdk_client_state%22%3Atrue%2C%223_method%22%3A%22sfvc_auth%22%7D&scope=user_birthday%2Cuser_photos%2Cuser_education_history%2Cemail%2Cuser_relationship_details%2Cuser_friends%2Cuser_work_history%2Cuser_likes&response_type=token%2Csigned_request&default_audience=friends&return_scopes=true&auth_type=rerequest&client_id=464891386855067&ret=login&sdk=ios&logger_id=54783C22-558A-4E54-A1EE-BB9E357CC11F#_=_'
 
-const Channel = require('../channel')
+const Channel = require('./channel')
 
 const _ = require('lodash')
 const Promise = require('bluebird')
@@ -20,12 +20,12 @@ const Logger = require('modern-logger')
 
 const Health = require('health-checkup')
 
-const { NotAuthorizedError, OutOfLikesError } = require('../errors')
+const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
-const TinderWrapper = require('./tinder-wrapper')
+const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
 
-const { Facebook } = require('../auth')
-const { Channels, Auth } = require('../../database')
+const { Facebook } = require('./auth')
+const { Channels, Auth } = require('../database')
 
 const createTinderChannelIfNeeded = function () {
   return Channels.findByName(this._options.channel.name)
@@ -93,7 +93,7 @@ const defaultOptions = {
   channel: { name: 'tinder', is_enabled: false }
 }
 
-class TinderChannel extends Channel {
+class Tinder extends Channel {
   constructor (options = {}) {
     super('tinder')
 
@@ -132,7 +132,7 @@ class TinderChannel extends Channel {
       }
     })
       .then(() => this._tinder.getAccount())
-      .catch(NotAuthorizedError, () => onNotAuthorizedError.bind(this)())
+      .catch(TinderNotAuthorizedError, () => onNotAuthorizedError.bind(this)())
   }
 
   getRecommendations () {
@@ -143,7 +143,7 @@ class TinderChannel extends Channel {
     })
       .then(() => this._tinder.getRecommendations())
       .then(({ results }) => results)
-      .catch(NotAuthorizedError, () => onNotAuthorizedError.bind(this)())
+      .catch(TinderNotAuthorizedError, () => onNotAuthorizedError.bind(this)())
   }
 
   getUpdates () {
@@ -164,7 +164,7 @@ class TinderChannel extends Channel {
         return Channels.save([ this.name ], { last_activity_date })
           .then(() => data)
       })
-      .catch(NotAuthorizedError, () => onNotAuthorizedError.bind(this)())
+      .catch(TinderNotAuthorizedError, () => onNotAuthorizedError.bind(this)())
   }
 
   like (userId, photoId, contentHash, sNumber) {
@@ -192,9 +192,9 @@ class TinderChannel extends Channel {
       .then(() => {
         return this._tinder.like(userId, photoId, contentHash, sNumber)
           .then(({ match }) => match)
-          .catch(OutOfLikesError, () => onOutOfLikesError.bind(this)())
+          .catch(TinderOutOfLikesError, () => onOutOfLikesError.bind(this)())
       })
-      .catch(NotAuthorizedError, () => onNotAuthorizedError.bind(this)())
+      .catch(TinderNotAuthorizedError, () => onNotAuthorizedError.bind(this)())
   }
 
   getUser (userId) {
@@ -209,8 +209,8 @@ class TinderChannel extends Channel {
     })
       .then(() => this._tinder.getUser(userId))
       .then(({ results }) => results)
-      .catch(NotAuthorizedError, () => onNotAuthorizedError.bind(this)())
+      .catch(TinderNotAuthorizedError, () => onNotAuthorizedError.bind(this)())
   }
 }
 
-module.exports = new TinderChannel()
+module.exports = new Tinder()
