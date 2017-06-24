@@ -5,12 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const FACEBOOK_USER_EMAIL = process.env.FACEBOOK_USER_EMAIL
+const FACEBOOK_USER_PASSWORD = process.env.FACEBOOK_USER_PASSWORD
+
 const _ = require('lodash')
 const Promise = require('bluebird')
 
 const Health = require('health-checkup')
 
 const Logger = require('modern-logger')
+
+const FacebookLogin = require('facebook-login-for-robots')
 
 const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
@@ -29,6 +34,13 @@ const createChannelIfNeeded = function () {
 class Channel {
   constructor (name) {
     this._name = name
+
+    this._facebookLogin = new FacebookLogin({
+      facebook: {
+        email: FACEBOOK_USER_EMAIL,
+        password: FACEBOOK_USER_PASSWORD
+      }
+    })
 
     Health.addCheck(this.name, () => new Promise((resolve, reject) => {
       if (this._happn._breaker.isOpen()) {

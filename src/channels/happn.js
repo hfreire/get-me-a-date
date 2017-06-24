@@ -7,9 +7,6 @@
 
 /* eslint-disable camelcase */
 
-const FACEBOOK_USER_EMAIL = process.env.FACEBOOK_USER_EMAIL
-const FACEBOOK_USER_PASSWORD = process.env.FACEBOOK_USER_PASSWORD
-
 const HAPPN_FACEBOOK_LOGIN_APP_CLIENT_ID = '247294518656661'
 const HAPPN_FACEBOOK_LOGIN_APP_REDIRECT_URI = 'https://www.happn.fr'
 const HAPPN_FACEBOOK_LOGIN_APP_OPTIONAL_PARAMS = { scope: 'basic_info', response_type: 'token' }
@@ -23,7 +20,6 @@ const { NotAuthorizedError } = require('./errors')
 
 const { HappnWrapper, HappnNotAuthorizedError } = require('happn-wrapper')
 
-const { Facebook } = require('./auth')
 const { Channels, Auth } = require('../database')
 
 const findOrAuthorizeHappnIfNeeded = function (channel) {
@@ -47,11 +43,18 @@ const findOrAuthorizeHappnIfNeeded = function (channel) {
 }
 
 const facebookAuthorizeHappnApp = function () {
-  return this._facebook.login(this.name, HAPPN_FACEBOOK_LOGIN_APP_CLIENT_ID, HAPPN_FACEBOOK_LOGIN_APP_REDIRECT_URI, HAPPN_FACEBOOK_LOGIN_APP_OPTIONAL_PARAMS)
+  return this._facebookLogin.oauthDialog(this._options.oauth.facebook.clientId, this._options.oauth.facebook.redirectUri, this._options.oauth.facebook.optionalParams)
     .then(({ facebookAccessToken }) => this._happn.authorize(facebookAccessToken))
 }
 
 const defaultOptions = {
+  oauth: {
+    facebook: {
+      clientId: HAPPN_FACEBOOK_LOGIN_APP_CLIENT_ID,
+      redirectUri: HAPPN_FACEBOOK_LOGIN_APP_REDIRECT_URI,
+      optionalParams: HAPPN_FACEBOOK_LOGIN_APP_OPTIONAL_PARAMS
+    }
+  },
   channel: { is_enabled: false }
 }
 
@@ -62,8 +65,6 @@ class Happn extends Channel {
     this._options = _.defaults(options, defaultOptions)
 
     this._happn = new HappnWrapper()
-
-    this._facebook = new Facebook({ facebook: { email: FACEBOOK_USER_EMAIL, password: FACEBOOK_USER_PASSWORD } })
   }
 
   authorize () {

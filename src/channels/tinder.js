@@ -7,9 +7,6 @@
 
 /* eslint-disable camelcase */
 
-const FACEBOOK_USER_EMAIL = process.env.FACEBOOK_USER_EMAIL
-const FACEBOOK_USER_PASSWORD = process.env.FACEBOOK_USER_PASSWORD
-
 const TINDER_FACEBOOK_LOGIN_APP_CLIENT_ID = '464891386855067'
 const TINDER_FACEBOOK_LOGIN_APP_REDIRECT_URI = 'fb464891386855067://authorize/'
 const TINDER_FACEBOOK_LOGIN_APP_OPTIONAL_PARAMS = {
@@ -33,7 +30,6 @@ const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
 
-const { Facebook } = require('./auth')
 const { Channels, Auth } = require('../database')
 
 const findOrAuthorizeTinderIfNeeded = function (channel) {
@@ -57,11 +53,18 @@ const findOrAuthorizeTinderIfNeeded = function (channel) {
 }
 
 const facebookAuthorizeTinderApp = function () {
-  return this._facebook.login(this.name, TINDER_FACEBOOK_LOGIN_APP_CLIENT_ID, TINDER_FACEBOOK_LOGIN_APP_REDIRECT_URI, TINDER_FACEBOOK_LOGIN_APP_OPTIONAL_PARAMS)
+  return this._facebookLogin.oauthDialog(this._options.oauth.facebook.clientId, this._options.oauth.facebook.redirectUri, this._options.oauth.facebook.optionalParams)
     .then(({ facebookAccessToken, facebookUserId }) => this._tinder.authorize(facebookAccessToken, facebookUserId))
 }
 
 const defaultOptions = {
+  oauth: {
+    facebook: {
+      clientId: TINDER_FACEBOOK_LOGIN_APP_CLIENT_ID,
+      redirectUri: TINDER_FACEBOOK_LOGIN_APP_REDIRECT_URI,
+      optionalParams: TINDER_FACEBOOK_LOGIN_APP_OPTIONAL_PARAMS
+    }
+  },
   channel: { is_enabled: false }
 }
 
@@ -72,7 +75,6 @@ class Tinder extends Channel {
     this._options = _.defaults(options, defaultOptions)
 
     this._tinder = new TinderWrapper()
-    this._facebook = new Facebook({ facebook: { email: FACEBOOK_USER_EMAIL, password: FACEBOOK_USER_PASSWORD } })
   }
 
   authorize () {
