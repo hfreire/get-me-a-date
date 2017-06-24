@@ -12,7 +12,7 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Tinder } = require('../channels')
+const { Tinder, Happn } = require('../channels')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { SQLite, Recommendations, Channels } = require('../database')
@@ -64,7 +64,8 @@ const likeOrPass = (channel, recommendation, like, pass) => {
 class Dates {
   constructor () {
     this._channels = {
-      'tinder': Tinder
+      'tinder': Tinder,
+      'happn': Happn
     }
   }
 
@@ -145,7 +146,7 @@ class Dates {
 
     return channel.getRecommendations()
       .then((channelRecommendations) => {
-        received = channelRecommendations.length
+        received = _.size(channelRecommendations)
 
         return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
           .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {

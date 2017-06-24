@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const BASE_URL = 'https://www.facebook.com/dialog/oauth'
+
 const _ = require('lodash')
 const Promise = require('bluebird')
 const retry = require('bluebird-retry')
@@ -20,10 +22,26 @@ const Health = require('health-checkup')
 const RandomUserAgent = require('random-http-useragent')
 
 const { join } = require('path')
+const querystring = require('querystring')
 
-const authorizeApp = function (email, password, url, userAgent) {
+const buildUrl = function (clientId, redirectUri, optionalParams) {
+  const params = _.assign({
+    client_id: clientId,
+    redirect_uri: redirectUri
+  }, optionalParams)
+
+  return `${BASE_URL}?${querystring.stringify(params, null, null, { encodeURIComponent: (s) => s })}`
+}
+
+const authorizeApp = function (url, userAgent) {
   let facebookUserId
-  let accessToken
+  let facebookAccessToken
+
+  let redirectUri
+  const match = url.match(/redirect_uri=(.*?)&/)
+  if (match.length > 1) {
+    redirectUri = match[ 1 ]
+  }
 
   const nightmare = Nightmare(this._options.nightmare)
 
@@ -44,33 +62,52 @@ const authorizeApp = function (email, password, url, userAgent) {
       if (_.includes(url, 'www.facebook.com/ajax/haste-response') && !facebookUserId) {
         const match = url.match(/__user=([0-9]+)/)
         facebookUserId = (match && match.length === 2) ? match[ 1 ] : undefined
+
+        return
       }
 
-      if (_.includes(url, 'oauth/confirm?dpr')) {
-        const match = response.match(/access_token=(.*)&/)
-        accessToken = match.length === 2 ? match[ 1 ] : undefined
+      if (_.includes(url, 'oauth/confirm?dpr') && !facebookAccessToken) {
+        const match = response.match(/access_token=(.*?)&/)
+        facebookAccessToken = match.length === 2 ? match[ 1 ] : undefined
+      }
+    })
+    .on('did-get-redirect-request', function (event, oldUrl, newUrl) {
+      if (_.startsWith(newUrl, redirectUri) && !facebookAccessToken) {
+        const match = newUrl.match(/#access_token=(.*?)&/)
+        if (match.length > 1) {
+          facebookAccessToken = match[ 1 ]
+        }
       }
     })
     .goto('https://facebook.com')
-    .type('input#email', email)
-    .type('input#pass', password)
+    .type('input#email', this._options.facebook.email)
+    .type('input#pass', this._options.facebook.password)
     .click('#loginbutton input')
     .wait(3000)
     .goto(url)
-    .wait('button._42ft._4jy0.layerConfirm._1flv._51_n.autofocus.uiOverlayButton._4jy5._4jy1.selected._51sy')
-    .click('button._42ft._4jy0.layerConfirm._1flv._51_n.autofocus.uiOverlayButton._4jy5._4jy1.selected._51sy')
-    .wait(10000)
-    .end()
     .then(() => {
-      if (!accessToken || !facebookUserId) {
+      if (_.startsWith(redirectUri, 'fb')) {
+        return nightmare
+          .wait('button._42ft._4jy0.layerConfirm._1flv._51_n.autofocus.uiOverlayButton._4jy5._4jy1.selected._51sy')
+          .click('button._42ft._4jy0.layerConfirm._1flv._51_n.autofocus.uiOverlayButton._4jy5._4jy1.selected._51sy')
+      }
+    })
+    .then(() => {
+      return nightmare
+        .wait(10000)
+        .end()
+    })
+    .then(() => {
+      if (!facebookAccessToken || !facebookUserId) {
         throw new Error('unable to authorize app')
       }
 
-      return { accessToken, facebookUserId }
+      return { facebookAccessToken, facebookUserId }
     })
 }
 
 const defaultOptions = {
+  facebook: {},
   nightmare: {
     show: false,
     partition: 'nopersist',
@@ -85,10 +122,9 @@ const defaultOptions = {
 
 class Facebook {
   constructor (options = {}) {
-    this._options = _.defaults(options, defaultOptions)
+    this._options = _.defaultsDeep(options, defaultOptions)
 
     this._breaker = new Brakes(this._options.breaker)
-
     this._authorizeAppCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => authorizeApp.bind(this)(...params), this._options.retry))
 
     Health.addCheck('facebook', () => new Promise((resolve, reject) => {
@@ -100,12 +136,18 @@ class Facebook {
     }))
   }
 
-  authorizeApp (email, password, url) {
-    Logger.debug('Started authorizing app in Facebook')
+  login (appName, clientId, redirectUri, optionalParams) {
+    if (!appName || !clientId || !redirectUri) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    const url = buildUrl(clientId, redirectUri, optionalParams)
+
+    Logger.debug(`Started Facebook Login for ${_.capitalize(appName)} app`)
 
     return RandomUserAgent.get()
-      .then((userAgent) => this._authorizeAppCircuitBreaker.exec(email, password, url, userAgent))
-      .finally(() => Logger.debug('Finished authorizing app in Facebook'))
+      .then((userAgent) => this._authorizeAppCircuitBreaker.exec(url, userAgent))
+      .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(appName)} app`))
   }
 }
 
