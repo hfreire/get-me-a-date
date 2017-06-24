@@ -20,32 +20,7 @@ const { NotAuthorizedError } = require('./errors')
 
 const { HappnWrapper, HappnNotAuthorizedError } = require('happn-wrapper')
 
-const { Channels, Auth } = require('../database')
-
-const findOrAuthorizeHappnIfNeeded = function (channel) {
-  return Auth.findById(channel.auth_id)
-    .then((auth) => {
-      if (!auth) {
-        return facebookAuthorizeHappnApp.bind(this)()
-          .then(() => {
-            const token = this._happn.accessToken
-
-            return Auth.save(undefined, { token })
-              .then((auth) => {
-                return Channels.save([ channel.name ], { auth_id: auth.id })
-                  .then(() => auth)
-              })
-          })
-      }
-
-      return auth
-    })
-}
-
-const facebookAuthorizeHappnApp = function () {
-  return this._facebookLogin.oauthDialog(this._options.oauth.facebook.clientId, this._options.oauth.facebook.redirectUri, this._options.oauth.facebook.optionalParams)
-    .then(({ facebookAccessToken }) => this._happn.authorize(facebookAccessToken))
-}
+const { Channels } = require('../database')
 
 const defaultOptions = {
   oauth: {
@@ -70,8 +45,16 @@ class Happn extends Channel {
   authorize () {
     return Channels.findByName(this.name)
       .then((channel) => {
-        return findOrAuthorizeHappnIfNeeded.bind(this)(channel)
-          .then(({ token }) => {
+        const authorize = function ({ facebookAccessToken }) {
+          return this._happn.authorize(facebookAccessToken)
+            .then(() => {
+              return { user_id: this._happn.userId, token: this._happn.accessToken }
+            })
+        }
+
+        return this.findOrAuthorizeIfNeeded(channel, authorize.bind(this))
+          .then(({ user_id, token }) => {
+            this._happn.userId = user_id
             this._happn.accessToken = token
           })
       })

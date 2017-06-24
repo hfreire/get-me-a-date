@@ -59,6 +59,33 @@ class Channel {
     return createChannelIfNeeded.bind(this)()
   }
 
+  findOrAuthorizeIfNeeded (channel, authorize) {
+    return Auth.findById(channel.auth_id)
+      .then((auth) => {
+        if (!auth) {
+          const { clientId, redirectUri, optionalParams } = this._options.oauth.facebook
+
+          return Logger.debug(`Started Facebook Login for ${_.capitalize(this.name)} app`)
+            .then(() => {
+              return this._facebookLogin.oauthDialog(clientId, redirectUri, optionalParams)
+                .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(this.name)} app`))
+            })
+            .then(({ facebookAccessToken, facebookUserId }) => authorize({ facebookAccessToken, facebookUserId }))
+            .then(({ token, user_id }) => {
+              return Auth.save(undefined, { token })
+                .then((auth) => {
+                  return Channels.save([ channel.name ], { user_id, auth_id: auth.id })
+                    .then(() => {
+                      return { user_id, token }
+                    })
+                })
+            })
+        }
+
+        return { user_id: channel.user_id, token: auth.token }
+      })
+  }
+
   onNotAuthorizedError () {
     return Logger.debug(`${_.capitalize(this.name)} got unauthorized`)
       .then(() => {

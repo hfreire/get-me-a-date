@@ -30,32 +30,7 @@ const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
 
-const { Channels, Auth } = require('../database')
-
-const findOrAuthorizeTinderIfNeeded = function (channel) {
-  return Auth.findById(channel.auth_id)
-    .then((auth) => {
-      if (!auth) {
-        return facebookAuthorizeTinderApp.bind(this)()
-          .then(() => {
-            const token = this._tinder.authToken
-
-            return Auth.save(undefined, { token })
-              .then((auth) => {
-                return Channels.save([ channel.name ], { auth_id: auth.id })
-                  .then(() => auth)
-              })
-          })
-      }
-
-      return auth
-    })
-}
-
-const facebookAuthorizeTinderApp = function () {
-  return this._facebookLogin.oauthDialog(this._options.oauth.facebook.clientId, this._options.oauth.facebook.redirectUri, this._options.oauth.facebook.optionalParams)
-    .then(({ facebookAccessToken, facebookUserId }) => this._tinder.authorize(facebookAccessToken, facebookUserId))
-}
+const { Channels } = require('../database')
 
 const defaultOptions = {
   oauth: {
@@ -80,7 +55,14 @@ class Tinder extends Channel {
   authorize () {
     return Channels.findByName(this.name)
       .then((channel) => {
-        return findOrAuthorizeTinderIfNeeded.bind(this)(channel)
+        const authorize = function ({ facebookAccessToken, facebookUserId }) {
+          return this._tinder.authorize(facebookAccessToken, facebookUserId)
+            .then(() => {
+              return { token: this._tinder.authToken }
+            })
+        }
+
+        return this.findOrAuthorizeIfNeeded(channel, authorize.bind(this))
           .then(({ token }) => {
             this._tinder.authToken = token
           })
@@ -93,7 +75,9 @@ class Tinder extends Channel {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => this._tinder.getAccount())
+      .then(() => {
+        return this._tinder.getAccount()
+      })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
 
