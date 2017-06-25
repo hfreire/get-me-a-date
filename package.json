@@ -16,7 +16,7 @@
     "@angular/animations": "4.2.4",
     "@angular/common": "4.2.2",
     "@angular/compiler": "4.2.4",
-    "@angular/core": "4.2.2",
+    "@angular/core": "4.2.3",
     "@angular/forms": "4.2.4",
     "@angular/http": "4.2.4",
     "@angular/material": "2.0.0-beta.7",
