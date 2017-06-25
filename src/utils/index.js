@@ -6,5 +6,6 @@
  */
 
 module.exports = {
-  Facebook: require('./facebook')
+  Rekognition: require('./rekognition'),
+  S3: require('./s3')
 }

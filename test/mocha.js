@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const _ = require('lodash')
 const Promise = require('bluebird')
 
 const chai = require('chai')
@@ -17,5 +18,6 @@ td.config({
   ignoreWarnings: true
 })
 
+global._ = _
 global.should = chai.should()
 global.td = td

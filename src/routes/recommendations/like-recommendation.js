@@ -12,9 +12,49 @@ const Logger = require('modern-logger')
 const Joi = require('joi')
 const Boom = require('boom')
 
-const { Tinder, OutOfLikesError } = require('../../channels')
-const { Recommendations, Channels } = require('../../database')
-const { Recommendation, Stats } = require('../../dates')
+const { OutOfLikesError } = require('../../channels')
+const { Recommendations } = require('../../database')
+const { Recommendation, Stats, Channel } = require('../../dates')
+
+const findById = (channelRecommendationId) => {
+  return Recommendations.findById(channelRecommendationId)
+    .then((recommendation) => {
+      if (!recommendation) {
+        throw new Error()
+      }
+
+      return recommendation
+    })
+}
+
+const like = (recommendation) => {
+  const channelName = recommendation.channel
+  const channel = Channel.getByName(channelName)
+
+  return Recommendation.like(channel, recommendation)
+    .then((recommendation) => {
+      recommendation.is_human_decision = true
+      recommendation.decision_date = new Date()
+
+      if (recommendation.match) {
+        Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
+      }
+
+      return recommendation
+    })
+}
+
+const save = (recommendation) => {
+  return Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation)
+}
+
+const fallInLove = (recommendation) => {
+  Recommendation.fallInLove(recommendation)
+    .then(() => Stats.updateByDate(new Date()))
+    .catch((error) => Logger.error(error))
+
+  return recommendation
+}
 
 class LikeRecommendation extends Route {
   constructor () {
@@ -24,41 +64,10 @@ class LikeRecommendation extends Route {
   handler (request, reply) {
     const { id } = request.params
 
-    Recommendations.findById(id)
-      .then((recommendation) => {
-        if (!recommendation) {
-          throw new Error()
-        }
-
-        const channelName = recommendation.channel
-        const channelRecommendationId = recommendation.channel_id
-
-        return Channels.findByName(channelName)
-          .then((channel) => {
-            return Recommendation.like(Tinder, recommendation)
-              .then((recommendation) => {
-                recommendation.is_human_decision = true
-                recommendation.decision_date = new Date()
-
-                return recommendation
-              })
-          })
-          .then((recommendation) => {
-            return Recommendations.save([ channelName, channelRecommendationId ], recommendation)
-              .then((recommendation) => {
-                Recommendation.fallInLove(recommendation)
-                  .then(() => Stats.updateByDate(new Date()))
-                  .then(() => {
-                    if (recommendation.match) {
-                      return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
-                    }
-                  })
-                  .catch((error) => Logger.error(error))
-
-                return recommendation
-              })
-          })
-      })
+    findById(id)
+      .then((recommendation) => like(recommendation))
+      .then((recommendation) => save(recommendation))
+      .then((recommendation) => fallInLove(recommendation))
       .then((recommendation) => reply(recommendation))
       .catch(OutOfLikesError, (error) => reply(Boom.tooManyRequests(error.message)))
       .catch((error) => {
