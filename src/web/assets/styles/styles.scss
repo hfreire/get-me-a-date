@@ -33,6 +33,12 @@ body {
   color: #cacaca;
 }
 
+#channels {
+  md-slide-toggle {
+    margin-bottom: 10px;
+  }
+}
+
 #stats {
   margin: 40px;
 }

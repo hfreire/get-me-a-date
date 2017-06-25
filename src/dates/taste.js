@@ -21,6 +21,8 @@ const Rekognition = require('../utils/rekognition')
 
 const request = Promise.promisifyAll(require('request').defaults({ encoding: null }))
 
+const sharp = require('sharp')
+
 const { parse } = require('url')
 
 const deleteFaces = function (faces) {
@@ -60,8 +62,8 @@ const indexFacesFromImages = function (images) {
     .then(() => indexedFaces)
 }
 
-const savePhoto = function (photo) {
-  if (!photo) {
+const savePhoto = function (channelName, photo, options = {}) {
+  if (!channelName || !photo) {
     return Promise.reject(new Error('invalid arguments'))
   }
 
@@ -72,9 +74,23 @@ const savePhoto = function (photo) {
 
   return request.getAsync(url.href)
     .then(({ body }) => {
-      return this.s3.putObject(`photos/tinder${url.pathname}`, body)
+      if (options.resize) {
+        return sharp(body)
+          .resize(options.resize.width, options.resize.height)
+          .toBuffer()
+      }
+
+      return body
+    })
+    .then((body) => {
+      let pathname = url.pathname.substring(1).replace('cache/images/', '').replace(`${AWS_S3_BUCKET}/photos/${channelName}/`, '')
+      if (options.rename) {
+        pathname = _.split(pathname, '/')[ 0 ] + `/${options.rename.prepend}` + _.split(pathname, '/')[ 1 ]
+      }
+
+      return this.s3.putObject(`photos/${channelName}/${pathname}`, body)
         .then(() => {
-          photo.url = `https://s3-${AWS_REGION}.amazonaws.com/${AWS_S3_BUCKET}/photos/tinder${url.pathname}`
+          photo.url = `https://s3-${AWS_REGION}.amazonaws.com/${AWS_S3_BUCKET}/photos/${channelName}/${pathname}`
 
           return body
         })
@@ -159,7 +175,7 @@ class Taste {
         })
 
         return Promise.props({
-          deletedFaces: deleteFaces.bind(this)(imagesToDelete),
+          deletedFaces: deleteFaces.bind(this)(facesToDelete),
           indexedFaces: indexFacesFromImages.bind(this)(imagesToIndex)
         })
           .then(({ deletedFaces, indexedFaces }) => {
@@ -171,14 +187,31 @@ class Taste {
       })
   }
 
-  mentalSnapshot (photo) {
-    const thumbnail = _.find(photo.processedFiles, { width: 84, height: 84 })
+  mentalSnapshot (channelName, photo) {
+    if (!channelName || !photo) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
 
-    return savePhoto.bind(this)(thumbnail)
+    let thumbnail = _.clone(_.find(photo.processedFiles, { width: 84, height: 84 })) // TODO: normalize data
+
+    let options
+    if (!thumbnail) {
+      thumbnail = _.clone(photo)
+      options = {
+        resize: { width: 84, height: 84 },
+        rename: { prepend: '84x84_' }
+      }
+    }
+
+    return savePhoto.bind(this)(channelName, thumbnail, options)
       .then(() => thumbnail.url)
   }
 
-  checkPhotosOut (photos) {
+  checkPhotosOut (channelName, photos) {
+    if (!channelName || !photos) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
     const photosToCompare = _.filter(photos, (photo) => !photo.similarity_date)
 
     return Promise.map(photos, (photo) => {
@@ -186,7 +219,7 @@ class Taste {
         return photo.similarity // do not s3 and rekognition photos that have already been checked out
       }
 
-      return savePhoto.bind(this)(photo)
+      return savePhoto.bind(this)(channelName, photo)
         .then((image) => compareFacesFromImage.bind(this)(photo, image))
     }, { concurrency: 2 })
       .then((faceSimilarities) => {
