@@ -42,15 +42,20 @@ export class RecommendationsComponent {
   itemsPerPage: number = 100
   totalItems: number
 
-  criteria: any = [
-    { value: {}, label: 'All' },
-    { value: { like: 1 }, label: 'Likes' },
-    { value: { is_pass: 1 }, label: 'Passes' },
-    { value: { like: 0, is_pass: 0 }, label: 'Waiting' },
-    { value: { match: 1 }, label: 'Matches' },
-    { value: { train: 1 }, label: 'Training' }
+  channelCriteria: any = [
+    { value: { channel: undefined }, label: 'All' },
+    { value: { channel: 'tinder' }, label: 'Tinder' },
+    { value: { channel: 'happn' }, label: 'Happn' }
   ]
-  currentCriteria: any = this.criteria[ 0 ].value
+  actionCriteria: any = [
+    { value: { like: undefined, is_pass: undefined, match: undefined, train: undefined }, label: 'All' },
+    { value: { like: 1 }, label: 'Liked' },
+    { value: { is_pass: 1 }, label: 'Passed' },
+    { value: { like: 0, is_pass: 0 }, label: 'Waiting' },
+    { value: { match: 1 }, label: 'Matched' },
+    { value: { train: 1 }, label: 'Trained' }
+  ]
+  currentCriteria: any = _.assign({}, this.channelCriteria[ 0 ].value, this.actionCriteria[ 0 ].value)
   sorts: any = [
     { value: 'last_checked_out_date', label: 'Last checked out' },
     { value: 'checked_out_times', label: 'Number of times checked out' }
@@ -97,7 +102,7 @@ export class RecommendationsComponent {
   }
 
   setPageCriterion ({ value }: any) {
-    this.currentCriteria = value
+    this.currentCriteria = _.assign(this.currentCriteria, value)
 
     this.getPage(undefined, undefined)
   }

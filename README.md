@@ -7,12 +7,13 @@
 [![](https://img.shields.io/github/release/hfreire/get-me-a-date.svg)](https://github.com/hfreire/get-me-a-date/releases)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based image recognition to help you automate your [Tinder](https://tinder.com) date discovery.
+Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based image recognition to help you automate your date discovery.
 
 <p align="center"><img src="share/github/overview.png" width="720"></p>
 
 ### Features
 * Supports [Tinder](https://tinder.com) dating app :white_check_mark:
+* Supports [Happn](https://happn.com) dating app :white_check_mark:
 * Uses your existing matches :revolving_hearts: for machine-learning :robot: when to :+1: or :-1: new recommendations :white_check_mark:
 * Periodically :clock10: gets dating app :girl::woman: recommendations and automatically :robot: :+1: or :-1: :white_check_mark:
 * Launch :rocket: inside a Docker container :whale: so you don't need to manage the dependencies :raised_hands: :white_check_mark:

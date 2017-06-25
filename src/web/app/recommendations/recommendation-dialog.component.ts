@@ -31,7 +31,9 @@ export class RecommendationDialogComponent {
   fadeInState = 'in'
   fadeOutState = 'out'
 
+  age: any
   occupation: any
+  description: any
   private today: Date
   private recommendation: any
 
@@ -40,7 +42,9 @@ export class RecommendationDialogComponent {
   ngOnInit () {
     this.today = new Date()
     this.recommendation = this.data.recommendation
-    this.occupation = _.has(this.recommendation, 'data.schools[0].name') ? this.recommendation.data.schools[ 0 ].name : _.has(this.recommendation, 'data.jobs[0].company.name') ? this.recommendation.data.jobs[ 0 ].company.name : ''
+    this.age = _.get(this.recommendation, 'data.notifier.age')
+    this.occupation = _.get(this.recommendation, 'data.teaser.string') || _.get(this.recommendation, 'data.notifier.job')
+    this.description = this.recommendation.data.bio || _.get(this.recommendation, 'data.notifier.about')
   }
 
   public isLoaded (event: Event) {
