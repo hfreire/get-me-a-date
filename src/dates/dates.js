@@ -12,13 +12,13 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Tinder, Happn } = require('../channels')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
-const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
-const { SQLite, Recommendations, Channels } = require('../database')
+const { Recommendations, Channels } = require('../database')
 
+const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { Match } = require('./match')
 const Stats = require('./stats')
+const Channel = require('./channel')
 
 const findAccount = (channel) => {
   return Channels.findByName(channel.name)
@@ -62,33 +62,8 @@ const likeOrPass = (channel, recommendation, like, pass) => {
 }
 
 class Dates {
-  constructor () {
-    this._channels = {
-      'tinder': Tinder,
-      'happn': Happn
-    }
-  }
-
   bootstrap () {
-    const initChannels = () => {
-      return SQLite.start()
-        .then(() => Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init()))
-    }
-
-    const authorizeChannels = () => {
-      return Channels.findAll()
-        .mapSeries(({ name, is_enabled }) => {
-          // eslint-disable-next-line camelcase
-          if (!is_enabled || !this._channels[ name ]) {
-            return
-          }
-
-          return this._channels[ name ].authorize()
-        })
-    }
-
-    return initChannels()
-      .then(() => authorizeChannels())
+    return Channel.bootstrap()
   }
 
   find () {
@@ -111,11 +86,7 @@ class Dates {
           return
         }
 
-        if (!this._channels[ name ]) {
-          return Promise.resolve()
-        }
-
-        const channel = this._channels[ name ]
+        const channel = Channel.getByName(name)
 
         return findByChannel.bind(this)(channel)
       })

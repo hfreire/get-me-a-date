@@ -61,7 +61,7 @@ class GetRecommendations extends Route {
           .description('recommendations page results limit'),
         criteria: Joi.string()
           .optional()
-          .description('recommendations criteria'),
+          .description('recommendations statusCriteria'),
         select: Joi.array().single()
           .optional()
           .description('recommendations select'),

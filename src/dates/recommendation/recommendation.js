@@ -82,11 +82,11 @@ class Recommendation {
     }
 
     if (recommendation.like) {
-      return Promise.resolve()
+      return Promise.reject(new Error('already liked'))
     }
 
     if (recommendation.is_pass) {
-      return Promise.reject(new Error('can not like'))
+      return Promise.reject(new Error('already passed'))
     }
 
     const channelRecommendationId = recommendation.channel_id
@@ -134,7 +134,7 @@ class Recommendation {
       return Promise.resolve()
     }
 
-    const { photos } = recommendation.data // TODO: normalize data
+    const photos = _.get(recommendation, 'data.photos', undefined) || _.get(recommendation, 'data.notifier.profiles', []) // TODO: normalize data
 
     return Taste.acquireTaste(photos)
       .then(() => _.merge(recommendation, {
@@ -190,7 +190,7 @@ class Recommendation {
     }
 
     recommendation.match = true
-    recommendation.match_id = match._id // TODO: normalize data
+    recommendation.match_id = match._id || match.id // TODO: normalize data
 
     if (match.created_date) {
       recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))

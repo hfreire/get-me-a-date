@@ -75,7 +75,7 @@ class Happn extends Channel {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => this._happn.getRecommendations(16, 0))
+      .then(() => this._happn.getRecommendations(16))
       .then(({ data }) => data)
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
