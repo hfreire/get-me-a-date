@@ -7,7 +7,11 @@
 
 const { Route } = require('serverful')
 
-const Database = require('../../database')
+const Boom = require('boom')
+
+const Logger = require('modern-logger')
+
+const { Channels } = require('../../database')
 
 class GetChannels extends Route {
   constructor () {
@@ -15,8 +19,13 @@ class GetChannels extends Route {
   }
 
   handler (request, reply) {
-    return Database.Channels.findAll()
+    return Channels.findAll()
       .then((channels) => reply(null, channels))
+      .catch((error) => {
+        Logger.error(error)
+
+        reply(Boom.badImplementation(error.message, error))
+      })
   }
 
   auth () {

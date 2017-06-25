@@ -12,32 +12,13 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Tinder } = require('../channels')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
-const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
-const { SQLite, Recommendations, Channels } = require('../database')
+const { Recommendations, Channels } = require('../database')
 
+const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { Match } = require('./match')
 const Stats = require('./stats')
-
-const findAccount = (channel) => {
-  return Channels.findByName(channel.name)
-    .then(({ user_id }) => {
-      if (!user_id) {
-        return channel.getAccount()
-          .then(({ user }) => {
-            const user_id = user._id
-
-            return Channels.save([ channel.name ], { user_id })
-              .then(() => {
-                return { user_id }
-              })
-          })
-      }
-
-      return { user_id }
-    })
-}
+const Channel = require('./channel')
 
 const likeOrPass = (channel, recommendation, like, pass) => {
   if (like) {
@@ -62,39 +43,15 @@ const likeOrPass = (channel, recommendation, like, pass) => {
 }
 
 class Dates {
-  constructor () {
-    this._channels = {
-      'tinder': Tinder
-    }
-  }
-
   bootstrap () {
-    const initChannels = () => {
-      return SQLite.start()
-        .then(() => Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init()))
-    }
-
-    const authorizeChannels = () => {
-      return Channels.findAll()
-        .mapSeries(({ name, is_enabled }) => {
-          // eslint-disable-next-line camelcase
-          if (!is_enabled || !this._channels[ name ]) {
-            return
-          }
-
-          return this._channels[ name ].authorize()
-        })
-    }
-
-    return initChannels()
-      .then(() => authorizeChannels())
+    return Channel.bootstrap()
   }
 
   find () {
     const findByChannel = function (channel) {
-      return Logger.info(`Started finding dates in ${_.capitalize(channel.name)}`)
+      return Logger.info(`Started finding dates in ${_.capitalize(channel.name)} channel`)
         .then(() => this.findByChannel(channel))
-        .finally(() => Logger.info(`Finished finding dates in ${_.capitalize(channel.name)}`))
+        .finally(() => Logger.info(`Finished finding dates in ${_.capitalize(channel.name)} channel`))
     }
 
     const updateStats = () => {
@@ -104,17 +61,12 @@ class Dates {
     }
 
     return Channels.findAll()
-      .mapSeries(({ name, is_enabled }) => {
-        // eslint-disable-next-line camelcase
-        if (!is_enabled) {
+      .mapSeries((data) => {
+        if (!data[ 'is_enabled' ]) {
           return
         }
 
-        if (!this._channels[ name ]) {
-          return Promise.resolve()
-        }
-
-        const channel = this._channels[ name ]
+        const channel = Channel.getByName(data[ 'name' ])
 
         return findByChannel.bind(this)(channel)
       })
@@ -123,9 +75,9 @@ class Dates {
 
   findByChannel (channel) {
     const checkRecommendations = function (channel) {
-      return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} `)
+      return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} channel`)
         .then(() => this.checkRecommendations(channel))
-        .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
+        .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} channel (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     }
 
     const checkUpdates = function (channel) {
@@ -145,11 +97,11 @@ class Dates {
 
     return channel.getRecommendations()
       .then((channelRecommendations) => {
-        received = channelRecommendations.length
+        received = _.size(channelRecommendations)
 
         return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
           .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {
-            const channelRecommendationId = channelRecommendation._id
+            const channelRecommendationId = channelRecommendation._id || channelRecommendation.notifier.id // TODO: normalize data
 
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
               .then(({ recommendation, like, pass }) => {
@@ -189,27 +141,21 @@ class Dates {
   }
 
   checkUpdates (channel) {
-    return findAccount(channel)
-      .then(({ user_id }) => {
-        const accountUserId = user_id
+    return channel.getUpdates()
+      .mapSeries((match) => {
+        return Match.checkLatestNews(channel, match)
+          .catch((error) => {
+            Logger.warn(error)
 
-        return channel.getUpdates()
-          .then(({ matches }) => matches)
-          .map((match) => {
-            return Match.checkLatestNews(channel, accountUserId, match)
-              .catch((error) => {
-                Logger.warn(error)
-
-                return { messages: 0, matches: 0 }
-              })
-          }, { concurrency: 1 })
-          .then((updates) => {
-            return _.reduce(updates, (accumulator, update) => {
-              accumulator.messages += update.messages
-              accumulator.matches += update.matches
-              return accumulator
-            }, { messages: 0, matches: 0 })
+            return { messages: 0, matches: 0 }
           })
+      })
+      .then((updates) => {
+        return _.reduce(updates, (accumulator, update) => {
+          accumulator.messages += update.messages
+          accumulator.matches += update.matches
+          return accumulator
+        }, { messages: 0, matches: 0 })
       })
       .catch(NotAuthorizedError, () => {
         return channel.authorize()
