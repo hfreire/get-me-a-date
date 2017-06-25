@@ -33,17 +33,25 @@ class Recommendation {
           return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
         }
 
+        const channelName = channel.name
+
         return Promise.resolve()
           .then(() => {
-            const photosToCheckOut = _.unionBy(_.get(recommendation, 'data.photos', []), channelRecommendation.photos, 'id')
+            const currentPhotos = _.get(recommendation, 'data.photos', undefined) || _.get(recommendation, 'data.notifier.profiles', []) // TODO: normalize data
+            const availablePhotos = _.get(channelRecommendation, 'photos', undefined) || _.get(channelRecommendation, 'notifier.profiles', []) // TODO: normalize data
+            const photosToCheckOut = _.unionBy(currentPhotos, availablePhotos, 'id')
 
             return Promise.props({
-              photos: Taste.checkPhotosOut(photosToCheckOut)
+              photos: Taste.checkPhotosOut(channelName, photosToCheckOut)
             })
               .then(({ photos }) => {
-                channelRecommendation.photos = photosToCheckOut
+                if (channelRecommendation.photos) { // TODO: normalize data
+                  channelRecommendation.photos = photosToCheckOut
+                } else {
+                  channelRecommendation.notifier.profiles = photosToCheckOut
+                }
 
-                recommendation.name = channelRecommendation.name
+                recommendation.name = channelRecommendation.name || channelRecommendation.notifier.first_name
                 recommendation.last_checked_out_date = new Date()
                 recommendation.data = channelRecommendation
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
@@ -54,7 +62,9 @@ class Recommendation {
           })
           .then(() => {
             if (!recommendation.thumbnail_url) {
-              return Taste.mentalSnapshot(recommendation.data.photos[ 0 ])
+              const firstPhoto = _.get(recommendation, 'data.photos[0]', undefined) || _.get(recommendation, 'data.notifier.profiles[0]', undefined) // TODO: normalize data
+
+              return Taste.mentalSnapshot(channelName, firstPhoto)
                 .then((url) => {
                   recommendation.thumbnail_url = url
                 })
@@ -81,8 +91,8 @@ class Recommendation {
 
     const channelRecommendationId = recommendation.channel_id
 
-    const { photos, content_hash, s_number } = recommendation.data
-    const photoId = photos[ 0 ].id
+    const { photos, content_hash, s_number } = recommendation.data // TODO: normalize data
+    const photoId = _.get(photos, '[0].id')
 
     return channel.like(channelRecommendationId, photoId, content_hash, s_number)
       .then((match) => {
@@ -124,7 +134,7 @@ class Recommendation {
       return Promise.resolve()
     }
 
-    const { photos } = recommendation.data
+    const { photos } = recommendation.data // TODO: normalize data
 
     return Taste.acquireTaste(photos)
       .then(() => _.merge(recommendation, {
@@ -180,7 +190,7 @@ class Recommendation {
     }
 
     recommendation.match = true
-    recommendation.match_id = match._id
+    recommendation.match_id = match._id // TODO: normalize data
 
     if (match.created_date) {
       recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))

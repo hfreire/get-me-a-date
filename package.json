@@ -44,6 +44,7 @@
     "request": "2.81.0",
     "rxjs": "5.4.1",
     "serverful": "1.1.4",
+    "sharp": "^0.18.1",
     "sqlite3": "3.1.8",
     "systemjs": "0.20.14",
     "tinder-wrapper": "1.0.3",

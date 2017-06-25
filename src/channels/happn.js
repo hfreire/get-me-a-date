@@ -75,6 +75,8 @@ class Happn extends Channel {
         throw new NotAuthorizedError()
       }
     })
+      .then(() => this._happn.getRecommendations(16, 0))
+      .then(({ data }) => data)
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
@@ -97,6 +99,9 @@ class Happn extends Channel {
         throw new NotAuthorizedError()
       }
     })
+      .then(() => this._happn.like(userId))
+      .then(({ data }) => this.getUser(userId)) // "user accepted"
+      .then(({ data }) => data.my_relation === 4 ? data : undefined)
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
@@ -110,6 +115,7 @@ class Happn extends Channel {
         throw new NotAuthorizedError()
       }
     })
+      .then(() => this._happn.getUser(userId))
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 

@@ -92,7 +92,7 @@ class Channel {
         return Channels.findByName(this.name)
           .then((channel) => {
             return Promise.all([
-              Channels.save([ this.name ], { auth_id: channel.auth_id }),
+              Channels.save([ this.name ], { auth_id: null }),
               Auth.deleteById(channel.auth_id)
             ])
           })

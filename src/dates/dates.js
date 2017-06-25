@@ -131,7 +131,7 @@ class Dates {
 
     const checkUpdates = function (channel) {
       return Logger.info(`Started checking updates from ${_.capitalize(channel.name)} `)
-        .then(() => this.checkUpdates(channel))
+      // .then(() => this.checkUpdates(channel))
         .then(({ matches = 0, messages = 0 }) => Logger.info(`Finished checking updates from ${_.capitalize(channel.name)} (matches = ${matches}, messages = ${messages})`))
     }
 
@@ -150,7 +150,7 @@ class Dates {
 
         return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
           .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {
-            const channelRecommendationId = channelRecommendation._id
+            const channelRecommendationId = channelRecommendation._id || channelRecommendation.notifier.id // TODO: normalize data
 
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
               .then(({ recommendation, like, pass }) => {
