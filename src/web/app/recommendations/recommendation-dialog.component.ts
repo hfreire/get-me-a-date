@@ -43,7 +43,6 @@ export class RecommendationDialogComponent {
     this.today = new Date()
     this.recommendation = this.data.recommendation
     this.age = _.get(this.recommendation, 'data.notifier.age')
-    console.log(this.recommendation)
     this.occupation = _.get(this.recommendation, 'data.teaser.string') || _.get(this.recommendation, 'data.notifier.job')
     this.description = this.recommendation.data.bio || _.get(this.recommendation, 'data.notifier.about')
   }

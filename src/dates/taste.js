@@ -175,7 +175,7 @@ class Taste {
         })
 
         return Promise.props({
-          deletedFaces: deleteFaces.bind(this)(imagesToDelete),
+          deletedFaces: deleteFaces.bind(this)(facesToDelete),
           indexedFaces: indexFacesFromImages.bind(this)(imagesToIndex)
         })
           .then(({ deletedFaces, indexedFaces }) => {
@@ -192,11 +192,11 @@ class Taste {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    let thumbnail = _.find(photo.processedFiles, { width: 84, height: 84 }) // TODO: normalize data
+    let thumbnail = _.clone(_.find(photo.processedFiles, { width: 84, height: 84 })) // TODO: normalize data
 
     let options
     if (!thumbnail) {
-      thumbnail = photo
+      thumbnail = _.clone(photo)
       options = {
         resize: { width: 84, height: 84 },
         rename: { prepend: '84x84_' }
