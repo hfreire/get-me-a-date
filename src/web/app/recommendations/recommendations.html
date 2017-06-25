@@ -7,11 +7,18 @@
 
 <div id="recommendations">
     <md-card>
-        <md-select id="filter" placeholder="Filter" (change)="setPageCriterion($event)">
-            <md-option *ngFor="let criterion of criteria" [value]="criterion.value">
-                {{ criterion.label }}
+        <md-select id="filter" placeholder="Channel" (change)="setPageCriterion($event)">
+            <md-option *ngFor="let channelCriterion of channelCriteria" [value]="channelCriterion.value">
+                {{ channelCriterion.label }}
             </md-option>
         </md-select>
+
+        <md-select id="filter" placeholder="Action" (change)="setPageCriterion($event)">
+            <md-option *ngFor="let actionCriterion of actionCriteria" [value]="actionCriterion.value">
+                {{ actionCriterion.label }}
+            </md-option>
+        </md-select>
+
         <md-select id="sort" placeholder="Sort" (change)="setPageSort($event)">
             <md-option *ngFor="let sort of sorts" [value]="sort.value">
                 {{ sort.label }}

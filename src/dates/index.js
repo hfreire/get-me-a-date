@@ -9,5 +9,6 @@ module.exports = {
   Dates: require('./dates'),
   Taste: require('./taste'),
   Recommendation: require('./recommendation').Recommendation,
-  Stats: require('./stats')
+  Stats: require('./stats'),
+  Channel: require('./channel')
 }
