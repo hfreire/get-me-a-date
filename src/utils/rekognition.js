@@ -14,6 +14,16 @@ const Health = require('health-checkup')
 
 const AWS = require('aws-sdk')
 
+const encodeExternalImageId = (externalImageId) => {
+  const encodedExternalImageId = Buffer.from(externalImageId).toString('base64')
+
+  return encodedExternalImageId.indexOf('=') > 0 ? encodedExternalImageId.replace(/=/g, '') : encodedExternalImageId
+}
+
+const decodeExternalImageId = (externalImageId) => {
+  return externalImageId.length % 4 ? decodeExternalImageId(`${externalImageId}=`) : Buffer.from(externalImageId, 'base64').toString('ascii')
+}
+
 const defaultOptions = {
   retry: { max_tries: 3, interval: 1000, timeout: 12000, throw_original: true },
   breaker: {
@@ -81,7 +91,7 @@ class Rekognition {
 
     const params = {
       CollectionId: collectionId,
-      ExternalImageId: Buffer.from(key).toString('base64'),
+      ExternalImageId: encodeExternalImageId(key),
       Image: {
         S3Object: {
           Bucket: bucket,
@@ -103,7 +113,7 @@ class Rekognition {
     return this._rekognition.listFacesCircuitBreaker.exec(params)
       .then((data) => {
         return Promise.mapSeries(data.Faces, (face) => {
-          face.ExternalImageId = Buffer.from(face.ExternalImageId, 'base64').toString('ascii')
+          face.ExternalImageId = decodeExternalImageId(face.ExternalImageId)
         })
           .then(() => data)
       })
