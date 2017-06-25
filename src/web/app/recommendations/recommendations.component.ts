@@ -45,7 +45,7 @@ export class RecommendationsComponent {
   channelCriteria: any = [
     { value: { channel: undefined }, label: 'All' },
     { value: { channel: 'tinder' }, label: 'Tinder' },
-    { value: { channel: 'happn' }, label: 'Happn' },
+    { value: { channel: 'happn' }, label: 'Happn' }
   ]
   actionCriteria: any = [
     { value: { like: undefined, is_pass: undefined, match: undefined, train: undefined }, label: 'All' },
