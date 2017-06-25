@@ -57,8 +57,12 @@ class Tinder extends Channel {
       .then((channel) => {
         const authorize = function ({ facebookAccessToken, facebookUserId }) {
           return this._tinder.authorize(facebookAccessToken, facebookUserId)
-            .then(() => {
-              return { token: this._tinder.authToken }
+            .then(() => this.getAccount())
+            .then(({ user }) => {
+              const user_id = user._id
+              const token = this._tinder.authToken
+
+              return { user_id, token }
             })
         }
 
@@ -75,9 +79,7 @@ class Tinder extends Channel {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => {
-        return this._tinder.getAccount()
-      })
+      .then(() => this._tinder.getAccount())
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
 
@@ -108,7 +110,7 @@ class Tinder extends Channel {
         const last_activity_date = new Date()
 
         return Channels.save([ this.name ], { last_activity_date })
-          .then(() => data)
+          .then(() => data.matches)
       })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }

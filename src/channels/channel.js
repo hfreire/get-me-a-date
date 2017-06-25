@@ -65,10 +65,10 @@ class Channel {
         if (!auth) {
           const { clientId, redirectUri, optionalParams } = this._options.oauth.facebook
 
-          return Logger.debug(`Started Facebook Login for ${_.capitalize(this.name)} app`)
+          return Logger.debug(`Started Facebook Login for ${_.capitalize(this.name)} channel`)
             .then(() => {
               return this._facebookLogin.oauthDialog(clientId, redirectUri, optionalParams)
-                .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(this.name)} app`))
+                .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(this.name)} channel`))
             })
             .then(({ facebookAccessToken, facebookUserId }) => authorize({ facebookAccessToken, facebookUserId }))
             .then(({ token, user_id }) => {

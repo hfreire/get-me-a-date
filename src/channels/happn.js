@@ -86,6 +86,7 @@ class Happn extends Channel {
         throw new NotAuthorizedError()
       }
     })
+      .then(() => [])
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
