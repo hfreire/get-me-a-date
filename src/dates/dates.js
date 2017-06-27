@@ -13,7 +13,7 @@ const Promise = require('bluebird')
 const Logger = require('modern-logger')
 
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
-const { Recommendations, Channels } = require('../database')
+const { Recommendations, Channels } = require('../databases')
 
 const Taste = require('./taste')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')

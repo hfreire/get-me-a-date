@@ -8,7 +8,7 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const Database = require('../database')
+const Database = require('../databases')
 
 const stats = [
   { name: 'machine_likes', metric: 'decision_date', criteria: { is_human_decision: 0, like: 1 } },

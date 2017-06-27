@@ -11,7 +11,7 @@ const Boom = require('boom')
 
 const Logger = require('modern-logger')
 
-const { Channels } = require('../../database')
+const { Channels } = require('../../databases')
 
 class GetChannels extends Route {
   constructor () {

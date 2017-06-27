@@ -12,7 +12,7 @@ const Logger = require('modern-logger')
 const Joi = require('joi')
 const Boom = require('boom')
 
-const Database = require('../database')
+const Database = require('../databases')
 
 class Stats extends Route {
   constructor () {

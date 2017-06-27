@@ -14,7 +14,7 @@ const { AlreadyCheckedOutEarlierError } = require('./errors')
 
 const Taste = require('../taste')
 
-const { Recommendations } = require('../../database')
+const { Recommendations } = require('../../databases')
 
 class Recommendation {
   checkOut (channel, channelRecommendationId, channelRecommendation) {

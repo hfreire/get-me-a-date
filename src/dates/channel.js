@@ -9,7 +9,7 @@ const _ = require('lodash')
 const Promise = require('bluebird')
 
 const { Tinder, Happn } = require('../channels')
-const { SQLite, Channels } = require('../database')
+const { SQLite, Channels } = require('../databases')
 
 class Channel {
   constructor () {

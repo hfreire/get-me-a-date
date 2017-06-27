@@ -13,7 +13,7 @@ const Joi = require('joi')
 const Boom = require('boom')
 
 const { OutOfLikesError } = require('../../channels')
-const { Recommendations } = require('../../database')
+const { Recommendations } = require('../../databases')
 const { Recommendation, Stats, Channel } = require('../../dates')
 
 const findById = (channelRecommendationId) => {
