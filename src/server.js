@@ -14,7 +14,7 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Dates, Taste } = require('./dates')
+const { Dates } = require('./dates')
 
 const findDates = function () {
   const startDate = _.now()
@@ -34,7 +34,7 @@ const findDates = function () {
 
 class Server extends Serverful {
   start () {
-    return Promise.all([ super.start(), Dates.bootstrap(), Taste.bootstrap() ])
+    return Promise.all([ super.start(), Dates.bootstrap() ])
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           findDates()

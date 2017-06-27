@@ -15,6 +15,7 @@ const Logger = require('modern-logger')
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
 const { Recommendations, Channels } = require('../database')
 
+const Taste = require('./taste')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
 const { Match } = require('./match')
 const Stats = require('./stats')
@@ -44,7 +45,7 @@ const likeOrPass = (channel, recommendation, like, pass) => {
 
 class Dates {
   bootstrap () {
-    return Channel.bootstrap()
+    return Promise.all([ Channel.bootstrap(), Taste.bootstrap() ])
   }
 
   find () {
