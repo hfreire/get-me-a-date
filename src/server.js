@@ -22,6 +22,7 @@ const findDates = function () {
   Logger.info('Started finding dates')
 
   return Dates.find()
+    .catch((error) => Logger.error(error))
     .finally(() => {
       const stopDate = _.now()
       const duration = _.round((stopDate - startDate) / 1000, 1)
