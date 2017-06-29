@@ -20,7 +20,7 @@ const { NotAuthorizedError } = require('./errors')
 
 const { HappnWrapper, HappnNotAuthorizedError } = require('happn-wrapper')
 
-const { Channels } = require('../database')
+const { Channels } = require('../databases')
 
 const defaultOptions = {
   oauth: {

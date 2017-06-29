@@ -19,7 +19,7 @@ const FacebookLogin = require('facebook-login-for-robots')
 
 const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
-const { Channels, Auth } = require('../database')
+const { Channels, Auth } = require('../databases')
 
 const createChannelIfNeeded = function () {
   return Channels.findByName(this.name)

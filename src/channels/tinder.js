@@ -30,7 +30,7 @@ const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
 
-const { Channels } = require('../database')
+const { Channels } = require('../databases')
 
 const defaultOptions = {
   oauth: {
