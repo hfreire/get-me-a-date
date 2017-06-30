@@ -23,7 +23,7 @@
     "@angular/platform-browser": "4.2.5",
     "@angular/platform-browser-dynamic": "4.2.4",
     "@angular/router": "4.2.5",
-    "@types/lodash": "4.14.67",
+    "@types/lodash": "4.14.68",
     "angular-in-memory-web-api": "0.3.2",
     "angular2-moment": "1.4.0",
     "aws-sdk": "2.80.0",
