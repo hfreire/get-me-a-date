@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/hfreire/get-me-a-date#readme",
   "dependencies": {
-    "@angular/animations": "4.2.4",
+    "@angular/animations": "4.2.5",
     "@angular/common": "4.2.4",
     "@angular/compiler": "4.2.4",
     "@angular/core": "4.2.4",
