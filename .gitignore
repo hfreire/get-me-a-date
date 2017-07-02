@@ -6,5 +6,5 @@ src/web/**/*.js
 src/web/**/*.js.map
 src/web/**/*.css
 tmp
-share/rancher
+share/rancher/docker-compose.yml
 
