@@ -51,6 +51,10 @@ const createSchema = function () {
     'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
     'name VARCHAR(32) DEFAULT NULL,' +
     'thumbnail_url VARCHAR(512) DEFAULT NULL,' +
+    'photos TEXT NOT NULL,' +
+    'photos_similarity_mean REAL DEFAULT NULL,' +
+    'checked_out_times INTEGER NOT NULL DEFAULT 0,' +
+    'last_checked_out_date DATETIME DEFAULT NULL,' +
     'like INTEGER NOT NULL DEFAULT 0,' +
     'is_pass INTEGER NOT NULL DEFAULT 0,' +
     'decision_date DATETIME DEFAULT NULL,' +
@@ -60,9 +64,6 @@ const createSchema = function () {
     'matched_date DATETIME DEFAULT NULL,' +
     'train INTEGER NOT NULL DEFAULT 0,' +
     'trained_date DATETIME DEFAULT NULL,' +
-    'checked_out_times INTEGER NOT NULL DEFAULT 0,' +
-    'last_checked_out_date DATETIME DEFAULT NULL,' +
-    'photos_similarity_mean REAL DEFAULT NULL,' +
     'data TEXT NOT NULL,' +
     'PRIMARY KEY (channel, channel_id)' +
     ')')

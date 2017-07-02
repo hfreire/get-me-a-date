@@ -192,15 +192,10 @@ class Taste {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    let thumbnail = _.clone(_.find(photo.processedFiles, { width: 84, height: 84 })) // TODO: normalize data
-
-    let options
-    if (!thumbnail) {
-      thumbnail = _.clone(photo)
-      options = {
-        resize: { width: 84, height: 84 },
-        rename: { prepend: '84x84_' }
-      }
+    const thumbnail = _.clone(photo)
+    const options = {
+      resize: { width: 84, height: 84 },
+      rename: { prepend: '84x84_' }
     }
 
     return savePhoto.bind(this)(channelName, thumbnail, options)

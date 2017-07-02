@@ -95,6 +95,10 @@ class Recommendations extends Database {
       return
     }
 
+    if (_row.photos) {
+      _row.photos = JSON.parse(_row.photos)
+    }
+
     if (_row.decision_date) {
       _row.decision_date = new Date(_row.decision_date)
     }
@@ -128,6 +132,10 @@ class Recommendations extends Database {
 
     if (!_object) {
       return
+    }
+
+    if (_object.photos) {
+      _object.photos = JSON.stringify(_object.photos)
     }
 
     if (_object.decision_date instanceof Date) {

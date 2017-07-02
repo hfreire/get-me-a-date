@@ -91,6 +91,15 @@ class Tinder extends Channel {
     })
       .then(() => this._tinder.getRecommendations())
       .then(({ results }) => results)
+      .mapSeries((result) => {
+        return {
+          channel: 'tinder',
+          channel_id: result._id,
+          name: result.name,
+          photos: _.map(result.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+          data: result
+        }
+      })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
 
@@ -157,6 +166,15 @@ class Tinder extends Channel {
     })
       .then(() => this._tinder.getUser(userId))
       .then(({ results }) => results)
+      .mapSeries((result) => {
+        return {
+          channel: 'tinder',
+          channel_id: result._id,
+          name: result.name,
+          photos: _.map(result.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+          data: result
+        }
+      })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 

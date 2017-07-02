@@ -37,23 +37,16 @@ class Recommendation {
 
         return Promise.resolve()
           .then(() => {
-            const currentPhotos = _.get(recommendation, 'data.photos', undefined) || _.get(recommendation, 'data.notifier.profiles', []) // TODO: normalize data
-            const availablePhotos = _.get(channelRecommendation, 'photos', undefined) || _.get(channelRecommendation, 'notifier.profiles', []) // TODO: normalize data
+            const currentPhotos = recommendation.photos
+            const availablePhotos = channelRecommendation.photos
             const photosToCheckOut = _.unionBy(currentPhotos, availablePhotos, 'id')
 
             return Promise.props({
               photos: Taste.checkPhotosOut(channelName, photosToCheckOut)
             })
               .then(({ photos }) => {
-                if (channelRecommendation.photos) { // TODO: normalize data
-                  channelRecommendation.photos = photosToCheckOut
-                } else {
-                  channelRecommendation.notifier.profiles = photosToCheckOut
-                }
-
-                recommendation.name = channelRecommendation.name || channelRecommendation.notifier.first_name
                 recommendation.last_checked_out_date = new Date()
-                recommendation.data = channelRecommendation
+                recommendation.photos = photosToCheckOut
                 recommendation.photos_similarity_mean = photos.faceSimilarityMean
 
                 like = photos.like
@@ -62,7 +55,7 @@ class Recommendation {
           })
           .then(() => {
             if (!recommendation.thumbnail_url) {
-              const firstPhoto = _.get(recommendation, 'data.photos[0]', undefined) || _.get(recommendation, 'data.notifier.profiles[0]', undefined) // TODO: normalize data
+              const firstPhoto = _.get(recommendation, 'photos[0]', undefined)
 
               return Taste.mentalSnapshot(channelName, firstPhoto)
                 .then((url) => {
@@ -91,7 +84,7 @@ class Recommendation {
 
     const channelRecommendationId = recommendation.channel_id
 
-    const { photos, content_hash, s_number } = recommendation.data // TODO: normalize data
+    const { photos, content_hash, s_number } = recommendation.data
     const photoId = _.get(photos, '[0].id')
 
     return channel.like(channelRecommendationId, photoId, content_hash, s_number)
@@ -134,7 +127,7 @@ class Recommendation {
       return Promise.resolve()
     }
 
-    const photos = _.get(recommendation, 'data.photos', undefined) || _.get(recommendation, 'data.notifier.profiles', []) // TODO: normalize data
+    const photos = recommendation.photos
 
     return Taste.acquireTaste(photos)
       .then(() => _.merge(recommendation, {
@@ -172,15 +165,7 @@ class Recommendation {
 
             return channel.getUser(channelRecommendationId)
           })
-          .then((channelRecommendation) => {
-            const recommendation = {
-              channel: channel.name,
-              channel_id: channelRecommendationId,
-              data: channelRecommendation
-            }
-
-            return Recommendations.save([ channel.name, channelRecommendationId ], recommendation)
-          })
+          .then((channelRecommendation) => Recommendations.save([ channel.name, channelRecommendationId ], channelRecommendation))
       })
   }
 

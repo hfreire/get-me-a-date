@@ -68,6 +68,15 @@ class Happn extends Channel {
     })
       .then(() => this._happn.getRecommendations(16))
       .then(({ data }) => data)
+      .mapSeries((data) => {
+        return {
+          channel: 'happn',
+          channel_id: data.notifier.id,
+          name: data.notifier.first_name,
+          photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+          data
+        }
+      })
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
@@ -124,8 +133,18 @@ class Happn extends Channel {
       }
     })
       .then(() => this._happn.like(userId))
-      .then(({ data }) => this.getUser(userId)) // "user accepted"
-      .then(({ data }) => data.my_relation === 4 ? data : undefined)
+      .then(() => this._happn.getUser(userId))
+      .then(({ data }) => {
+        if (data.my_relation === 4) {
+          return {
+            channel: 'happn',
+            channel_id: data.id,
+            name: data.first_name,
+            photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+            data
+          }
+        }
+      })
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
@@ -140,7 +159,15 @@ class Happn extends Channel {
       }
     })
       .then(() => this._happn.getUser(userId))
-      .then(({ data }) => data)
+      .then(({ data }) => {
+        return {
+          channel: 'happn',
+          channel_id: data.id,
+          name: data.first_name,
+          photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+          data
+        }
+      })
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
