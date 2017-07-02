@@ -49,11 +49,11 @@ export class RecommendationsComponent {
   ]
   actionCriteria: any = [
     { value: { like: undefined, is_pass: undefined, match: undefined, train: undefined }, label: 'All' },
-    { value: { like: 1 }, label: 'Liked' },
-    { value: { is_pass: 1 }, label: 'Passed' },
-    { value: { like: 0, is_pass: 0 }, label: 'Waiting' },
-    { value: { match: 1 }, label: 'Matched' },
-    { value: { train: 1 }, label: 'Trained' }
+    { value: { like: 1, is_pass: undefined, match: undefined, train: undefined }, label: 'Liked' },
+    { value: { like: undefined, is_pass: 1, match: undefined, train: undefined }, label: 'Passed' },
+    { value: { like: 0, is_pass: 0, match: undefined, train: undefined }, label: 'Waiting' },
+    { value: { like: undefined, is_pass: undefined, match: 1, train: undefined }, label: 'Matched' },
+    { value: { like: undefined, is_pass: undefined, match: undefined, train: 1 }, label: 'Trained' }
   ]
   currentCriteria: any = _.assign({}, this.channelCriteria[ 0 ].value, this.actionCriteria[ 0 ].value)
   sorts: any = [

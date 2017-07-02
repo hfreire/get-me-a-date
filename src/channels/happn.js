@@ -113,11 +113,26 @@ class Happn extends Channel {
 
         return getUpdates(10, 0, lastActivityDate, { matches: [], conversations: [] })
       })
-      .then(({ matches }) => {
+      .then(({ matches, conversations }) => {
         const last_activity_date = new Date()
 
         return Channels.save([ this.name ], { last_activity_date })
-          .then(() => matches)
+          .then(() => {
+            return Promise.mapSeries(matches, (match) => {
+              return {
+                isNewMatch: true,
+                recommendation: {
+                  channel: 'happn',
+                  channel_id: match.notifier.id,
+                  name: match.notifier.first_name,
+                  photos: _.map(match.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+                  match_id: match.notifier.id,
+                  data: match.notifier
+                },
+                messages: []
+              }
+            })
+          })
       })
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }

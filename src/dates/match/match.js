@@ -68,7 +68,7 @@ class Match {
                 }
               })
           })
-          .then(() => { return { messages: messages.length, matches: match.isNewMatch ? 0 : 1 } })
+          .then(() => { return { messages: messages.length, matches: match.isNewMatch ? 1 : 0 } })
       })
   }
 }
