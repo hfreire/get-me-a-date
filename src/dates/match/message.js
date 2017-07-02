@@ -5,31 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const _ = require('lodash')
+const Promise = require('bluebird')
 
-const { Messages, Channels } = require('../../databases')
+const { Messages } = require('../../databases')
 
 class Message {
-  readMessages (channelName, recommendationId, messages) {
-    return Channels.findByName(channelName)
-      .then((channel) => {
-        const _messages = []
-
-        _.forEach(messages, ({ _id, message, from, sent_date }) => {
-          const _message = {
-            channel: channel[ 'name' ],
-            channel_message_id: _id,
-            recommendation_id: recommendationId,
-            sent_date: new Date(sent_date.replace(/T/, ' ').replace(/\..+/, '')),
-            text: message,
-            is_from_recommendation: from !== channel[ 'user_id' ]
-          }
-          _messages.push(_message)
-        })
-
-        return _messages
-      })
-      .mapSeries((message) => Messages.save([ message.channel, message.channel_message_id ], message))
+  readMessages (messages) {
+    return Promise.mapSeries(messages, (message) => {
+      return Messages.save([ message.channel, message.channel_message_id ], message)
+    })
   }
 }
 

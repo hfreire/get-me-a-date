@@ -124,7 +124,7 @@ class Recommendation {
     }
 
     if (recommendation.train) {
-      return Promise.resolve()
+      return Promise.resolve(recommendation)
     }
 
     const photos = recommendation.photos

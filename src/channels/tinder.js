@@ -110,16 +110,62 @@ class Tinder extends Channel {
       }
     })
       .then(() => Channels.findByName(this.name))
-      .then(({ last_activity_date }) => {
+      .then(({ last_activity_date, user_id }) => {
         const lastActivityDate = !last_activity_date ? undefined : last_activity_date
 
         return this._tinder.getUpdates(lastActivityDate)
-      })
-      .then((data) => {
-        const last_activity_date = new Date()
+          .then((data) => {
+            const last_activity_date = new Date()
 
-        return Channels.save([ this.name ], { last_activity_date })
-          .then(() => data.matches)
+            return Channels.save([ this.name ], { last_activity_date })
+              .then(() => {
+                return Promise.mapSeries((data.matches), (match) => {
+                  if (match.is_new_message) {
+                    const channelRecommendationId = match.messages[ 0 ].from === user_id ? match.messages[ 0 ].to : match.messages[ 0 ].from
+                    const matchId = match.messages[ 0 ].match_id
+                    const messages = _.map(match.messages, (message) => {
+                      return {
+                        channel: 'tinder',
+                        channel_message_id: message._id,
+                        recommendation_id: channelRecommendationId,
+                        sent_date: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
+                        text: message.message,
+                        is_from_recommendation: message.from !== user_id
+                      }
+                    })
+
+                    return this.getUser(channelRecommendationId)
+                      .then((channelRecommendation) => {
+                        channelRecommendation.match_id = matchId
+
+                        return { recommendation: channelRecommendation, messages }
+                      })
+                  } else {
+                    return {
+                      isNewMatch: true,
+                      recommendation: {
+                        channel: 'tinder',
+                        channel_id: match.person._id,
+                        name: match.person.name,
+                        photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+                        match_id: match.id,
+                        data: match.person
+                      },
+                      messages: _.map(match.messages, (message) => {
+                        return {
+                          channel: 'tinder',
+                          channel_message_id: message._id,
+                          recommendation_id: message.from === user_id ? message.to : message.from,
+                          sent_date: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
+                          text: message.message,
+                          is_from_recommendation: message.from !== user_id
+                        }
+                      })
+                    }
+                  }
+                })
+              })
+          })
       })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
@@ -165,14 +211,13 @@ class Tinder extends Channel {
       }
     })
       .then(() => this._tinder.getUser(userId))
-      .then(({ results }) => results)
-      .mapSeries((result) => {
+      .then(({ results }) => {
         return {
           channel: 'tinder',
-          channel_id: result._id,
-          name: result.name,
-          photos: _.map(result.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
-          data: result
+          channel_id: results._id,
+          name: results.name,
+          photos: _.map(results.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+          data: results
         }
       })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
