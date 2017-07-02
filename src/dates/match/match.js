@@ -33,7 +33,6 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
       }
 
       return Recommendation.setUpMatch(recommendation, match)
-        .then(() => Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`))
     })
     .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
 }
