@@ -15,25 +15,26 @@ ENV VERSION_BUILD_DATE $VERSION_BUILD_DATE
 
 ENV HOME /opt/$NAME
 
-RUN apt-get update &&\
-    apt-get install -y git python &&\
-    apt-get clean
-
 # Create app directory
 RUN mkdir -p $HOME
 WORKDIR $HOME
 
+RUN apt-get update &&\
+    apt-get install -y build-essential git python &&\
+    apt-get clean
+
 # Install app dependencies
 COPY package.json $HOME
 RUN npm install --production
+
+RUN apt-get remove --purge -y build-essential git python &&\
+    apt-get autoremove --purge -y
 
 # Bundle app source
 COPY src $HOME/src
 
 COPY share/docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-RUN apt-get remove --purge -y git python
 
 EXPOSE 3000
 ENTRYPOINT [ "/entrypoint.sh" ]
