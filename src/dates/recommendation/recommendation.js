@@ -190,10 +190,14 @@ class Recommendation {
     }
 
     recommendation.match = true
-    recommendation.match_id = match._id || match.id // TODO: normalize data
+    recommendation.match_id = match._id || _.get(match, 'notifier.id') || match.id // TODO: normalize data
 
     if (match.created_date) {
       recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
+    } else if (match.creation_date) {
+      recommendation.matched_date = new Date(match.creation_date.replace(/T/, ' ').replace(/\..+/, ''))
+    } else {
+      recommendation.matched_date = new Date()
     }
 
     return recommendation

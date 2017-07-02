@@ -7,6 +7,8 @@
 
 /* eslint-disable camelcase */
 
+const _ = require('lodash')
+
 const Logger = require('modern-logger')
 
 const { Recommendations, Channels } = require('../../databases')
@@ -16,21 +18,44 @@ const Message = require('./message')
 
 const findOrCreateNewRecommendationFromMatch = function (channel, channelRecommendationId, match) {
   const channelName = channel.name
-  const channelRecommendation = match.person
+  const channelRecommendation = getChannelRecommendationFromMatch(match)
 
   return Recommendation.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
     .then((recommendation) => {
-      if (!recommendation.like) {
-        recommendation.like = true
-      }
-
       if (recommendation.match) {
         return recommendation
       }
 
+      recommendation.like = true
+      recommendation.is_human_decision = true
+
       return Recommendation.setUpMatch(recommendation, match)
     })
     .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
+}
+
+const getChannelRecommendationFromMatch = (match) => {
+  if (isNewMessageFromMatch(match)) {
+    return undefined
+  } else {
+    return match.person || match
+  }
+}
+
+const getChannelRecommendationIdFromMatch = (channelUserId, match) => {
+  if (isNewMessageFromMatch(match)) {
+    return match.messages[ 0 ].from !== channelUserId ? match.messages[ 0 ].from : match.messages[ 0 ].to
+  } else {
+    return _.get(match, 'person._id') || _.get(match, 'notifier.id')
+  }
+}
+
+const isNewMessageFromMatch = (match) => {
+  return match.is_new_message || !_.isEmpty(match.messages)
+}
+
+const getMessagesFromMatch = (match) => {
+  return match.messages || []
 }
 
 class Match {
@@ -39,27 +64,15 @@ class Match {
 
     return Channels.findByName(channelName)
       .then(({ user_id }) => {
-        const accountUserId = user_id
-
-        let messages = 0
-        let matches = 0
-
-        let channelRecommendationId
-        if (match.is_new_message) {
-          channelRecommendationId = match.messages[ 0 ].from !== accountUserId ? match.messages[ 0 ].from : match.messages[ 0 ].to
-        } else {
-          matches++
-          channelRecommendationId = match.person._id
-        }
-
-        messages += match.messages.length
+        const channelUserId = user_id
+        const channelRecommendationId = getChannelRecommendationIdFromMatch(channelUserId, match)
+        const channelRecommendation = getChannelRecommendationFromMatch(match)
+        const isNewMessage = isNewMessageFromMatch(match)
+        const messages = getMessagesFromMatch(match)
 
         return findOrCreateNewRecommendationFromMatch.bind(this)(channel, channelRecommendationId, match)
           .then((recommendation) => {
-            const channelName = channel.name
-            const channelRecommendation = match.person
-
-            return Message.readMessages(channel, accountUserId, recommendation.id, match.messages)
+            return Message.readMessages(channelName, channelRecommendationId, messages)
               .then(() => {
                 return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
                   .catch(AlreadyCheckedOutEarlierError, () => { return { recommendation } })
@@ -67,14 +80,14 @@ class Match {
               .then(({ recommendation }) => Recommendation.fallInLove(recommendation))
               .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
               .then((recommendation) => {
-                if (match.is_new_message) {
-                  return Logger.info(`${recommendation.data.name} has ${messages} :envelope:`)
+                if (isNewMessage) {
+                  return Logger.info(`${recommendation.name} has ${messages.length} :envelope:`)
                 }
 
-                return Logger.info(`${recommendation.data.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
+                return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
               })
+              .then(() => { return { messages: messages.length, matches: isNewMessage ? 0 : 1 } })
           })
-          .then(() => { return { messages, matches } })
       })
   }
 }

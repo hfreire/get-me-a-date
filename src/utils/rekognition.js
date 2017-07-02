@@ -27,7 +27,7 @@ const decodeExternalImageId = (externalImageId) => {
 const defaultOptions = {
   retry: { max_tries: 3, interval: 1000, timeout: 12000, throw_original: true },
   breaker: {
-    timeout: 16000,
+    timeout: 160000,
     threshold: 80,
     circuitDuration: 30000,
     isFailure: (error) => {

@@ -60,15 +60,6 @@ class Happn extends Channel {
       })
   }
 
-  getAccount () {
-    return Promise.try(() => {
-      if (!this._happn.accessToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
-  }
-
   getRecommendations () {
     return Promise.try(() => {
       if (!this._happn.accessToken) {
@@ -81,12 +72,44 @@ class Happn extends Channel {
   }
 
   getUpdates () {
+    const getUpdates = (limit, offset, lastActivityDate, updates) => {
+      return this._happn.getUpdates(limit, offset)
+        .then(({ matches }) => {
+          if (_.isEmpty(matches.data) || new Date(matches.data[ 0 ].creation_date).getTime() < lastActivityDate.getTime()) {
+            return updates
+          }
+
+          _.forEach(matches.data, (match) => {
+            if (new Date(match.creation_date).getTime() > lastActivityDate.getTime()) {
+              updates.matches.push(match)
+            }
+          })
+
+          if (new Date(matches.data[ matches.data.length - 1 ].creation_date).getTime() > lastActivityDate.getTime()) {
+            return getUpdates(limit, offset + limit, lastActivityDate, updates)
+          }
+
+          return updates
+        })
+    }
+
     return Promise.try(() => {
       if (!this._happn.accessToken) {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => [])
+      .then(() => Channels.findByName(this.name))
+      .then(({ last_activity_date }) => {
+        const lastActivityDate = !last_activity_date ? undefined : last_activity_date
+
+        return getUpdates(10, 0, lastActivityDate, { matches: [], conversations: [] })
+      })
+      .then(({ matches }) => {
+        const last_activity_date = new Date()
+
+        return Channels.save([ this.name ], { last_activity_date })
+          .then(() => matches)
+      })
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
@@ -117,6 +140,7 @@ class Happn extends Channel {
       }
     })
       .then(() => this._happn.getUser(userId))
+      .then(({ data }) => data)
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
