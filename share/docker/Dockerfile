@@ -16,7 +16,7 @@ ENV VERSION_BUILD_DATE $VERSION_BUILD_DATE
 ENV HOME /opt/$NAME
 
 RUN apt-get update &&\
-    apt-get install -y git &&\
+    apt-get install -y git python &&\
     apt-get clean
 
 # Create app directory
@@ -32,6 +32,8 @@ COPY src $HOME/src
 
 COPY share/docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+RUN apt-get remove --purge -y git python
 
 EXPOSE 3000
 ENTRYPOINT [ "/entrypoint.sh" ]
