@@ -16,6 +16,8 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
+const Database = require('../database')
+
 const S3 = require('../utils/s3')
 const Rekognition = require('../utils/rekognition')
 
@@ -209,7 +211,7 @@ class Taste {
 
     const photosToCompare = _.filter(photos, (photo) => !photo.similarity_date)
 
-    return Promise.map(photos, (photo) => {
+    return Promise.map(photosToCompare, (photo) => {
       if (photo.similarity_date) {
         return photo.similarity // do not s3 and rekognition photos that have already been checked out
       }
@@ -222,10 +224,21 @@ class Taste {
         const faceSimilarityMin = _.min(faceSimilarities)
         const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
 
-        const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > 80
+        return Database.settings.findById(1)
+          .then((settings) => {
+            const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > settings.likePhotosThreshold
 
-        return Logger.debug(`Compared ${photosToCompare.length} photo(s)`)
-          .then(() => { return { faceSimilarities, faceSimilarityMax, faceSimilarityMin, faceSimilarityMean, like } })
+            return Logger.debug(`Compared ${photosToCompare.length} photo(s)`)
+              .then(() => {
+                return {
+                  faceSimilarities,
+                  faceSimilarityMax,
+                  faceSimilarityMin,
+                  faceSimilarityMean,
+                  like
+                }
+              })
+          })
       })
   }
 

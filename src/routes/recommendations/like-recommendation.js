@@ -61,8 +61,8 @@ class LikeRecommendation extends Route {
     super('POST', '/recommendations/{id}/like', 'Like', 'Like a recommendation')
   }
 
-  handler (request, reply) {
-    const { id } = request.params
+  handler ({ params = {} }, reply) {
+    const { id } = params
 
     findById(id)
       .then((recommendation) => like(recommendation))

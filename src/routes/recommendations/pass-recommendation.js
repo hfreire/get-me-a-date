@@ -56,8 +56,8 @@ class PassRecommendation extends Route {
     super('POST', '/recommendations/{id}/pass', 'Pass', 'Pass a recommendation')
   }
 
-  handler (request, reply) {
-    const { id } = request.params
+  handler ({ params = {} }, reply) {
+    const { id } = params
 
     findById(id)
       .then((recommendation) => pass(recommendation))

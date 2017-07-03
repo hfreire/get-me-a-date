@@ -7,6 +7,7 @@
 
 const { Route } = require('serverful')
 
+const Joi = require('joi')
 const Boom = require('boom')
 
 const Logger = require('modern-logger')
@@ -45,6 +46,16 @@ class UpdateChannel extends Route {
 
   auth () {
     return false
+  }
+
+  validate () {
+    return {
+      params: {
+        name: Joi.string()
+          .required()
+          .description('channel name')
+      }
+    }
   }
 }
 

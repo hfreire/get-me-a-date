@@ -15,6 +15,7 @@ System.config({
     app: 'app',
     'app/recommendations': 'app/recommendations',
     'app/channels': 'app/channels',
+    'app/settings': 'app/settings',
     'app/stats': 'app/stats',
 
     '@angular/core': 'npm:@angular/core/bundles/core.umd.js',
@@ -50,6 +51,10 @@ System.config({
       defaultExtension: 'js'
     },
     'app/channels': {
+      main: './index.js',
+      defaultExtension: 'js'
+    },
+    'app/settings': {
       main: './index.js',
       defaultExtension: 'js'
     },

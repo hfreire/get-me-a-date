@@ -13,13 +13,16 @@ import 'hammerjs'
 import {
   MdButtonModule,
   MdCardModule,
+  MdCheckboxModule,
   MdDialogModule,
   MdGridListModule,
   MdIconModule,
+  MdInputModule,
   MdMenuModule,
   MdProgressSpinnerModule,
   MdSelectModule,
   MdSidenavModule,
+  MdSliderModule,
   MdSlideToggleModule,
   MdToolbarModule,
   MdTooltipModule
@@ -32,6 +35,7 @@ import { ChartsModule } from 'ng2-charts'
 import { AppComponent } from './app.component'
 import { RecommendationDialogComponent, RecommendationsComponent } from './recommendations'
 import { ChannelsComponent } from './channels'
+import { SettingsComponent } from './settings'
 import { StatsComponent } from './stats'
 import { CapitalizePipe } from './capitalize.pipe'
 
@@ -54,10 +58,13 @@ import { CapitalizePipe } from './capitalize.pipe'
     NgxPaginationModule,
     MdSelectModule,
     MdMenuModule,
+    MdCheckboxModule,
+    MdInputModule,
+    MdSliderModule,
     ChartsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, StatsComponent ],
-  entryComponents: [ RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, StatsComponent ],
+  declarations: [ AppComponent, CapitalizePipe, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
+  entryComponents: [ RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

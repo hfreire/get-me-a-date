@@ -14,6 +14,8 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
+const Database = require('./database')
+
 const { Dates } = require('./dates')
 
 const findDates = function () {
@@ -35,7 +37,7 @@ const findDates = function () {
 
 class Server extends Serverful {
   start () {
-    return Promise.all([ super.start(), Dates.bootstrap() ])
+    return Promise.all([ super.start(), Dates.bootstrap().then(() => Database.start()) ])
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           findDates()
