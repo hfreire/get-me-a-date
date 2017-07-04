@@ -7,12 +7,12 @@
 
 const Promise = require('bluebird')
 
-const { Messages } = require('../../databases')
+const Database = require('../../database')
 
 class Message {
   readMessages (messages) {
     return Promise.mapSeries(messages, (message) => {
-      return Messages.save([ message.channel, message.channel_message_id ], message)
+      return Database.message.create(message)
     })
   }
 }

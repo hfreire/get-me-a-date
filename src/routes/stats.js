@@ -12,7 +12,7 @@ const Logger = require('modern-logger')
 const Joi = require('joi')
 const Boom = require('boom')
 
-const Database = require('../databases')
+const Database = require('../database')
 
 class Stats extends Route {
   constructor () {
@@ -22,8 +22,8 @@ class Stats extends Route {
   handler ({ query }, reply) {
     const { page = 1, limit = 25 } = query
 
-    Database.Stats.findAll(page, limit)
-      .then(({ results, totalCount }) => reply({ results, totalCount }))
+    Database.stats.findAndCountAll({ offset: (page - 1) * limit, limit })
+      .then(({ rows, count }) => reply({ results: rows, totalCount: count }))
       .catch((error) => {
         Logger.error(error)
 

@@ -11,22 +11,19 @@ const FACEBOOK_USER_PASSWORD = process.env.FACEBOOK_USER_PASSWORD
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const Health = require('health-checkup')
-
 const Logger = require('modern-logger')
 
 const FacebookLogin = require('facebook-login-for-robots')
 
 const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
-const { Channels, Auth } = require('../databases')
+const Database = require('../database')
 
 const createChannelIfNeeded = function () {
-  return Channels.findByName(this.name)
+  return Database.channels.find({ where: { name: this._name } })
     .then((channel) => {
       if (!channel) {
-        const _channel = _.assign({ name: this.name }, this._options.channel)
-        return Channels.save([ this.name ], _channel)
+        return Database.channels.create(_.assign({ name: this._name }, this._options.channel))
       }
     })
 }
@@ -41,14 +38,6 @@ class Channel {
         password: FACEBOOK_USER_PASSWORD
       }
     })
-
-    Health.addCheck(this.name, () => new Promise((resolve, reject) => {
-      if (this._happn._breaker.isOpen()) {
-        return reject(new Error(`circuit breaker is open`))
-      } else {
-        return resolve()
-      }
-    }))
   }
 
   get name () {
@@ -59,43 +48,36 @@ class Channel {
     return createChannelIfNeeded.bind(this)()
   }
 
-  findOrAuthorizeIfNeeded (channel, authorize) {
-    return Auth.findById(channel.auth_id)
-      .then((auth) => {
-        if (!auth) {
-          const { clientId, redirectUri, optionalParams } = this._options.oauth.facebook
+  findOrAuthorizeIfNeeded (authorize) {
+    if (!_.isFunction(authorize)) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
 
-          return Logger.debug(`Started Facebook Login for ${_.capitalize(this.name)} channel`)
-            .then(() => {
-              return this._facebookLogin.oauthDialog(clientId, redirectUri, optionalParams)
-                .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(this.name)} channel`))
-            })
-            .then(({ facebookAccessToken, facebookUserId }) => authorize({ facebookAccessToken, facebookUserId }))
-            .then(({ token, user_id }) => {
-              return Auth.save(undefined, { token })
-                .then((auth) => {
-                  return Channels.save([ channel.name ], { user_id, auth_id: auth.id })
-                    .then(() => {
-                      return { user_id, token }
-                    })
-                })
-            })
+    return Database.channels.find({ where: { name: this._name } })
+      .then((channel) => {
+        if (channel.userId && channel.accessToken) {
+          return { userId: channel.userId, accessToken: channel.accessToken }
         }
 
-        return { user_id: channel.user_id, token: auth.token }
+        const { clientId, redirectUri, optionalParams } = this._options.oauth.facebook
+
+        return Logger.debug(`Started Facebook Login for ${_.capitalize(this.name)} channel`)
+          .then(() => {
+            return this._facebookLogin.oauthDialog(clientId, redirectUri, optionalParams)
+              .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(this.name)} channel`))
+          })
+          .then(({ facebookAccessToken, facebookUserId }) => authorize({ facebookAccessToken, facebookUserId }))
+          .then(({ userId, accessToken }) => {
+            return Database.channels.update({ userId, accessToken }, { where: { name: this._name } })
+              .then(() => { return { userId, accessToken } })
+          })
       })
   }
 
   onNotAuthorizedError () {
-    return Logger.debug(`${_.capitalize(this.name)} got unauthorized`)
+    return Logger.debug(`${_.capitalize(this._name)} got unauthorized`)
       .then(() => {
-        return Channels.findByName(this.name)
-          .then((channel) => {
-            return Promise.all([
-              Channels.save([ this.name ], { auth_id: null }),
-              Auth.deleteById(channel.auth_id)
-            ])
-          })
+        return Database.channels.update({ accessToken: null }, { where: { name: this._name } })
           .then(() => {
             throw new NotAuthorizedError()
           })
@@ -105,7 +87,10 @@ class Channel {
   onOutOfLikesError () {
     return Logger.debug(`${_.capitalize(this.name)} is out of likes`)
       .then(() => {
-        return Channels.save([ this.name ], { is_out_of_likes: true, out_of_likes_date: new Date() })
+        return Database.channels.update({
+          isOutOfLikes: true,
+          outOfLikesDate: new Date()
+        }, { where: { name: this._name } })
           .then(() => {
             throw new OutOfLikesError()
           })

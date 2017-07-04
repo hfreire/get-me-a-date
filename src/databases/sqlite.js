@@ -67,52 +67,9 @@ const createSchema = function () {
     'data TEXT NOT NULL,' +
     'PRIMARY KEY (channel, channel_id)' +
     ')')
-    .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS channels (' +
-      'name VARCHAR(32) NOT NULL, ' +
-      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'is_enabled INTEGER NOT NULL DEFAULT 0,' +
-      'user_id VARCHAR(64) DEFAULT NULL,' +
-      'auth_id INTEGER NULL,' +
-      'last_activity_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))),' +
-      'is_out_of_likes INTEGER NOT NULL DEFAULT 0,' +
-      'out_of_likes_date DATETIME DEFAULT NULL,' +
-      'PRIMARY KEY (name)' +
-      ')'))
-    .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS auth (' +
-      'id INTEGER PRIMARY KEY,' +
-      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'token TEXT NOT NULL' +
-      ')'))
-    .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS stats (' +
-      'date DATE PRIMARY KEY,' +
-      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'machine_likes INTEGER NOT NULL DEFAULT 0,' +
-      'human_likes INTEGER NOT NULL DEFAULT 0,' +
-      'machine_passes INTEGER NOT NULL DEFAULT 0,' +
-      'human_passes INTEGER NOT NULL DEFAULT 0,' +
-      'trains INTEGER NOT NULL DEFAULT 0,' +
-      'matches INTEGER NOT NULL DEFAULT 0,' +
-      'skips INTEGER NOT NULL DEFAULT 0' +
-      ')'))
-    .then(() => this._database.runAsync(
-      'CREATE TABLE IF NOT EXISTS messages (' +
-      'channel VARCHAR(32) NOT NULL, ' +
-      'channel_message_id VARCHAR(64) NOT NULL, ' +
-      'created_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'updated_date DATETIME DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', datetime(\'now\'))), ' +
-      'recommendation_id VARCHAR(36) NOT NULL, ' +
-      'sent_date DATETIME NOT NULL, ' +
-      'is_from_recommendation INTEGER NOT NULL,' +
-      'text TEXT NOT NULL,' +
-      'PRIMARY KEY (channel, channel_message_id)' +
-      ')'))
 }
+
+const Database = require('../database')
 
 class SQLite {
   start () {
@@ -122,6 +79,7 @@ class SQLite {
 
     return createFile.bind(this)()
       .then(() => createSchema.bind(this)())
+      .then(() => Database.start())
   }
 
   run (sql, param) {

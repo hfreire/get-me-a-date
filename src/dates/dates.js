@@ -13,7 +13,8 @@ const Promise = require('bluebird')
 const Logger = require('modern-logger')
 
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
-const { Recommendations, Channels } = require('../databases')
+const { Recommendations } = require('../databases')
+const Database = require('../database')
 
 const Taste = require('./taste')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
@@ -61,13 +62,13 @@ class Dates {
         .finally(() => Logger.info('Finished updating stats'))
     }
 
-    return Channels.findAll()
-      .mapSeries((data) => {
-        if (!data[ 'is_enabled' ]) {
+    return Database.channels.findAll()
+      .mapSeries(({ name, isEnabled }) => {
+        if (!isEnabled) {
           return
         }
 
-        const channel = Channel.getByName(data[ 'name' ])
+        const channel = Channel.getByName(name)
 
         return findByChannel.bind(this)(channel)
       })

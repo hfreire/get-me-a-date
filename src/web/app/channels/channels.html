@@ -10,7 +10,7 @@
     <md-card-content>
         <md-list>
             <md-list-item *ngFor="let channel of channels">
-                <md-slide-toggle [checked]="channel.is_enabled" (change)="toggleChannel(channel)" color="primary">{{
+                <md-slide-toggle [checked]="channel.isEnabled" (change)="toggleChannel(channel)" color="primary">{{
                     channel.name | capitalize }}
                 </md-slide-toggle>
             </md-list-item>

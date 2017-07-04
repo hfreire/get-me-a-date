@@ -11,7 +11,7 @@ const Boom = require('boom')
 
 const Logger = require('modern-logger')
 
-const { Channels } = require('../../databases')
+const Database = require('../../database')
 
 class GetChannels extends Route {
   constructor () {
@@ -19,7 +19,7 @@ class GetChannels extends Route {
   }
 
   handler (request, reply) {
-    return Channels.findAll()
+    return Database.channels.findAll()
       .then((channels) => reply(null, channels))
       .catch((error) => {
         Logger.error(error)

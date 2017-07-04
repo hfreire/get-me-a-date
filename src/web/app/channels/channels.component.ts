@@ -31,9 +31,9 @@ export class ChannelsComponent {
   }
 
   toggleChannel (channel: any) {
-    this.channelsService.updateChannel(channel.name, { is_enabled: !channel.is_enabled })
+    this.channelsService.updateChannel(channel.name, { isEnabled: !channel.isEnabled })
       .subscribe((_channel) => {
-        channel.is_enabled = _channel.is_enabled
+        channel.isEnabled = _channel.isEnabled
       })
   }
 }

@@ -77,10 +77,10 @@ export class StatsComponent {
     this.statsService.getAll(page, limit)
       .subscribe(({ results }) => {
         this.lineChartLabels = _.reverse(_.map(results, ({ date }) => date.replace(/T.*$/, '')))
-        this.lineChartData[ 0 ].data = _.reverse(_.map(results, 'machine_likes'))
-        this.lineChartData[ 1 ].data = _.reverse(_.map(results, 'human_likes'))
-        this.lineChartData[ 2 ].data = _.reverse(_.map(results, 'machine_passes'))
-        this.lineChartData[ 3 ].data = _.reverse(_.map(results, 'human_passes'))
+        this.lineChartData[ 0 ].data = _.reverse(_.map(results, 'machineLikes'))
+        this.lineChartData[ 1 ].data = _.reverse(_.map(results, 'humanLikes'))
+        this.lineChartData[ 2 ].data = _.reverse(_.map(results, 'machinePasses'))
+        this.lineChartData[ 3 ].data = _.reverse(_.map(results, 'humanPasses'))
         this.lineChartData[ 4 ].data = _.reverse(_.map(results, 'matches'))
       })
   }

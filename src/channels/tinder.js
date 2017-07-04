@@ -30,7 +30,7 @@ const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
 
-const { Channels } = require('../databases')
+const Database = require('../database')
 
 const defaultOptions = {
   oauth: {
@@ -53,23 +53,20 @@ class Tinder extends Channel {
   }
 
   authorize () {
-    return Channels.findByName(this.name)
-      .then((channel) => {
-        const authorize = function ({ facebookAccessToken, facebookUserId }) {
-          return this._tinder.authorize(facebookAccessToken, facebookUserId)
-            .then(() => this.getAccount())
-            .then(({ user }) => {
-              const user_id = user._id
-              const token = this._tinder.authToken
+    const authorize = function ({ facebookAccessToken, facebookUserId }) {
+      return this._tinder.authorize(facebookAccessToken, facebookUserId)
+        .then(() => this.getAccount())
+        .then(({ user }) => {
+          const userId = user._id
+          const accessToken = this._tinder.authToken
 
-              return { user_id, token }
-            })
-        }
+          return { userId, accessToken }
+        })
+    }
 
-        return this.findOrAuthorizeIfNeeded(channel, authorize.bind(this))
-          .then(({ token }) => {
-            this._tinder.authToken = token
-          })
+    return this.findOrAuthorizeIfNeeded(authorize.bind(this))
+      .then(({ accessToken }) => {
+        this._tinder.authToken = accessToken
       })
   }
 
@@ -109,28 +106,26 @@ class Tinder extends Channel {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => Channels.findByName(this.name))
-      .then(({ last_activity_date, user_id }) => {
-        const lastActivityDate = !last_activity_date ? undefined : last_activity_date
+      .then(() => Database.channels.find({ where: { name: this._name } }))
+      .then(({ lastActivityDate, userId }) => {
+        const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
 
-        return this._tinder.getUpdates(lastActivityDate)
+        return this._tinder.getUpdates(_lastActivityDate)
           .then((data) => {
-            const last_activity_date = new Date()
-
-            return Channels.save([ this.name ], { last_activity_date })
+            return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
               .then(() => {
                 return Promise.mapSeries((data.matches), (match) => {
                   if (match.is_new_message) {
-                    const channelRecommendationId = match.messages[ 0 ].from === user_id ? match.messages[ 0 ].to : match.messages[ 0 ].from
+                    const channelRecommendationId = match.messages[ 0 ].from === userId ? match.messages[ 0 ].to : match.messages[ 0 ].from
                     const matchId = match.messages[ 0 ].match_id
                     const messages = _.map(match.messages, (message) => {
                       return {
-                        channel: 'tinder',
-                        channel_message_id: message._id,
-                        recommendation_id: channelRecommendationId,
-                        sent_date: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
-                        text: message.message,
-                        is_from_recommendation: message.from !== user_id
+                        channelName: 'tinder',
+                        channelMessageId: message._id,
+                        recommendationId: channelRecommendationId,
+                        isFromRecommendation: message.from !== userId,
+                        sentDate: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
+                        text: message.message
                       }
                     })
 
@@ -153,12 +148,12 @@ class Tinder extends Channel {
                       },
                       messages: _.map(match.messages, (message) => {
                         return {
-                          channel: 'tinder',
-                          channel_message_id: message._id,
-                          recommendation_id: message.from === user_id ? message.to : message.from,
-                          sent_date: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
-                          text: message.message,
-                          is_from_recommendation: message.from !== user_id
+                          channelName: 'tinder',
+                          channelMessageId: message._id,
+                          recommendationId: message.from === userId ? message.to : message.from,
+                          isFromRecommendation: message.from !== userId,
+                          sentDate: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
+                          text: message.message
                         }
                       })
                     }
@@ -181,13 +176,16 @@ class Tinder extends Channel {
       }
     })
       .then(() => {
-        return Channels.findByName(this.name)
+        return Database.channels.find({ where: { name: this._name } })
           .then(({ is_out_of_likes, out_of_likes_date }) => {
             if (is_out_of_likes) {
               if ((_.now() - out_of_likes_date) < 12 * 60 * 60 * 1000) {
                 throw new OutOfLikesError()
               } else {
-                return Channels.save([ this.name ], { is_out_of_likes: false, out_of_likes_date: null })
+                return Database.channels.update({
+                  isOutOfLikes: false,
+                  outOfLikesDate: null
+                }, { where: { name: this._name } })
               }
             }
           })

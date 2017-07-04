@@ -7,23 +7,14 @@
 
 const { Route } = require('serverful')
 
+const Promise = require('bluebird')
+
 const Joi = require('joi')
 const Boom = require('boom')
 
 const Logger = require('modern-logger')
 
-const { Channels } = require('../../databases')
-
-const findByName = (channelName) => {
-  return Channels.findByName(channelName)
-    .then((channel) => {
-      if (!channel) {
-        throw new Error()
-      }
-
-      return channel
-    })
-}
+const Database = require('../../database')
 
 class UpdateChannel extends Route {
   constructor () {
@@ -33,9 +24,9 @@ class UpdateChannel extends Route {
   handler ({ params = {}, payload }, reply) {
     const { name } = params
 
-    return findByName(name)
-      .then(() => JSON.parse(payload))
-      .then((channel) => Channels.save([ name ], channel))
+    return Promise.try(() => JSON.parse(payload))
+      .then((channel) => Database.channels.update(channel, { where: { name } }))
+      .then(() => Database.channels.find({ where: { name } }))
       .then((channel) => reply(channel))
       .catch((error) => {
         Logger.error(error)

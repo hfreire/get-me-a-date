@@ -20,7 +20,7 @@ const { NotAuthorizedError } = require('./errors')
 
 const { HappnWrapper, HappnNotAuthorizedError } = require('happn-wrapper')
 
-const { Channels } = require('../databases')
+const Database = require('../database')
 
 const defaultOptions = {
   oauth: {
@@ -43,20 +43,17 @@ class Happn extends Channel {
   }
 
   authorize () {
-    return Channels.findByName(this.name)
-      .then((channel) => {
-        const authorize = function ({ facebookAccessToken }) {
-          return this._happn.authorize(facebookAccessToken)
-            .then(() => {
-              return { user_id: this._happn.userId, token: this._happn.accessToken }
-            })
-        }
+    const authorize = function ({ facebookAccessToken }) {
+      return this._happn.authorize(facebookAccessToken)
+        .then(() => {
+          return { userId: this._happn.userId, accessToken: this._happn.accessToken }
+        })
+    }
 
-        return this.findOrAuthorizeIfNeeded(channel, authorize.bind(this))
-          .then(({ user_id, token }) => {
-            this._happn.userId = user_id
-            this._happn.accessToken = token
-          })
+    return this.findOrAuthorizeIfNeeded(authorize.bind(this))
+      .then((channel) => {
+        this._happn.userId = channel.userId
+        this._happn.accessToken = channel.accessToken
       })
   }
 
@@ -107,16 +104,14 @@ class Happn extends Channel {
         throw new NotAuthorizedError()
       }
     })
-      .then(() => Channels.findByName(this.name))
-      .then(({ last_activity_date }) => {
-        const lastActivityDate = !last_activity_date ? undefined : last_activity_date
+      .then(() => Database.channels.find({ where: { name: this._name } }))
+      .then(({ lastActivityDate }) => {
+        const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
 
-        return getUpdates(10, 0, lastActivityDate, { matches: [], conversations: [] })
+        return getUpdates(10, 0, _lastActivityDate, { matches: [], conversations: [] })
       })
       .then(({ matches, conversations }) => {
-        const last_activity_date = new Date()
-
-        return Channels.save([ this.name ], { last_activity_date })
+        return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
           .then(() => {
             return Promise.mapSeries(matches, (match) => {
               return {

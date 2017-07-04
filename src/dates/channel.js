@@ -9,7 +9,8 @@ const _ = require('lodash')
 const Promise = require('bluebird')
 
 const { Tinder, Happn } = require('../channels')
-const { SQLite, Channels } = require('../databases')
+const { SQLite } = require('../databases')
+const Database = require('../database')
 
 class Channel {
   constructor () {
@@ -26,10 +27,9 @@ class Channel {
     }
 
     const authorizeChannels = () => {
-      return Channels.findAll()
-        .mapSeries(({ name, is_enabled }) => {
-          // eslint-disable-next-line camelcase
-          if (!is_enabled || !this._channels[ name ]) {
+      return Database.channels.findAll()
+        .mapSeries(({ name, isEnabled }) => {
+          if (!isEnabled || !this._channels[ name ]) {
             return
           }
 
