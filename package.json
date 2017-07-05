@@ -72,7 +72,7 @@
     "pre-git": "3.14.1",
     "semantic-release": "6.3.6",
     "testdouble": "3.2.2",
-    "tslint": "5.4.3",
+    "tslint": "5.5.0",
     "tslint-config-standard": "6.0.1",
     "typescript": "2.4.1"
   },
