@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "chai": "4.0.2",
-    "chai-as-promised": "7.1.0",
+    "chai-as-promised": "7.1.1",
     "coveralls": "2.13.1",
     "eslint": "4.1.1",
     "eslint-config-hfreire": "1.0.6",
