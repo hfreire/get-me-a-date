@@ -12,7 +12,7 @@ const Database = require('../../database')
 class Message {
   readMessages (messages) {
     return Promise.mapSeries(messages, (message) => {
-      return Database.message.create(message)
+      return Database.messages.create(message)
     })
   }
 }

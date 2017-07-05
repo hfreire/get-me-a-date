@@ -22,7 +22,7 @@ class Stats extends Route {
   handler ({ query }, reply) {
     const { page = 1, limit = 25 } = query
 
-    Database.stats.findAndCountAll({ offset: (page - 1) * limit, limit })
+    Database.stats.findAndCountAll({ offset: (page - 1) * limit, limit, order: [ [ 'date', 'DESC' ] ] })
       .then(({ rows, count }) => reply({ results: rows, totalCount: count }))
       .catch((error) => {
         Logger.error(error)

@@ -98,6 +98,6 @@
     "build": "pushd ./share/docker; NAME=$npm_package_name ./hooks/build; popd",
     "push": "pushd ./share/docker; NAME=$npm_package_name ./hooks/push; popd",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "start": "node src/app.js"
+    "start": "npm run compile && node src/app.js"
   }
 }
