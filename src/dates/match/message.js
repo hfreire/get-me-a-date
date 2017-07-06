@@ -12,7 +12,12 @@ const Database = require('../../database')
 class Message {
   readMessages (messages) {
     return Promise.mapSeries(messages, (message) => {
-      return Database.messages.create(message)
+      return Database.messages.upsert(message, {
+        where: {
+          channelName: message.channelName,
+          channelMessageId: message.channelMessageId
+        }
+      })
     })
   }
 }

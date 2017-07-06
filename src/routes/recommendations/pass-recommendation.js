@@ -12,35 +12,20 @@ const Logger = require('modern-logger')
 const Joi = require('joi')
 const Boom = require('boom')
 
-const { Recommendations } = require('../../databases')
+const Database = require('../../database')
 const { Recommendation, Stats, Channel } = require('../../dates')
 
-const findById = (channelRecommendationId) => {
-  return Recommendations.findById(channelRecommendationId)
-    .then((recommendation) => {
-      if (!recommendation) {
-        throw new Error()
-      }
-
-      return recommendation
-    })
-}
-
 const pass = (recommendation) => {
-  const channelName = recommendation.channel
+  const channelName = recommendation.channelName
   const channel = Channel.getByName(channelName)
 
   return Recommendation.pass(channel, recommendation)
     .then((recommendation) => {
-      recommendation.is_human_decision = true
-      recommendation.decision_date = new Date()
+      recommendation.isHumanDecision = true
+      recommendation.decisionDate = new Date()
 
       return recommendation
     })
-}
-
-const save = (recommendation) => {
-  return Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation)
 }
 
 const couldDoBetter = (recommendation) => {
@@ -59,9 +44,9 @@ class PassRecommendation extends Route {
   handler ({ params = {} }, reply) {
     const { id } = params
 
-    findById(id)
+    Database.recommendations.findById(id)
       .then((recommendation) => pass(recommendation))
-      .then((recommendation) => save(recommendation))
+      .then((recommendation) => Database.recommendations.update(recommendation, { where: { id } }))
       .then((recommendation) => couldDoBetter(recommendation))
       .then((recommendation) => reply(recommendation))
       .catch((error) => {

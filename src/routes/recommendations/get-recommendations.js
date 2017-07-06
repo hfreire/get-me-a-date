@@ -14,7 +14,7 @@ const Boom = require('boom')
 
 const Logger = require('modern-logger')
 
-const { Recommendations } = require('../../databases')
+const Database = require('../../database')
 
 class GetRecommendations extends Route {
   constructor () {
@@ -29,8 +29,14 @@ class GetRecommendations extends Route {
         return JSON.parse(criteria)
       }
     })
-      .then((criteria) => Recommendations.findAll(page, limit, criteria, select, sort))
-      .then(({ results, totalCount }) => reply({ results, totalCount }))
+      .then((criteria) => Database.recommendations.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit,
+        attributes: select,
+        where: criteria,
+        order: [ [ sort, 'DESC' ] ]
+      }))
+      .then(({ rows, count }) => reply({ results: rows, totalCount: count }))
       .catch((error) => {
         Logger.error(error)
 

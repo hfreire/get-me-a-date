@@ -14,7 +14,7 @@ const { AlreadyCheckedOutEarlierError } = require('./errors')
 
 const Taste = require('../taste')
 
-const { Recommendations } = require('../../databases')
+const Database = require('../../database')
 
 class Recommendation {
   checkOut (channel, channelRecommendationId, channelRecommendation) {
@@ -27,9 +27,9 @@ class Recommendation {
 
     return this.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
       .then((recommendation) => {
-        recommendation.checked_out_times++
+        recommendation.checkedOutTimes++
 
-        if (recommendation.last_checked_out_date) {
+        if (recommendation.lastCheckedOutDate) {
           return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
         }
 
@@ -45,21 +45,21 @@ class Recommendation {
               photos: Taste.checkPhotosOut(channelName, photosToCheckOut)
             })
               .then(({ photos }) => {
-                recommendation.last_checked_out_date = new Date()
+                recommendation.lastCheckedOutDate = new Date()
                 recommendation.photos = photosToCheckOut
-                recommendation.photos_similarity_mean = photos.faceSimilarityMean
+                recommendation.photosSimilarityMean = photos.faceSimilarityMean
 
                 like = photos.like
                 pass = photos.pass
               })
           })
           .then(() => {
-            if (!recommendation.thumbnail_url) {
+            if (!recommendation.thumbnailUrl) {
               const firstPhoto = _.get(recommendation, 'photos[0]', undefined)
 
               return Taste.mentalSnapshot(channelName, firstPhoto)
                 .then((url) => {
-                  recommendation.thumbnail_url = url
+                  recommendation.thumbnailUrl = url
                 })
             }
           })
@@ -78,18 +78,18 @@ class Recommendation {
       return Promise.reject(new Error('already liked'))
     }
 
-    if (recommendation.is_pass) {
+    if (recommendation.isPass) {
       return Promise.reject(new Error('already passed'))
     }
 
-    const channelRecommendationId = recommendation.channel_id
+    const channelRecommendationId = recommendation.channelRecommendationId
 
     const { photos, content_hash, s_number } = recommendation.data
     const photoId = _.get(photos, '[0].id')
 
     return channel.like(channelRecommendationId, photoId, content_hash, s_number)
       .then((match) => {
-        recommendation.like = true
+        recommendation.isLike = true
 
         if (!match) {
           return recommendation
@@ -105,15 +105,15 @@ class Recommendation {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    if (recommendation.is_pass) {
+    if (recommendation.isPass) {
       return Promise.resolve()
     }
 
-    if (recommendation.like) {
+    if (recommendation.isLike) {
       return Promise.reject(new Error('can not pass'))
     }
 
-    recommendation.is_pass = true
+    recommendation.isPass = true
 
     return Promise.resolve(recommendation)
   }
@@ -123,7 +123,7 @@ class Recommendation {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    if (recommendation.train) {
+    if (recommendation.isTrain) {
       return Promise.resolve(recommendation)
     }
 
@@ -131,7 +131,7 @@ class Recommendation {
 
     return Taste.acquireTaste(photos)
       .then(() => _.merge(recommendation, {
-        train: true,
+        isTrain: true,
         trained_date: new Date()
       }))
   }
@@ -151,7 +151,7 @@ class Recommendation {
 
     const channelName = channel.name
 
-    return Recommendations.findByChannelAndChannelId(channelName, channelRecommendationId)
+    return Database.recommendations.find({ where: { channelName, channelRecommendationId } })
       .then((recommendation) => {
         if (recommendation) {
           return recommendation
@@ -165,7 +165,7 @@ class Recommendation {
 
             return channel.getUser(channelRecommendationId)
           })
-          .then((channelRecommendation) => Recommendations.save([ channel.name, channelRecommendationId ], channelRecommendation))
+          .then((channelRecommendation) => Database.recommendations.create(channelRecommendation))
       })
   }
 
@@ -174,8 +174,8 @@ class Recommendation {
       throw new Error('invalid arguments')
     }
 
-    recommendation.match = true
-    recommendation.match_id = match._id || _.get(match, 'notifier.id') || match.id // TODO: normalize data
+    recommendation.isMatch = true
+    recommendation.channelMatchId = match.channelMatchId
 
     if (match.created_date) {
       recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))

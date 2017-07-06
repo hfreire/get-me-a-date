@@ -12,13 +12,11 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { Recommendations } = require('../../databases')
 const { Recommendation, AlreadyCheckedOutEarlierError } = require('../recommendation')
 
 const Message = require('./message')
 
 const findOrCreateNewRecommendationFromMatch = function (channel, channelRecommendationId, match) {
-  const channelName = channel.name
   const channelRecommendation = match.recommendation
 
   return Recommendation.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
@@ -28,21 +26,19 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
       }
 
       if (!recommendation.like) {
-        recommendation.like = true
-        recommendation.is_human_decision = true
+        recommendation.isLike = true
+        recommendation.isHumanDecision = true
       }
 
       return Recommendation.setUpMatch(recommendation, match)
     })
-    .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
+    .then((recommendation) => recommendation.save())
 }
 
 class Match {
   checkLatestNews (channel, match) {
-    const channelName = channel.name
-
     const channelRecommendation = match.recommendation
-    const channelRecommendationId = channelRecommendation.channel_id
+    const channelRecommendationId = channelRecommendation.channelRecommendationId
     const messages = match.messages
 
     return findOrCreateNewRecommendationFromMatch.bind(this)(channel, channelRecommendationId, match)
@@ -53,12 +49,12 @@ class Match {
               .catch(AlreadyCheckedOutEarlierError, () => { return { recommendation } })
           })
           .then(({ recommendation }) => Recommendation.fallInLove(recommendation))
-          .then((recommendation) => Recommendations.save([ channelName, channelRecommendationId ], recommendation))
+          .then((recommendation) => recommendation.save())
           .then((recommendation) => {
             return Promise.resolve()
               .then(() => {
                 if (match.isNewMatch) {
-                  return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
+                  return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
                 }
               })
               .then(() => {

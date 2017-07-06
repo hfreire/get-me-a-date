@@ -67,8 +67,8 @@ class Happn extends Channel {
       .then(({ data }) => data)
       .mapSeries((data) => {
         return {
-          channel: 'happn',
-          channel_id: data.notifier.id,
+          channelName: 'happn',
+          channelRecommendationId: data.notifier.id,
           name: data.notifier.first_name,
           photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
           data
@@ -117,11 +117,11 @@ class Happn extends Channel {
               return {
                 isNewMatch: true,
                 recommendation: {
-                  channel: 'happn',
-                  channel_id: match.notifier.id,
+                  channelName: 'happn',
+                  channelRecommendationId: match.notifier.id,
                   name: match.notifier.first_name,
                   photos: _.map(match.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
-                  match_id: match.notifier.id,
+                  channelMatchId: match.notifier.id,
                   data: match.notifier
                 },
                 messages: []
@@ -147,8 +147,8 @@ class Happn extends Channel {
       .then(({ data }) => {
         if (data.my_relation === 4) {
           return {
-            channel: 'happn',
-            channel_id: data.id,
+            channelName: 'happn',
+            channelRecommendationId: data.id,
             name: data.first_name,
             photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
             data
@@ -171,8 +171,8 @@ class Happn extends Channel {
       .then(() => this._happn.getUser(userId))
       .then(({ data }) => {
         return {
-          channel: 'happn',
-          channel_id: data.id,
+          channelName: 'happn',
+          channelRecommendationId: data.id,
           name: data.first_name,
           photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
           data

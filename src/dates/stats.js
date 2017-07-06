@@ -8,17 +8,16 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const { Recommendations } = require('../databases')
 const Database = require('../database')
 
 const stats = [
-  { name: 'machineLikes', metric: 'decision_date', criteria: { is_human_decision: 0, like: 1 } },
-  { name: 'humanLikes', metric: 'decision_date', criteria: { is_human_decision: 1, like: 1 } },
-  { name: 'machinePasses', metric: 'decision_date', criteria: { is_human_decision: 0, is_pass: 1 } },
-  { name: 'humanPasses', metric: 'decision_date', criteria: { is_human_decision: 1, is_pass: 1 } },
-  { name: 'trains', metric: 'trained_date', criteria: { train: 1 } },
-  { name: 'matches', metric: 'matched_date', criteria: { match: 1 } },
-  { name: 'skips', metric: 'last_checked_out_date', criteria: { like: 0, is_pass: 0 } }
+  { name: 'machineLikes', metric: 'decisionDate', criteria: { isHumanDecision: false, isLike: true } },
+  { name: 'humanLikes', metric: 'decisionDate', criteria: { isHumanDecision: true, isLike: true } },
+  { name: 'machinePasses', metric: 'decisionDate', criteria: { isHumanDecision: false, isPass: true } },
+  { name: 'humanPasses', metric: 'decisionDate', criteria: { isHumanDecision: true, isPass: true } },
+  { name: 'trains', metric: 'trainedDate', criteria: { isTrain: true } },
+  { name: 'matches', metric: 'matchedDate', criteria: { isMatch: true } },
+  { name: 'skips', metric: 'lastCheckedOutDate', criteria: { isLike: false, isPass: false } }
 ]
 
 class Stats {
@@ -38,14 +37,16 @@ class Stats {
 
   updateFromStart () {
     return Promise.mapSeries(stats, ({ name, metric, criteria }) => {
-      return Recommendations.findAll(1, 1000, undefined, [ metric ], metric, true)
-        .then(({ results }) => results)
+      return Database.recommendations.findAll({
+        attributes: [ [ Database._sequelize.fn('DISTINCT', Database._sequelize.fn('strftime', '%Y-%m-%d', Database._sequelize.col(metric))), 'metric' ] ],
+        order: [ metric ]
+      })
         .mapSeries((result) => {
-          if (!result[ metric ]) {
+          if (!result.get('metric')) {
             return
           }
 
-          return this.updateByStatsAndDate({ name, metric, criteria }, result[ metric ])
+          return this.updateByStatsAndDate({ name, metric, criteria }, result.get('metric'))
         })
     })
   }
@@ -55,11 +56,16 @@ class Stats {
   }
 
   updateByStatsAndDate ({ name, metric, criteria }, date) {
-    const _criteria = _.merge({ [metric]: date }, criteria)
+    const where = _.merge({
+      [metric]: {
+        $gt: date,
+        $lt: Database._sequelize.fn('strftime', '%Y-%m-%dT%H:%M:%fZ', Database._sequelize.fn('datetime', date, '+1 day'))
+      }
+    }, criteria)
 
-    return Recommendations.findAll(1, 10000, _criteria)
-      .then(({ totalCount }) => {
-        return Database.stats.upsert({ date, [name]: totalCount }, { where: { date } })
+    return Database.recommendations.findAll({ where })
+      .then((results) => {
+        return Database.stats.upsert({ date, [name]: results.length }, { where: { date } })
       })
   }
 }

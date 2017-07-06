@@ -12,18 +12,7 @@ const Boom = require('boom')
 
 const Logger = require('modern-logger')
 
-const { Recommendations } = require('../../databases')
-
-const findById = (channelRecommendationId) => {
-  return Recommendations.findById(channelRecommendationId)
-    .then((recommendation) => {
-      if (!recommendation) {
-        throw new Error()
-      }
-
-      return recommendation
-    })
-}
+const Database = require('../../database')
 
 class GetRecommendation extends Route {
   constructor () {
@@ -33,7 +22,7 @@ class GetRecommendation extends Route {
   handler ({ params = {} }, reply) {
     const { id } = params
 
-    findById(id)
+    Database.recommendations.findById(id)
       .then((recommendation) => reply(recommendation))
       .catch((error) => {
         Logger.error(error)

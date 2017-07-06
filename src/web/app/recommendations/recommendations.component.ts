@@ -36,29 +36,29 @@ export class RecommendationsComponent {
 
   recommendations: any = []
   recommendation: any
-  recommendationProperties = [ 'id', 'name', 'thumbnail_url', 'like', 'is_pass', 'train', 'is_human_decision', 'match', 'photos_similarity_mean' ]
+  recommendationProperties = [ 'id', 'name', 'thumbnailUrl', 'isLike', 'isPass', 'isTrain', 'isHumanDecision', 'isMatch', 'photosSimilarityMean' ]
   dialogRef: MdDialogRef<RecommendationDialogComponent>
   currentPage: number = 1
   itemsPerPage: number = 100
   totalItems: number
 
   channelCriteria: any = [
-    { value: { channel: undefined }, label: 'All' },
-    { value: { channel: 'tinder' }, label: 'Tinder' },
-    { value: { channel: 'happn' }, label: 'Happn' }
+    { value: { channelName: undefined }, label: 'All' },
+    { value: { channelName: 'tinder' }, label: 'Tinder' },
+    { value: { channelName: 'happn' }, label: 'Happn' }
   ]
   actionCriteria: any = [
-    { value: { like: undefined, is_pass: undefined, match: undefined, train: undefined }, label: 'All' },
-    { value: { like: 1, is_pass: undefined, match: undefined, train: undefined }, label: 'Liked' },
-    { value: { like: undefined, is_pass: 1, match: undefined, train: undefined }, label: 'Passed' },
-    { value: { like: 0, is_pass: 0, match: undefined, train: undefined }, label: 'Waiting' },
-    { value: { like: undefined, is_pass: undefined, match: 1, train: undefined }, label: 'Matched' },
-    { value: { like: undefined, is_pass: undefined, match: undefined, train: 1 }, label: 'Trained' }
+    { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'All' },
+    { value: { isLike: true, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'Liked' },
+    { value: { isLike: undefined, isPass: 1, isMatch: undefined, isTrain: undefined }, label: 'Passed' },
+    { value: { isLike: false, isPass: 0, isMatch: undefined, isTrain: undefined }, label: 'Waiting' },
+    { value: { isLike: undefined, isPass: undefined, isMatch: 1, isTrain: undefined }, label: 'Matched' },
+    { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: 1 }, label: 'Trained' }
   ]
   currentCriteria: any = _.assign({}, this.channelCriteria[ 0 ].value, this.actionCriteria[ 0 ].value)
   sorts: any = [
-    { value: 'last_checked_out_date', label: 'Last checked out' },
-    { value: 'checked_out_times', label: 'Number of times checked out' }
+    { value: 'lastCheckedOutDate', label: 'Last checked out' },
+    { value: 'checkedOutTimes', label: 'Number of times checked out' }
   ]
   currentSort: any = this.sorts[ 0 ].value
 

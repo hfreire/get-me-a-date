@@ -90,8 +90,8 @@ class Tinder extends Channel {
       .then(({ results }) => results)
       .mapSeries((result) => {
         return {
-          channel: 'tinder',
-          channel_id: result._id,
+          channelName: 'tinder',
+          channelRecommendationId: result._id,
           name: result.name,
           photos: _.map(result.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
           data: result
@@ -117,7 +117,7 @@ class Tinder extends Channel {
                 return Promise.mapSeries((data.matches), (match) => {
                   if (match.is_new_message) {
                     const channelRecommendationId = match.messages[ 0 ].from === userId ? match.messages[ 0 ].to : match.messages[ 0 ].from
-                    const matchId = match.messages[ 0 ].match_id
+                    const channelMatchId = match.messages[ 0 ].match_id
                     const messages = _.map(match.messages, (message) => {
                       return {
                         channelName: 'tinder',
@@ -131,7 +131,7 @@ class Tinder extends Channel {
 
                     return this.getUser(channelRecommendationId)
                       .then((channelRecommendation) => {
-                        channelRecommendation.match_id = matchId
+                        channelRecommendation.channelMatchId = channelMatchId
 
                         return { recommendation: channelRecommendation, messages }
                       })
@@ -139,11 +139,11 @@ class Tinder extends Channel {
                     return {
                       isNewMatch: true,
                       recommendation: {
-                        channel: 'tinder',
-                        channel_id: match.person._id,
+                        channelName: 'tinder',
+                        channelRecommendationId: match.person._id,
                         name: match.person.name,
                         photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
-                        match_id: match.id,
+                        channelMatchId: match.id,
                         data: match.person
                       },
                       messages: _.map(match.messages, (message) => {
@@ -177,9 +177,9 @@ class Tinder extends Channel {
     })
       .then(() => {
         return Database.channels.find({ where: { name: this._name } })
-          .then(({ is_out_of_likes, out_of_likes_date }) => {
-            if (is_out_of_likes) {
-              if ((_.now() - out_of_likes_date) < 12 * 60 * 60 * 1000) {
+          .then(({ isOutOfLikes, outOfLikesDate }) => {
+            if (isOutOfLikes) {
+              if ((_.now() - outOfLikesDate) < 12 * 60 * 60 * 1000) {
                 throw new OutOfLikesError()
               } else {
                 return Database.channels.update({
@@ -211,8 +211,8 @@ class Tinder extends Channel {
       .then(() => this._tinder.getUser(userId))
       .then(({ results }) => {
         return {
-          channel: 'tinder',
-          channel_id: results._id,
+          channelName: 'tinder',
+          channelRecommendationId: results._id,
           name: results.name,
           photos: _.map(results.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
           data: results

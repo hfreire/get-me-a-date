@@ -30,14 +30,14 @@
                     *ngFor="let recommendation of recommendations | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }; let _index = index">
                 <div class="tint"
                      [ngClass]="{
-                     is_machine_like: recommendation.like && !recommendation.is_human_decision,
-                     is_human_like: recommendation.like && recommendation.is_human_decision,
-                     is_machine_pass: recommendation.is_pass && !recommendation.is_human_decision,
-                     is_human_pass: recommendation.is_pass && recommendation.is_human_decision,
-                     is_match: recommendation.match,
-                     not_decided: !recommendation.like && !recommendation.is_pass}"
+                     isMachineLike: recommendation.isLike && !recommendation.isHumanDecision,
+                     isHumanLike: recommendation.isLike && recommendation.isHumanDecision,
+                     isMachinePass: recommendation.isPass && !recommendation.isHumanDecision,
+                     isHumanPass: recommendation.isPass && recommendation.isHumanDecision,
+                     isMatch: recommendation.isMatch,
+                     notDecided: !recommendation.isLike && !recommendation.isPass}"
                      (click)="openRecommendationDialog(recommendation.id, _index)"
-                     mdTooltip="Similarity: {{recommendation.photos_similarity_mean}}%"
+                     mdTooltip="Similarity: {{recommendation.photosSimilarityMean}}%"
                      tooltipPosition="bottom">
 
                     <img [@fadeInOut]="fadeInState"
@@ -47,7 +47,7 @@
                     <img [@fadeInOut]="fadeOutState"
                          class="thumbnail"
                          alt="image"
-                         [src]="recommendation.thumbnail_url"
+                         [src]="recommendation.thumbnailUrl"
                          onError="this.src = './assets/images/placeholder.jpg'"
                          (load)="isLoaded($event)"/>
                 </div>

@@ -13,7 +13,7 @@ const Promise = require('bluebird')
 const Logger = require('modern-logger')
 
 const { NotAuthorizedError, OutOfLikesError } = require('../channels')
-const { Recommendations } = require('../databases')
+
 const Database = require('../database')
 
 const Taste = require('./taste')
@@ -26,16 +26,16 @@ const likeOrPass = (channel, recommendation, like, pass) => {
   if (like) {
     return Recommendation.like(channel, recommendation)
       .then((recommendation) => {
-        recommendation.is_human_decision = false
-        recommendation.decision_date = new Date()
+        recommendation.isHumanDecision = false
+        recommendation.decisionDate = new Date()
 
         return recommendation
       })
   } else if (pass) {
     return Recommendation.pass(channel, recommendation)
       .then((recommendation) => {
-        recommendation.is_human_decision = false
-        recommendation.decision_date = new Date()
+        recommendation.isHumanDecision = false
+        recommendation.decisionDate = new Date()
 
         return recommendation
       })
@@ -78,7 +78,7 @@ class Dates {
   findByChannel (channel) {
     const checkRecommendations = function (channel) {
       return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} channel`)
-        .then(() => this.checkRecommendations(channel))
+      // .then(() => this.checkRecommendations(channel))
         .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} channel (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
     }
 
@@ -103,7 +103,7 @@ class Dates {
 
         return Logger.debug(`Got ${received} recommendations from ${_.capitalize(channel.name)}`)
           .then(() => Promise.map(channelRecommendations, (channelRecommendation) => {
-            const channelRecommendationId = channelRecommendation.channel_id
+            const { channelRecommendationId } = channelRecommendation
 
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
               .then(({ recommendation, like, pass }) => {
@@ -114,18 +114,20 @@ class Dates {
                     return recommendation
                   })
               })
-              .then((recommendation) => Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation))
-              .then(({ like, photos_similarity_mean, match, name }) => {
-                if (match) {
-                  return Logger.info(`${name} is a :fire:(photos = ${photos_similarity_mean}%)`)
-                } else {
-                  return Logger.info(`${name} got a ${like ? 'like :+1:' : 'pass :-1:'}(photos = ${photos_similarity_mean}%)`)
-                }
+              .then((recommendation) => {
+                return Database.recommendations.upsert(recommendation, { where: { id: recommendation.id } })
+                  .then(() => {
+                    if (recommendation.isMatch) {
+                      return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
+                    } else {
+                      return Logger.info(`${recommendation.name} got a ${recommendation.like ? 'like :+1:' : 'pass :-1:'}(photos = ${recommendation.photosSimilarityMean}%)`)
+                    }
+                  })
               })
               .catch(AlreadyCheckedOutEarlierError, ({ recommendation }) => {
                 skipped++
 
-                return Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation)
+                return Database.recommendations.upsert(recommendation, { where: { id: recommendation.id } })
               })
               .catch((error) => {
                 failed++

@@ -58,12 +58,12 @@
                 md-button
                 md-small
                 color="primary"
-                [disabled]="recommendation.like || recommendation.is_pass"
+                [disabled]="recommendation.isLike || recommendation.isPass"
                 (click)="like()">Like
         </button>
 
         <button md-button
-                [disabled]="recommendation.like || recommendation.is_pass"
+                [disabled]="recommendation.isLike || recommendation.isPass"
                 (click)="pass()">Pass
         </button>
     </md-dialog-actions>

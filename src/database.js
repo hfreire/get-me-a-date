@@ -10,6 +10,8 @@ const Promise = require('bluebird')
 
 const Sequelize = require('sequelize')
 
+const { mkdirAsync, existsSync } = Promise.promisifyAll(require('fs'))
+
 const { join } = require('path')
 
 class Database {
@@ -22,6 +24,61 @@ class Database {
     })
 
     this._models = {
+      recommendations: this._sequelize.define('recommendations', {
+        id: { type: Sequelize.UUID, primaryKey: true, defaultValue: Sequelize.UUIDV4 },
+        channelName: { type: Sequelize.STRING, allowNull: false },
+        channelRecommendationId: { type: Sequelize.INTEGER, allowNull: false },
+        name: { type: Sequelize.STRING, allowNull: true },
+        thumbnailUrl: { type: Sequelize.STRING, defaultValue: null },
+        photos: {
+          type: Sequelize.TEXT,
+          defaultValue: null,
+          get: function () {
+            if (!this.getDataValue('photos')) {
+              return null
+            }
+
+            return JSON.parse(this.getDataValue('photos'))
+          },
+          set: function (value) {
+            if (value === null) {
+              return this.setDataValue('photos', null)
+            }
+
+            this.setDataValue('photos', JSON.stringify(value))
+          }
+        },
+        photosSimilarityMean: { type: Sequelize.FLOAT, defaultValue: null },
+        checkedOutTimes: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
+        lastCheckedOutDate: { type: Sequelize.DATE, defaultValue: null },
+        isLike: { type: Sequelize.BOOLEAN, defaultValue: false },
+        isPass: { type: Sequelize.BOOLEAN, defaultValue: false },
+        decisionDate: { type: Sequelize.DATE, defaultValue: null },
+        isHumanDecision: { type: Sequelize.BOOLEAN, defaultValue: false },
+        isMatch: { type: Sequelize.BOOLEAN, defaultValue: false },
+        channelMatchId: { type: Sequelize.STRING, defaultValue: null },
+        matchedDate: { type: Sequelize.DATE, defaultValue: null },
+        isTrain: { type: Sequelize.BOOLEAN, defaultValue: false },
+        trainedDate: { type: Sequelize.DATE, defaultValue: null },
+        data: {
+          type: Sequelize.TEXT,
+          defaultValue: null,
+          get: function () {
+            if (!this.getDataValue('data')) {
+              return null
+            }
+
+            return JSON.parse(this.getDataValue('data'))
+          },
+          set: function (value) {
+            if (value === null) {
+              return this.setDataValue('data', null)
+            }
+
+            this.setDataValue('data', JSON.stringify(value))
+          }
+        }
+      }),
       stats: this._sequelize.define('stats', {
         date: { type: Sequelize.DATEONLY, primaryKey: true, allowNull: false },
         machineLikes: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
@@ -33,8 +90,8 @@ class Database {
         skips: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false }
       }),
       messages: this._sequelize.define('messages', {
-        channelName: { type: Sequelize.STRING, primaryKey: true, allowNull: false },
-        channelMessageId: { type: Sequelize.BOOLEAN, primaryKey: true, allowNull: false },
+        channelName: { type: Sequelize.STRING, allowNull: false },
+        channelMessageId: { type: Sequelize.BOOLEAN, allowNull: false },
         recommendationId: { type: Sequelize.STRING, allowNull: false },
         isFromRecommendation: { type: Sequelize.BOOLEAN, allowNull: false },
         sentDate: { type: Sequelize.DATE, allowNull: false },
@@ -57,6 +114,10 @@ class Database {
     }
   }
 
+  get recommendations () {
+    return this._models[ 'recommendations' ]
+  }
+
   get stats () {
     return this._models[ 'stats' ]
   }
@@ -74,7 +135,15 @@ class Database {
   }
 
   start () {
-    return this._sequelize.authenticate()
+    return Promise.resolve()
+      .then(() => {
+        const path = join(__dirname, '../../tmp/')
+
+        if (!existsSync(path)) {
+          return mkdirAsync(path)
+        }
+      })
+      .then(() => this._sequelize.authenticate())
       .then(() => {
         return Promise.mapSeries(_.keys(this._models), (modelName) => this._models[ modelName ].sync())
       })

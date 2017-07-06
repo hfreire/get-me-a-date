@@ -9,7 +9,6 @@ const _ = require('lodash')
 const Promise = require('bluebird')
 
 const { Tinder, Happn } = require('../channels')
-const { SQLite } = require('../databases')
 const Database = require('../database')
 
 class Channel {
@@ -22,8 +21,7 @@ class Channel {
 
   bootstrap () {
     const initChannels = () => {
-      return SQLite.start()
-        .then(() => Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init()))
+      return Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init())
     }
 
     const authorizeChannels = () => {

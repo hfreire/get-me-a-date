@@ -13,39 +13,24 @@ const Joi = require('joi')
 const Boom = require('boom')
 
 const { OutOfLikesError } = require('../../channels')
-const { Recommendations } = require('../../databases')
+const Database = require('../../database')
 const { Recommendation, Stats, Channel } = require('../../dates')
 
-const findById = (channelRecommendationId) => {
-  return Recommendations.findById(channelRecommendationId)
-    .then((recommendation) => {
-      if (!recommendation) {
-        throw new Error()
-      }
-
-      return recommendation
-    })
-}
-
 const like = (recommendation) => {
-  const channelName = recommendation.channel
+  const channelName = recommendation.channelName
   const channel = Channel.getByName(channelName)
 
   return Recommendation.like(channel, recommendation)
     .then((recommendation) => {
-      recommendation.is_human_decision = true
-      recommendation.decision_date = new Date()
+      recommendation.isHumanDecision = true
+      recommendation.decisionDate = new Date()
 
       if (recommendation.match) {
-        Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photos_similarity_mean}%)`)
+        Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
       }
 
       return recommendation
     })
-}
-
-const save = (recommendation) => {
-  return Recommendations.save([ recommendation.channel, recommendation.channel_id ], recommendation)
 }
 
 const fallInLove = (recommendation) => {
@@ -64,9 +49,9 @@ class LikeRecommendation extends Route {
   handler ({ params = {} }, reply) {
     const { id } = params
 
-    findById(id)
+    Database.recommendations.findById(id)
       .then((recommendation) => like(recommendation))
-      .then((recommendation) => save(recommendation))
+      .then((recommendation) => Database.recommendations.update(recommendation, { where: { id } }))
       .then((recommendation) => fallInLove(recommendation))
       .then((recommendation) => reply(recommendation))
       .catch(OutOfLikesError, (error) => reply(Boom.tooManyRequests(error.message)))
