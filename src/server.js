@@ -37,7 +37,7 @@ const findDates = function () {
 class Server extends Serverful {
   start () {
     return Promise.all([ super.start(), Database.start() ])
-      .then(() => Dates.bootstrap())
+      .then(() => Dates.start())
       .then(() => {
         if (FIND_DATES_PERIOD > 0) {
           findDates()

@@ -45,8 +45,8 @@ const likeOrPass = (channel, recommendation, like, pass) => {
 }
 
 class Dates {
-  bootstrap () {
-    return Promise.all([ Channel.bootstrap(), Taste.bootstrap() ])
+  start () {
+    return Promise.all([ Channel.start(), Taste.start() ])
   }
 
   find () {

@@ -135,7 +135,7 @@ class Taste {
     })
   }
 
-  bootstrap () {
+  start () {
     return this.createRekognitionCollectionIfNeeded()
       .then(() => this.syncS3BucketAndRekognitionCollection())
   }

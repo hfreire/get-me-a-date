@@ -19,7 +19,7 @@ class Channel {
     }
   }
 
-  bootstrap () {
+  start () {
     const initChannels = () => {
       return Promise.mapSeries(_.keys(this._channels), (name) => this._channels[ name ].init())
     }
