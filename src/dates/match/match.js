@@ -25,7 +25,7 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
         return recommendation
       }
 
-      if (!recommendation.like) {
+      if (!recommendation.isLike) {
         recommendation.isLike = true
         recommendation.isHumanDecision = true
       }

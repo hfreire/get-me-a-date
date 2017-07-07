@@ -115,19 +115,19 @@ class Dates {
                   })
               })
               .then((recommendation) => {
-                return Database.recommendations.upsert(recommendation, { where: { id: recommendation.id } })
+                return recommendation.save()
                   .then(() => {
                     if (recommendation.isMatch) {
                       return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
                     } else {
-                      return Logger.info(`${recommendation.name} got a ${recommendation.like ? 'like :+1:' : 'pass :-1:'}(photos = ${recommendation.photosSimilarityMean}%)`)
+                      return Logger.info(`${recommendation.name} got a ${recommendation.isLike ? 'like :+1:' : 'pass :-1:'}(photos = ${recommendation.photosSimilarityMean}%)`)
                     }
                   })
               })
               .catch(AlreadyCheckedOutEarlierError, ({ recommendation }) => {
                 skipped++
 
-                return Database.recommendations.upsert(recommendation, { where: { id: recommendation.id } })
+                return recommendation.save()
               })
               .catch((error) => {
                 failed++

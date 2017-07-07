@@ -46,7 +46,7 @@ class PassRecommendation extends Route {
 
     Database.recommendations.findById(id)
       .then((recommendation) => pass(recommendation))
-      .then((recommendation) => Database.recommendations.update(recommendation, { where: { id } }))
+      .then((recommendation) => recommendation.save())
       .then((recommendation) => couldDoBetter(recommendation))
       .then((recommendation) => reply(recommendation))
       .catch((error) => {

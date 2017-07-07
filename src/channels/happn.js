@@ -150,7 +150,7 @@ class Happn extends Channel {
             channelName: 'happn',
             channelRecommendationId: data.id,
             name: data.first_name,
-            photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+            photos: _.map(data.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
             data
           }
         }

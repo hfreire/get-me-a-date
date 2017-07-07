@@ -74,7 +74,7 @@ class Recommendation {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    if (recommendation.like) {
+    if (recommendation.isLike) {
       return Promise.reject(new Error('already liked'))
     }
 

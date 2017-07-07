@@ -51,7 +51,7 @@ class LikeRecommendation extends Route {
 
     Database.recommendations.findById(id)
       .then((recommendation) => like(recommendation))
-      .then((recommendation) => Database.recommendations.update(recommendation, { where: { id } }))
+      .then((recommendation) => recommendation.save())
       .then((recommendation) => fallInLove(recommendation))
       .then((recommendation) => reply(recommendation))
       .catch(OutOfLikesError, (error) => reply(Boom.tooManyRequests(error.message)))

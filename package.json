@@ -93,7 +93,7 @@
     "test": "npm run clean && npm run lint && npm run coverage",
     "compile:ts": "./node_modules/.bin/tsc",
     "compile:sass": "./node_modules/.bin/node-sass -o src/web/assets/styles/ src/web/assets/styles/styles.scss",
-    "compile": "npm run compile:ts && npm run compile:sass",
+    "compile": "npm run clean && npm run compile:ts && npm run compile:sass",
     "watch:sass": "./node_modules/.bin/node-sass -w -o src/web/assets/styles/ src/web/assets/styles/styles.scss",
     "semantic-release": "./node_modules/.bin/semantic-release pre && node_modules/.bin/semantic-release post",
     "build": "pushd ./share/docker; NAME=$npm_package_name ./hooks/build; popd",
