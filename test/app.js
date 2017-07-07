@@ -325,4 +325,29 @@ describe('App', () => {
         })
     })
   })
+
+  /*
+   it('do', (done) => {
+   const Database = require('../src/database')
+   const { Taste } = require('../src/dates')
+
+   Database.start()
+   .then(() => Taste.start())
+   .then(() => {
+   return Database.recommendations.findAll({ where: { thumbnailUrl: null } })
+   .mapSeries(({ id, channelName, photos }) => {
+   return Taste.mentalSnapshot(channelName, photos[ 0 ])
+   .catch((error) => {
+   console.error(error)
+   console.log(photos[ 0 ])
+
+   return null
+   })
+   .then((thumbnailUrl) => Database.recommendations.update({ thumbnailUrl }, { where: { id } }))
+   })
+   })
+   .catch((error) => console.error(error))
+   .finally(done)
+   })
+   */
 })

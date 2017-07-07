@@ -5,13 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const _ = require('lodash')
+
 const AWS_REGION = process.env.AWS_REGION
 const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
-const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET
-const AWS_REKOGNITION_COLLECTION = process.env.AWS_REKOGNITION_COLLECTION || 'get-me-a-tinder-date'
+const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || `get-me-a-date-${_.now()}-${_.uniqueId()}`
+const AWS_REKOGNITION_COLLECTION = process.env.AWS_REKOGNITION_COLLECTION || 'get-me-a-date'
 
-const _ = require('lodash')
 const Promise = require('bluebird')
 
 const Logger = require('modern-logger')

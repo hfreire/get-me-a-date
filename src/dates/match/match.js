@@ -31,6 +31,7 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
       }
 
       return Recommendation.setUpMatch(recommendation, match)
+        .then(() => Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`))
     })
     .then((recommendation) => recommendation.save())
 }
@@ -52,11 +53,6 @@ class Match {
           .then((recommendation) => recommendation.save())
           .then((recommendation) => {
             return Promise.resolve()
-              .then(() => {
-                if (match.isNewMatch) {
-                  return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
-                }
-              })
               .then(() => {
                 if (!_.isEmpty(messages)) {
                   return Logger.info(`${recommendation.name} has ${messages.length} :envelope:`)

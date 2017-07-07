@@ -26,7 +26,9 @@ RUN apt-get update &&\
 
 # Install app dependencies
 COPY package.json $HOME
-RUN npm install --production
+RUN npm install
+RUN npm run compile
+RUN npm prune --production
 
 RUN apt-get remove --purge -y build-essential git python &&\
     apt-get autoremove --purge -y

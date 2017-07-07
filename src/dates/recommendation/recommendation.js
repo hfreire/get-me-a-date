@@ -170,22 +170,18 @@ class Recommendation {
   }
 
   setUpMatch (recommendation, match) {
-    if (!recommendation || !match) {
-      throw new Error('invalid arguments')
-    }
+    return Promise.resolve()
+      .then(() => {
+        if (!recommendation || !match) {
+          throw new Error('invalid arguments')
+        }
 
-    recommendation.isMatch = true
-    recommendation.channelMatchId = match.channelMatchId
+        recommendation.isMatch = true
+        recommendation.channelMatchId = match.channelMatchId
+        recommendation.matchedDate = match.matchedDate
 
-    if (match.created_date) {
-      recommendation.matched_date = new Date(match.created_date.replace(/T/, ' ').replace(/\..+/, ''))
-    } else if (match.creation_date) {
-      recommendation.matched_date = new Date(match.creation_date.replace(/T/, ' ').replace(/\..+/, ''))
-    } else {
-      recommendation.matched_date = new Date()
-    }
-
-    return recommendation
+        return recommendation
+      })
   }
 }
 

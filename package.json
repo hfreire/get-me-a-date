@@ -50,7 +50,6 @@
     "sqlite3": "3.1.8",
     "systemjs": "0.20.14",
     "tinder-wrapper": "1.0.3",
-    "uuid": "3.1.0",
     "zone.js": "0.8.12"
   },
   "devDependencies": {
@@ -99,6 +98,6 @@
     "build": "pushd ./share/docker; NAME=$npm_package_name ./hooks/build; popd",
     "push": "pushd ./share/docker; NAME=$npm_package_name ./hooks/push; popd",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "start": "npm run compile && node src/app.js"
+    "start": "node src/app.js"
   }
 }
