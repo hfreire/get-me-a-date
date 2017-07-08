@@ -5,6 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export * from './recommendations.component'
-export * from './recommendation-dialog/recommendation-dialog.component'
-export * from './recommendations.service'
+export * from './recommendation-dialog.component'

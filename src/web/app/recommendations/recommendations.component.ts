@@ -8,7 +8,7 @@
 import { Component } from '@angular/core'
 
 import { RecommendationsService } from './recommendations.service'
-import { RecommendationDialogComponent } from './recommendation-dialog.component'
+import { RecommendationDialogComponent } from './recommendation-dialog/recommendation-dialog.component'
 
 import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
 import { animate, state, style, transition, trigger } from '@angular/animations'
@@ -96,9 +96,10 @@ export class RecommendationsComponent {
     this.currentPage = page
     this.itemsPerPage = limit
 
+    this.recommendations = []
+
     this.recommendationService.getAll(page, limit, criteria, select, sort)
       .subscribe(({ results, meta }) => {
-        this.recommendations = []
         this.recommendations = results
         this.totalItems = meta.totalCount
 
@@ -109,12 +110,12 @@ export class RecommendationsComponent {
   setPageCriterion ({ value }: any) {
     this.currentCriteria = _.assign(this.currentCriteria, value)
 
-    this.getPage(undefined, undefined)
+    this.getPage(0, undefined)
   }
 
   setPageSort ({ value }: any) {
     this.currentSort = value
 
-    this.getPage(undefined, undefined)
+    this.getPage(0, undefined)
   }
 }

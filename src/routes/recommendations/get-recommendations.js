@@ -7,6 +7,7 @@
 
 const { Route } = require('serverful')
 
+const _ = require('lodash')
 const Promise = require('bluebird')
 
 const Joi = require('joi')
@@ -22,20 +23,21 @@ class GetRecommendations extends Route {
   }
 
   handler ({ query = {} }, reply) {
-    const { page = 0, limit = 25, criteria, select, sort } = query
+    const { page = 0, limit = 25, criteria = '{}', select = [], sort } = query
 
     return Promise.try(() => {
       if (criteria) {
         return JSON.parse(criteria)
       }
     })
-      .then((criteria) => Database.recommendations.findAndCountAll({
-        offset: page * limit,
-        limit,
-        attributes: select,
-        where: criteria,
-        order: [ [ sort, 'DESC' ] ]
-      }))
+      .then((criteria) => {
+        const offset = page * limit
+        const attributes = !_.isEmpty(select) ? select : undefined
+        const where = !_.isEmpty(criteria) ? criteria : undefined
+        const order = sort ? [ [ sort, 'DESC' ] ] : undefined
+
+        return Database.recommendations.findAndCountAll({ offset, limit, attributes, where, order })
+      })
       .then(({ rows, count }) => reply({ results: rows, totalCount: count }))
       .catch((error) => {
         Logger.error(error)
