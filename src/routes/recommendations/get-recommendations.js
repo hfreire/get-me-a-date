@@ -23,7 +23,7 @@ class GetRecommendations extends Route {
   }
 
   handler ({ query = {} }, reply) {
-    const { page = 0, limit = 25, criteria = '{}', select = [], sort } = query
+    const { page = 0, limit = 25, criteria = '{}', select = [], sort = 'lastCheckedOutDate' } = query
 
     return Promise.try(() => {
       if (criteria) {

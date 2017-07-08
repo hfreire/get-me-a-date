@@ -7,4 +7,5 @@
 
 export * from './recommendations.component'
 export * from './recommendation-dialog/recommendation-dialog.component'
+export * from './recommendations-criteria/recommendations-criteria.component'
 export * from './recommendations.service'

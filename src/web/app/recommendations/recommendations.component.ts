@@ -5,14 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import * as _ from 'lodash'
+
 import { Component } from '@angular/core'
+import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
+import { animate, state, style, transition, trigger } from '@angular/animations'
 
 import { RecommendationsService } from './recommendations.service'
 import { RecommendationDialogComponent } from './recommendation-dialog/recommendation-dialog.component'
-
-import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
-import { animate, state, style, transition, trigger } from '@angular/animations'
-import * as _ from 'lodash'
 
 @Component({
   selector: 'recommendations',
@@ -36,33 +36,19 @@ export class RecommendationsComponent {
 
   recommendations: any = []
   recommendation: any
-  recommendationProperties = [ 'id', 'name', 'thumbnailUrl', 'isLike', 'isPass', 'isTrain', 'isHumanDecision', 'isMatch', 'photosSimilarityMean' ]
 
   dialogRef: MdDialogRef<RecommendationDialogComponent>
-
-  channelCriteria: any = [
-    { value: { channelName: undefined }, label: 'All' },
-    { value: { channelName: 'tinder' }, label: 'Tinder' },
-    { value: { channelName: 'happn' }, label: 'Happn' }
-  ]
-  actionCriteria: any = [
-    { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'All' },
-    { value: { isLike: true, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'Liked' },
-    { value: { isLike: undefined, isPass: 1, isMatch: undefined, isTrain: undefined }, label: 'Passed' },
-    { value: { isLike: false, isPass: 0, isMatch: undefined, isTrain: undefined }, label: 'Waiting' },
-    { value: { isLike: undefined, isPass: undefined, isMatch: 1, isTrain: undefined }, label: 'Matched' },
-    { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: 1 }, label: 'Trained' }
-  ]
-  currentCriteria: any = _.assign({}, this.channelCriteria[ 0 ].value, this.actionCriteria[ 0 ].value)
-  sorts: any = [
-    { value: 'lastCheckedOutDate', label: 'Last checked out' },
-    { value: 'checkedOutTimes', label: 'Number of times checked out' }
-  ]
-  currentSort: any = this.sorts[ 0 ].value
 
   currentPage: number = 0
   itemsPerPage: number = 100
   totalItems: number
+
+  _criteria: any = {}
+  _select = [
+    'id', 'name', 'thumbnailUrl', 'isLike', 'isPass',
+    'isTrain', 'isHumanDecision', 'isMatch', 'photosSimilarityMean'
+  ]
+  _sort: string = undefined
 
   constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
@@ -85,12 +71,12 @@ export class RecommendationsComponent {
         this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
         this.dialogRef.afterClosed()
           .subscribe(() => {
-            this.recommendations[ index ] = _.pick(config.data.recommendation, this.recommendationProperties)
+            this.recommendations[ index ] = _.pick(config.data.recommendation, this._select)
           })
       })
   }
 
-  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = this.recommendationProperties, sort: string = this.currentSort) {
+  getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this._criteria, select: any = this._select, sort: string = this._sort) {
     this.loadedPage = false
 
     this.currentPage = page
@@ -107,15 +93,15 @@ export class RecommendationsComponent {
       })
   }
 
-  setPageCriterion ({ value }: any) {
-    this.currentCriteria = _.assign(this.currentCriteria, value)
+  onCriteriaChange (criteria: any) {
+    this._criteria = criteria
 
-    this.getPage(0, undefined)
+    this.getPage(undefined, undefined, this._criteria)
   }
 
-  setPageSort ({ value }: any) {
-    this.currentSort = value
+  onSortChange (sort: any) {
+    this._sort = sort
 
-    this.getPage(0, undefined)
+    this.getPage(undefined, undefined, undefined, undefined, this._sort)
   }
 }

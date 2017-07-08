@@ -104,7 +104,7 @@ class Database {
         accessToken: { type: Sequelize.TEXT, defaultValue: null },
         lastActivityDate: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.NOW },
         isOutOfLikes: { type: Sequelize.BOOLEAN, defaultValue: false },
-        isOutOfLikesDate: { type: Sequelize.DATE, defaultValue: null }
+        outOfLikesDate: { type: Sequelize.DATE, defaultValue: null }
       }),
       settings: this._sequelize.define('settings', {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

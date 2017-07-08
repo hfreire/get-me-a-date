@@ -179,7 +179,7 @@ class Tinder extends Channel {
         return Database.channels.find({ where: { name: this._name } })
           .then(({ isOutOfLikes, outOfLikesDate }) => {
             if (isOutOfLikes) {
-              if ((_.now() - outOfLikesDate) < 12 * 60 * 60 * 1000) {
+              if ((_.now() - outOfLikesDate.getTime()) < 12 * 60 * 60 * 1000) {
                 throw new OutOfLikesError()
               } else {
                 return Database.channels.update({

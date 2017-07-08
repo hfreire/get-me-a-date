@@ -20,7 +20,7 @@ export class RecommendationsService {
   getAll (page: number = 0, limit: number = 25, criteria?: any, select?: any, sort?: string): Observable<any> {
     const _criteria = criteria ? `&criteria=${JSON.stringify(criteria)}` : ''
     const _select = _.reduce(select, (a, s) => `${a}&select=${s}`, '')
-    const _sort = sort = `&sort=${sort}`
+    const _sort = sort ? `&sort=${sort}` : ''
 
     return this.http.get(`/recommendations?page=${page}&limit=${limit}${_criteria}${_select}${_sort}`)
       .retryWhen((error: any) => error.delay(500))

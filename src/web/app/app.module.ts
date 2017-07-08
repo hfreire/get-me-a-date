@@ -33,7 +33,11 @@ import { MomentModule } from 'angular2-moment'
 import { ChartsModule } from 'ng2-charts'
 
 import { AppComponent } from './app.component'
-import { RecommendationDialogComponent, RecommendationsComponent } from './recommendations'
+import {
+  RecommendationDialogComponent,
+  RecommendationsComponent,
+  RecommendationsCriteriaComponent
+} from './recommendations'
 import { ChannelsComponent } from './channels'
 import { SettingsComponent } from './settings'
 import { StatsComponent } from './stats'
@@ -63,8 +67,8 @@ import { CapitalizePipe } from './capitalize.pipe'
     MdPaginatorModule,
     ChartsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
-  entryComponents: [ RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
+  declarations: [ AppComponent, CapitalizePipe, RecommendationsCriteriaComponent, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
+  entryComponents: [ RecommendationsCriteriaComponent, RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

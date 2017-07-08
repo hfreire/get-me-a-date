@@ -91,7 +91,7 @@ class Channel {
           isOutOfLikes: true,
           outOfLikesDate: new Date()
         }, { where: { name: this._name } })
-          .then(() => {
+          .then((d) => {
             throw new OutOfLikesError()
           })
       })

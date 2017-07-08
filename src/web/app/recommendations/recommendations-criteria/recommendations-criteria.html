@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<md-select id="filter" placeholder="Channel" (change)="setPageCriterion($event)">
+  <md-option *ngFor="let channelCriterion of availableChannelCriteria" [value]="channelCriterion.value">
+    {{ channelCriterion.label }}
+  </md-option>
+</md-select>
+
+<md-select id="filter" placeholder="Action" (change)="setPageCriterion($event)">
+  <md-option *ngFor="let actionCriterion of availableActionCriteria" [value]="actionCriterion.value">
+    {{ actionCriterion.label }}
+  </md-option>
+</md-select>
+
+<md-select id="sort" placeholder="Sort" (change)="setPageSort($event)">
+  <md-option *ngFor="let sort of availableSorts" [value]="sort.value">
+    {{ sort.label }}
+  </md-option>
+</md-select>
