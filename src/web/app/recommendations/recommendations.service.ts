@@ -35,13 +35,6 @@ export class RecommendationsService {
       .map((response) => response.json())
   }
 
-  streamAll (page: number = 1, limit: number = 25, criteria?: any, select?: any, sort?: string): Observable<any> {
-    return Observable
-      .interval(5000)
-      .startWith(0)
-      .switchMap(() => this.getAll(page, limit, criteria, select, sort))
-  }
-
   like (id: string) {
     return this.http.post(`/recommendations/${id}/like`, {})
       .map((response) => response.json())
