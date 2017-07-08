@@ -37,10 +37,8 @@ export class RecommendationsComponent {
   recommendations: any = []
   recommendation: any
   recommendationProperties = [ 'id', 'name', 'thumbnailUrl', 'isLike', 'isPass', 'isTrain', 'isHumanDecision', 'isMatch', 'photosSimilarityMean' ]
+
   dialogRef: MdDialogRef<RecommendationDialogComponent>
-  currentPage: number = 1
-  itemsPerPage: number = 100
-  totalItems: number
 
   channelCriteria: any = [
     { value: { channelName: undefined }, label: 'All' },
@@ -61,6 +59,10 @@ export class RecommendationsComponent {
     { value: 'checkedOutTimes', label: 'Number of times checked out' }
   ]
   currentSort: any = this.sorts[ 0 ].value
+
+  currentPage: number = 0
+  itemsPerPage: number = 100
+  totalItems: number
 
   constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
@@ -91,9 +93,12 @@ export class RecommendationsComponent {
   getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this.currentCriteria, select: any = this.recommendationProperties, sort: string = this.currentSort) {
     this.loadedPage = false
 
+    this.currentPage = page
+    this.itemsPerPage = limit
+
     this.recommendationService.getAll(page, limit, criteria, select, sort)
       .subscribe(({ results, meta }) => {
-        this.currentPage = page
+        this.recommendations = []
         this.recommendations = results
         this.totalItems = meta.totalCount
 

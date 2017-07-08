@@ -6,6 +6,7 @@
   -->
 
 <div id="recommendations">
+
     <md-card>
         <md-select id="filter" placeholder="Channel" (change)="setPageCriterion($event)">
             <md-option *ngFor="let channelCriterion of channelCriteria" [value]="channelCriterion.value">
@@ -26,8 +27,9 @@
         </md-select>
 
         <md-grid-list cols="{{ itemsPerPage / 4 }}">
-            <md-grid-tile
-                    *ngFor="let recommendation of recommendations | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }; let _index = index">
+
+            <md-grid-tile *ngFor="let recommendation of recommendations; let _index = index">
+
                 <div class="tint"
                      [ngClass]="{
                      isMachineLike: recommendation.isLike && !recommendation.isHumanDecision,
@@ -54,6 +56,11 @@
             </md-grid-tile>
         </md-grid-list>
 
-        <pagination-controls (pageChange)="getPage($event)"></pagination-controls>
+        <md-paginator
+                [length]="totalItems"
+                [pageSize]="itemsPerPage"
+                (page)="getPage($event.pageIndex, $event.pageSize)"
+        >
+        </md-paginator>
     </md-card>
 </div>

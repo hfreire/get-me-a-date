@@ -22,7 +22,7 @@ class GetRecommendations extends Route {
   }
 
   handler ({ query = {} }, reply) {
-    const { page = 1, limit = 25, criteria, select, sort } = query
+    const { page = 0, limit = 25, criteria, select, sort } = query
 
     return Promise.try(() => {
       if (criteria) {
@@ -30,7 +30,7 @@ class GetRecommendations extends Route {
       }
     })
       .then((criteria) => Database.recommendations.findAndCountAll({
-        offset: (page - 1) * limit,
+        offset: page * limit,
         limit,
         attributes: select,
         where: criteria,

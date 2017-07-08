@@ -19,6 +19,7 @@ import {
   MdIconModule,
   MdInputModule,
   MdMenuModule,
+  MdPaginatorModule,
   MdProgressSpinnerModule,
   MdSelectModule,
   MdSidenavModule,
@@ -29,7 +30,6 @@ import {
 } from '@angular/material'
 
 import { MomentModule } from 'angular2-moment'
-import { NgxPaginationModule } from 'ngx-pagination'
 import { ChartsModule } from 'ng2-charts'
 
 import { AppComponent } from './app.component'
@@ -55,12 +55,12 @@ import { CapitalizePipe } from './capitalize.pipe'
     MomentModule,
     MdIconModule,
     MdSlideToggleModule,
-    NgxPaginationModule,
     MdSelectModule,
     MdMenuModule,
     MdCheckboxModule,
     MdInputModule,
     MdSliderModule,
+    MdPaginatorModule,
     ChartsModule
   ],
   declarations: [ AppComponent, CapitalizePipe, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
