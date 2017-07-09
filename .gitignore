@@ -7,4 +7,3 @@ src/web/**/*.js.map
 src/web/**/*.css
 tmp
 share/rancher/docker-compose.yml
-

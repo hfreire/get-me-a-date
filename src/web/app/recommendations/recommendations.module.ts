@@ -14,6 +14,7 @@ import {
   MdIconModule,
   MdMenuModule,
   MdPaginatorModule,
+  MdProgressSpinnerModule,
   MdSelectModule,
   MdTooltipModule
 } from '@angular/material'
@@ -36,6 +37,7 @@ import { RecommendationsListComponent } from './recommendations-list'
     MdSelectModule,
     MdButtonModule,
     MdIconModule,
+    MdProgressSpinnerModule,
     MomentModule
   ],
   declarations: [
