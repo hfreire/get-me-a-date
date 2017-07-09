@@ -51,15 +51,19 @@ System.config({
       main: './index.js',
       defaultExtension: 'js'
     },
-    'app/recommendations/recommendation-dialog': {
-      main: './index.js',
-      defaultExtension: 'js'
-    },
     'app/recommendations/recommendations-criteria': {
       main: './index.js',
       defaultExtension: 'js'
     },
     'app/recommendations/recommendations-list': {
+      main: './index.js',
+      defaultExtension: 'js'
+    },
+    'app/recommendations/recommendations-list/recommendation-tile': {
+      main: './index.js',
+      defaultExtension: 'js'
+    },
+    'app/recommendations/recommendations-list/recommendation-dialog': {
       main: './index.js',
       defaultExtension: 'js'
     },

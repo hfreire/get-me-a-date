@@ -5,13 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import * as _ from 'lodash'
-
 import { Component } from '@angular/core'
-import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
+import { MdDialog } from '@angular/material'
 
 import { RecommendationsService } from './recommendations.service'
-import { RecommendationDialogComponent } from './recommendation-dialog/recommendation-dialog.component'
 
 @Component({
   selector: 'recommendations',
@@ -27,7 +24,6 @@ export class RecommendationsComponent {
   _sort: string = undefined
 
   recommendations: any = []
-  dialogRef: MdDialogRef<RecommendationDialogComponent>
 
   loadedPage = false
   currentPage: number = 0
@@ -45,8 +41,6 @@ export class RecommendationsComponent {
 
     this.currentPage = page
     this.itemsPerPage = limit
-
-    this.recommendations = []
 
     this.recommendationService.getAll(page, limit, criteria, select, sort)
       .subscribe(({ results, meta }) => {
@@ -67,20 +61,5 @@ export class RecommendationsComponent {
     this._sort = sort
 
     this.getPage(0, undefined, undefined, undefined, this._sort)
-  }
-
-  onRecommendationsListClick (event: any) {
-    this.recommendationService.getById(event.id)
-      .subscribe((recommendation) => {
-        const config = new MdDialogConfig()
-        config.width = '450px'
-        config.data = { recommendation }
-
-        this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
-        this.dialogRef.afterClosed()
-          .subscribe(() => {
-            this.recommendations[ event.index ] = _.pick(config.data.recommendation, this._select)
-          })
-      })
   }
 }

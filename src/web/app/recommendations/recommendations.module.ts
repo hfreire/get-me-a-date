@@ -14,6 +14,7 @@ import {
   MdIconModule,
   MdMenuModule,
   MdPaginatorModule,
+  MdProgressBarModule,
   MdProgressSpinnerModule,
   MdSelectModule,
   MdTooltipModule
@@ -22,29 +23,34 @@ import { MomentModule } from 'angular2-moment'
 
 import { RecommendationsComponent } from './recommendations.component'
 import { RecommendationsService } from './recommendations.service'
-import { RecommendationDialogComponent } from './recommendation-dialog'
 import { RecommendationsCriteriaComponent } from './recommendations-criteria'
-import { RecommendationsListComponent } from './recommendations-list'
+import {
+  RecommendationDialogComponent,
+  RecommendationsListComponent,
+  RecommendationTileComponent
+} from './recommendations-list'
 
 @NgModule({
   imports: [
     CommonModule,
-    MdGridListModule,
-    MdCardModule,
-    MdTooltipModule,
-    MdPaginatorModule,
-    MdMenuModule,
-    MdSelectModule,
     MdButtonModule,
+    MdCardModule,
+    MdGridListModule,
     MdIconModule,
+    MdMenuModule,
+    MdPaginatorModule,
+    MdSelectModule,
+    MdTooltipModule,
     MdProgressSpinnerModule,
+    MdProgressBarModule,
     MomentModule
   ],
   declarations: [
     RecommendationsComponent,
     RecommendationDialogComponent,
     RecommendationsCriteriaComponent,
-    RecommendationsListComponent
+    RecommendationsListComponent,
+    RecommendationTileComponent
   ],
   entryComponents: [
     RecommendationDialogComponent

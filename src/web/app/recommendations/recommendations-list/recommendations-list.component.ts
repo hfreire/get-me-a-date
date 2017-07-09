@@ -5,23 +5,20 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import * as _ from 'lodash'
+
+import { Component, Input } from '@angular/core'
+import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import 'rxjs/add/operator/takeWhile'
-import { animate, state, style, transition, trigger } from '@angular/animations'
+
+import { RecommendationDialogComponent } from './recommendation-dialog'
+import { RecommendationsService } from '../recommendations.service'
 
 @Component({
   selector: 'recommendations-list',
   templateUrl: '/app/recommendations/recommendations-list/recommendations-list.html',
-  animations: [
-    trigger('fadeInOut', [
-      state('in', style({ opacity: 1, visibility: 'visible' })),
-      state('out', style({ opacity: 0, visibility: 'hidden' })),
-      transition('in <=> out', [
-        animate('1s ease-out')
-      ])
-    ])
-  ]
+  providers: [ RecommendationsService ]
 })
 export class RecommendationsListComponent {
   @Input()
@@ -33,22 +30,13 @@ export class RecommendationsListComponent {
     return this._data.getValue()
   }
 
-  @Input()
-  loaded: boolean = false
-
-  @Output()
-  click: EventEmitter<any> = new EventEmitter<any>()
+  recommendationDialog: MdDialogRef<RecommendationDialogComponent>
 
   recommendations: any = []
-  fadeInState = 'in'
-  fadeOutState = 'out'
 
   private _data = new BehaviorSubject<any>([])
 
-  public isLoaded (event: Event) {
-    this.fadeInState = 'out'
-    this.fadeOutState = 'in'
-  }
+  constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
   ngOnInit () {
     this._data
@@ -58,6 +46,17 @@ export class RecommendationsListComponent {
   }
 
   onRecommendationClick (id: string, index: number) {
-    this.click.emit({ id, index })
+    this.recommendationService.getById(id)
+      .subscribe((recommendation) => {
+        const config = new MdDialogConfig()
+        config.width = '450px'
+        config.data = { recommendation }
+
+        this.recommendationDialog = this.dialog.open(RecommendationDialogComponent, config)
+        this.recommendationDialog.afterClosed()
+          .subscribe(() => {
+            this.recommendations[ index ] = _.pick(config.data.recommendation, _.keys(this.recommendations[ index ]))
+          })
+      })
   }
 }

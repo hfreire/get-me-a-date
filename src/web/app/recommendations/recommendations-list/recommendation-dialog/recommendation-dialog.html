@@ -6,10 +6,13 @@
   -->
 
 <div id="recommendation-dialog">
+
     <div md-dialog-title>
         <h2>{{ recommendation.name }}, {{ age || (today | amDifference :
-            recommendation.data.birth_date :'years' || recommendation.data.notifier.age) }}</h2>
-        <div>
+          recommendation.data.birth_date :'years' || recommendation.data.notifier.age) }}
+        </h2>
+
+      <div>
             <button md-icon-button [mdMenuTriggerFor]="menu">
                 <md-icon>more_vert</md-icon>
             </button>

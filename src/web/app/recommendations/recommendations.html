@@ -6,17 +6,14 @@
   -->
 
 <div id="recommendations">
+  <md-progress-bar [mode]="loadedPage ? 'determinate' : 'indeterminate'"></md-progress-bar>
 
   <md-card>
+
     <recommendations-criteria (criteria)="onCriteriaChange($event)"
                               (sort)="onSortChange($event)"></recommendations-criteria>
 
-    <recommendations-list
-      [data]="recommendations"
-      [loaded]="loadedPage"
-      (click)="onRecommendationsListClick($event)"
-    >
-    </recommendations-list>
+    <recommendations-list [data]="recommendations"></recommendations-list>
 
     <md-paginator
       [pageIndex]="currentPage"

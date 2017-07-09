@@ -37,6 +37,10 @@ body {
   color: #cacaca;
 }
 
+.mat-progress-bar-buffer {
+  background-color: rgba(66, 66, 66, 1);
+}
+
 #channels {
   md-slide-toggle {
     margin-bottom: 10px;
@@ -139,7 +143,7 @@ body {
 }
 
 #recommendation-dialog {
-  .mat-dialog-title {
+  [md-dialog-title] {
     display: flex;
     align-items: center;
     margin-bottom: 0;
