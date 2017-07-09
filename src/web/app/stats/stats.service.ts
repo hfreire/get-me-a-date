@@ -8,9 +8,6 @@
 import { Injectable } from '@angular/core'
 import { Http } from '@angular/http'
 import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/operator/retryWhen'
-import 'rxjs/add/operator/timeout'
-import 'rxjs/add/observable/interval'
 
 @Injectable()
 export class StatsService {
@@ -21,12 +18,5 @@ export class StatsService {
       .retryWhen((error: any) => error.delay(500))
       .timeout(2000)
       .map((response) => response.json())
-  }
-
-  streamAll (page: number, limit: number): Observable<any> {
-    return Observable
-      .interval(5000)
-      .startWith(0)
-      .switchMap(() => this.getAll(page, limit))
   }
 }

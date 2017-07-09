@@ -24,11 +24,6 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   ]
 })
 export class RecommendationsListComponent {
-  private _data = new BehaviorSubject<any>([])
-  recommendations: any = []
-  fadeInState = 'in'
-  fadeOutState = 'out'
-
   @Input()
   set data (value) {
     this._data.next(value)
@@ -43,6 +38,12 @@ export class RecommendationsListComponent {
 
   @Output()
   click: EventEmitter<any> = new EventEmitter<any>()
+
+  recommendations: any = []
+  fadeInState = 'in'
+  fadeOutState = 'out'
+
+  private _data = new BehaviorSubject<any>([])
 
   public isLoaded (event: Event) {
     this.fadeInState = 'out'
