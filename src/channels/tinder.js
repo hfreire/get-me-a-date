@@ -26,6 +26,8 @@ const Channel = require('./channel')
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const moment = require('moment')
+
 const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
@@ -179,7 +181,7 @@ class Tinder extends Channel {
         return Database.channels.find({ where: { name: this._name } })
           .then(({ isOutOfLikes, outOfLikesDate }) => {
             if (isOutOfLikes) {
-              if ((_.now() - outOfLikesDate.getTime()) < 12 * 60 * 60 * 1000) {
+              if (moment().isBefore(moment(outOfLikesDate).add(12, 'hour'))) {
                 throw new OutOfLikesError()
               } else {
                 return Database.channels.update({

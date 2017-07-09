@@ -106,28 +106,32 @@ class Dates {
             const { channelRecommendationId } = channelRecommendation
 
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
-              .then(({ recommendation, like, pass }) => {
-                return likeOrPass(channel, recommendation, like, pass)
-                  .catch(OutOfLikesError, () => {
-                    skipped++
-
-                    return recommendation
-                  })
-              })
+              .then(({ recommendation, like, pass }) => likeOrPass(channel, recommendation, like, pass))
               .then((recommendation) => {
                 return recommendation.save()
                   .then(() => {
                     if (recommendation.isMatch) {
                       return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
-                    } else {
-                      return Logger.info(`${recommendation.name} got a ${recommendation.isLike ? 'like :+1:' : 'pass :-1:'}(photos = ${recommendation.photosSimilarityMean}%)`)
                     }
+
+                    if (recommendation.isLike) {
+                      return Logger.info(`${recommendation.name} got a like :+1:(photos = ${recommendation.photosSimilarityMean}%)`)
+                    }
+
+                    if (recommendation.isPass) {
+                      return Logger.info(`${recommendation.name} got a pass :-1:(photos = ${recommendation.photosSimilarityMean}%)`)
+                    }
+
+                    return Logger.info(`${recommendation.name} has to wait :raised_hand:(photos = ${recommendation.photosSimilarityMean}%)`)
                   })
               })
               .catch(AlreadyCheckedOutEarlierError, ({ recommendation }) => {
                 skipped++
 
                 return recommendation.save()
+              })
+              .catch(OutOfLikesError, () => {
+                skipped++
               })
               .catch((error) => {
                 failed++

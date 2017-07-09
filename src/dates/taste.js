@@ -65,6 +65,15 @@ const indexFacesFromImages = function (images) {
     .then(() => indexedFaces)
 }
 
+const checkPhotoOut = function (channelName, photo) {
+  if (photo.similarity_date) {
+    return photo.similarity // do not s3 and rekognition photos that have already been checked out
+  }
+
+  return savePhoto.bind(this)(channelName, photo)
+    .then((image) => compareFacesFromImage.bind(this)(photo, image))
+}
+
 const savePhoto = function (channelName, photo, options = {}) {
   if (!channelName || !photo) {
     return Promise.reject(new Error('invalid arguments'))
@@ -210,16 +219,9 @@ class Taste {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const photosToCompare = _.filter(photos, (photo) => !photo.similarity_date)
+    const notCheckedOutPhotos = _.filter(photos, (photo) => !photo.similarity_date)
 
-    return Promise.map(photosToCompare, (photo) => {
-      if (photo.similarity_date) {
-        return photo.similarity // do not s3 and rekognition photos that have already been checked out
-      }
-
-      return savePhoto.bind(this)(channelName, photo)
-        .then((image) => compareFacesFromImage.bind(this)(photo, image))
-    }, { concurrency: 2 })
+    return Promise.map(photos, (photo) => checkPhotoOut.bind(this)(channelName, photo), { concurrency: 2 })
       .then((faceSimilarities) => {
         const faceSimilarityMax = _.max(faceSimilarities)
         const faceSimilarityMin = _.min(faceSimilarities)
@@ -229,7 +231,12 @@ class Taste {
           .then((settings) => {
             const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > settings.likePhotosThreshold
 
-            return Logger.debug(`Compared ${photosToCompare.length} photo(s)`)
+            return Promise.resolve()
+              .then(() => {
+                if (!_.isEmpty(notCheckedOutPhotos)) {
+                  return Logger.debug(`Compared ${notCheckedOutPhotos.length} photo(s)`)
+                }
+              })
               .then(() => {
                 return {
                   faceSimilarities,
