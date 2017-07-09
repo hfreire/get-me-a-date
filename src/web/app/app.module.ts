@@ -18,26 +18,16 @@ import {
   MdGridListModule,
   MdIconModule,
   MdInputModule,
-  MdMenuModule,
-  MdPaginatorModule,
   MdProgressSpinnerModule,
-  MdSelectModule,
   MdSidenavModule,
   MdSliderModule,
   MdSlideToggleModule,
-  MdToolbarModule,
-  MdTooltipModule
+  MdToolbarModule
 } from '@angular/material'
-
-import { MomentModule } from 'angular2-moment'
 import { ChartsModule } from 'ng2-charts'
+import { RecommendationsModule } from './recommendations'
 
 import { AppComponent } from './app.component'
-import {
-  RecommendationDialogComponent,
-  RecommendationsComponent,
-  RecommendationsCriteriaComponent
-} from './recommendations'
 import { ChannelsComponent } from './channels'
 import { SettingsComponent } from './settings'
 import { StatsComponent } from './stats'
@@ -49,26 +39,22 @@ import { CapitalizePipe } from './capitalize.pipe'
     HttpModule,
     NoopAnimationsModule,
     MdDialogModule,
-    MdTooltipModule,
-    MdButtonModule,
     MdGridListModule,
     MdToolbarModule,
     MdProgressSpinnerModule,
     MdSidenavModule,
     MdCardModule,
-    MomentModule,
-    MdIconModule,
     MdSlideToggleModule,
-    MdSelectModule,
-    MdMenuModule,
     MdCheckboxModule,
     MdInputModule,
     MdSliderModule,
-    MdPaginatorModule,
-    ChartsModule
+    MdButtonModule,
+    MdIconModule,
+    ChartsModule,
+    RecommendationsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, RecommendationsCriteriaComponent, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
-  entryComponents: [ RecommendationsCriteriaComponent, RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
+  declarations: [ AppComponent, CapitalizePipe, ChannelsComponent, SettingsComponent, StatsComponent ],
+  entryComponents: [ ChannelsComponent, SettingsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

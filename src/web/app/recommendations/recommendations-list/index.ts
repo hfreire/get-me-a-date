@@ -5,4 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export * from './recommendations.module'
+export * from './recommendations-list.component'
