@@ -9,7 +9,6 @@ import * as _ from 'lodash'
 
 import { Component } from '@angular/core'
 import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material'
-import { animate, state, style, transition, trigger } from '@angular/animations'
 
 import { RecommendationsService } from './recommendations.service'
 import { RecommendationDialogComponent } from './recommendation-dialog/recommendation-dialog.component'
@@ -17,32 +16,9 @@ import { RecommendationDialogComponent } from './recommendation-dialog/recommend
 @Component({
   selector: 'recommendations',
   templateUrl: '/app/recommendations/recommendations.html',
-  providers: [ RecommendationsService ],
-  animations: [
-    trigger('fadeInOut', [
-      state('in', style({ opacity: 1, visibility: 'visible' })),
-      state('out', style({ opacity: 0, visibility: 'hidden' })),
-      transition('in <=> out', [
-        animate('1s ease-out')
-      ])
-    ])
-  ]
+  providers: [ RecommendationsService ]
 })
 export class RecommendationsComponent {
-  loadedPage = false
-
-  fadeInState = 'in'
-  fadeOutState = 'out'
-
-  recommendations: any = []
-  recommendation: any
-
-  dialogRef: MdDialogRef<RecommendationDialogComponent>
-
-  currentPage: number = 0
-  itemsPerPage: number = 100
-  totalItems: number
-
   _criteria: any = {}
   _select = [
     'id', 'name', 'thumbnailUrl', 'isLike', 'isPass',
@@ -50,30 +26,18 @@ export class RecommendationsComponent {
   ]
   _sort: string = undefined
 
+  recommendations: any = []
+  dialogRef: MdDialogRef<RecommendationDialogComponent>
+
+  loadedPage = false
+  currentPage: number = 0
+  itemsPerPage: number = 100
+  totalItems: number
+
   constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
 
   public ngOnInit () {
     this.getPage()
-  }
-
-  public isLoaded (event: Event) {
-    this.fadeInState = 'out'
-    this.fadeOutState = 'in'
-  }
-
-  openRecommendationDialog (recommendationId: string, index: number) {
-    this.recommendationService.getById(recommendationId)
-      .subscribe((recommendation) => {
-        const config = new MdDialogConfig()
-        config.width = '450px'
-        config.data = { recommendation }
-
-        this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
-        this.dialogRef.afterClosed()
-          .subscribe(() => {
-            this.recommendations[ index ] = _.pick(config.data.recommendation, this._select)
-          })
-      })
   }
 
   getPage (page: number = this.currentPage, limit: number = this.itemsPerPage, criteria: any = this._criteria, select: any = this._select, sort: string = this._sort) {
@@ -96,12 +60,27 @@ export class RecommendationsComponent {
   onCriteriaChange (criteria: any) {
     this._criteria = criteria
 
-    this.getPage(undefined, undefined, this._criteria)
+    this.getPage(0, undefined, this._criteria)
   }
 
   onSortChange (sort: any) {
     this._sort = sort
 
-    this.getPage(undefined, undefined, undefined, undefined, this._sort)
+    this.getPage(0, undefined, undefined, undefined, this._sort)
+  }
+
+  onRecommendationsListClick (event: any) {
+    this.recommendationService.getById(event.id)
+      .subscribe((recommendation) => {
+        const config = new MdDialogConfig()
+        config.width = '450px'
+        config.data = { recommendation }
+
+        this.dialogRef = this.dialog.open(RecommendationDialogComponent, config)
+        this.dialogRef.afterClosed()
+          .subscribe(() => {
+            this.recommendations[ event.index ] = _.pick(config.data.recommendation, this._select)
+          })
+      })
   }
 }
