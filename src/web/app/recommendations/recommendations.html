@@ -13,7 +13,7 @@
     <recommendations-criteria (criteria)="onCriteriaChange($event)"
                               (sort)="onSortChange($event)"></recommendations-criteria>
 
-    <recommendations-list [data]="recommendations"></recommendations-list>
+    <recommendations-list [recommendations]="recommendations"></recommendations-list>
 
     <md-paginator
       [pageIndex]="currentPage"

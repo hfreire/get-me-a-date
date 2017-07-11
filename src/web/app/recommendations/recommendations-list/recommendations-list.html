@@ -9,7 +9,7 @@
 
   <md-grid-list cols="{{ 100 / 4 }}">
 
-    <md-grid-tile *ngFor="let recommendation of recommendations; let _index = index">
+    <md-grid-tile *ngFor="let recommendation of recommendations | async; let _index = index">
       <recommendation-tile [recommendation]="recommendation"
                            (click)="onRecommendationClick($event, _index)"></recommendation-tile>
     </md-grid-tile>
