@@ -5,12 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import _ = require('lodash')
+
 import { Injectable } from '@angular/core'
 import { Http } from '@angular/http'
+
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/retryWhen'
 import 'rxjs/add/operator/timeout'
-import _ = require('lodash')
 
 @Injectable()
 export class RecommendationsService {
