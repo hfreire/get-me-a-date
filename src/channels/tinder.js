@@ -196,6 +196,10 @@ class Tinder extends Channel {
       .then(() => {
         return this._tinder.like(userId, photoId, contentHash, sNumber)
           .then(({ match }) => {
+            if (!match) {
+              return
+            }
+
             return {
               channelName: 'tinder',
               channelRecommendationId: match.person._id,
