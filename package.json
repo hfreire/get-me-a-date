@@ -50,7 +50,7 @@
     "sqlite3": "3.1.8",
     "systemjs": "0.20.15",
     "tinder-wrapper": "1.0.3",
-    "zone.js": "0.8.12"
+    "zone.js": "0.8.13"
   },
   "devDependencies": {
     "chai": "4.1.0",
