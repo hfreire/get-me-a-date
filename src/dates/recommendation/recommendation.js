@@ -105,7 +105,6 @@ class Recommendation {
 
         return this.setUpMatch(recommendation, match)
       })
-      .then((recommendation) => recommendation)
   }
 
   pass (channel, recommendation) {

@@ -11,7 +11,7 @@
         <md-list>
             <md-list-item *ngFor="let channel of channels">
                 <md-slide-toggle [checked]="channel.isEnabled" (change)="toggleChannel(channel)" color="primary">{{
-                    channel.name | capitalize }}
+                  channel.name | titlecase }}
                 </md-slide-toggle>
             </md-list-item>
         </md-list>

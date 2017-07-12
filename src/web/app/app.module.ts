@@ -31,7 +31,6 @@ import { AppComponent } from './app.component'
 import { ChannelsComponent } from './channels'
 import { SettingsComponent } from './settings'
 import { StatsComponent } from './stats'
-import { CapitalizePipe } from './capitalize.pipe'
 
 @NgModule({
   imports: [
@@ -53,7 +52,7 @@ import { CapitalizePipe } from './capitalize.pipe'
     ChartsModule,
     RecommendationsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, ChannelsComponent, SettingsComponent, StatsComponent ],
+  declarations: [ AppComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
   entryComponents: [ ChannelsComponent, SettingsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
