@@ -24,7 +24,7 @@
     "@angular/platform-browser": "4.2.6",
     "@angular/platform-browser-dynamic": "4.2.6",
     "@angular/router": "4.2.6",
-    "@types/lodash": "4.14.68",
+    "@types/lodash": "4.14.69",
     "angular-in-memory-web-api": "0.3.2",
     "angular2-moment": "1.4.0",
     "aws-sdk": "2.84.0",
