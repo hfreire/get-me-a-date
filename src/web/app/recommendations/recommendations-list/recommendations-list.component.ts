@@ -17,7 +17,7 @@ import { RecommendationsService } from '../recommendations.service'
 
 @Component({
   selector: 'recommendations-list',
-  templateUrl: '/app/recommendations/recommendations-list/recommendations-list.html',
+  templateUrl: 'recommendations-list.html',
   providers: [ RecommendationsService ]
 })
 export class RecommendationsListComponent {

@@ -11,7 +11,7 @@ import * as _ from 'lodash'
 
 @Component({
   selector: 'stats',
-  templateUrl: '/app/stats/stats.html',
+  templateUrl: 'stats.html',
   providers: [ StatsService ]
 })
 export class StatsComponent {

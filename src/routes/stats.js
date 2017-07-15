@@ -31,6 +31,10 @@ class Stats extends Route {
       })
   }
 
+  cors () {
+    return true
+  }
+
   auth () {
     return false
   }

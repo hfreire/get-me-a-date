@@ -11,7 +11,7 @@ import { Component, EventEmitter, Output } from '@angular/core'
 
 @Component({
   selector: 'recommendations-criteria',
-  templateUrl: '/app/recommendations/recommendations-criteria/recommendations-criteria.html'
+  templateUrl: 'recommendations-criteria.html'
 })
 export class RecommendationsCriteriaComponent {
   @Output()
