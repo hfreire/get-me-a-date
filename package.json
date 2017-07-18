@@ -49,7 +49,7 @@
     "sharp": "0.18.1",
     "sqlite3": "3.1.8",
     "tinder-wrapper": "1.0.3",
-    "zone.js": "0.8.12"
+    "zone.js": "0.8.14"
   },
   "devDependencies": {
     "@angularclass/hmr": "2.1.3",
