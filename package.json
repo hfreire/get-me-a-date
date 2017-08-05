@@ -47,7 +47,7 @@
     "sequelize": "4.2.1",
     "serverful": "1.1.10",
     "sharp": "0.18.1",
-    "sqlite3": "3.1.8",
+    "sqlite3": "3.1.9",
     "tinder-wrapper": "1.0.3",
     "zone.js": "0.8.16"
   },
