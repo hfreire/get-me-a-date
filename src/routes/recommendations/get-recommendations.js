@@ -46,6 +46,10 @@ class GetRecommendations extends Route {
       })
   }
 
+  cors () {
+    return true
+  }
+
   auth () {
     return false
   }

@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { RecommendationsService } from '../recommendations.service'
+import { RecommendationsService } from '../../recommendations.service'
 
 import { Component, Inject } from '@angular/core'
 import { MD_DIALOG_DATA, MdDialogRef } from '@angular/material'
@@ -15,7 +15,7 @@ import * as _ from 'lodash'
 
 @Component({
   selector: 'recommendation-dialog',
-  templateUrl: '/app/recommendations/recommendation-dialog/recommendation-dialog.html',
+  templateUrl: 'recommendation-dialog.html',
   providers: [ RecommendationsService ],
   animations: [
     trigger('fadeInOut', [
@@ -54,7 +54,7 @@ export class RecommendationDialogComponent {
 
   like () {
     this.recommendationService.like(this.recommendation.id)
-      .subscribe((recommendation) => {
+      .subscribe((recommendation: any) => {
         this.recommendation = recommendation
         this.data.recommendation = recommendation
       })

@@ -24,6 +24,8 @@ RUN apt-get update &&\
     apt-get install -y build-essential git python &&\
     apt-get clean
 COPY package.json $HOME
+COPY tsconfig.json $HOME
+COPY webpack.config.js $HOME
 RUN npm install
 
 # Copy app source

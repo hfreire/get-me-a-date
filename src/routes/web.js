@@ -33,20 +33,7 @@ class Web extends Route {
           path: '/{param*}',
           handler: {
             directory: {
-              path: join(__dirname, '../web'),
-              index: true
-            }
-          }
-        })
-        .value(),
-      _(super.toRoute())
-        .omit('config.handler')
-        .merge({
-          method: 'GET',
-          path: '/node_modules/{param*}',
-          handler: {
-            directory: {
-              path: join(__dirname, '../../node_modules'),
+              path: join(__dirname, '../../tmp/web'),
               index: true
             }
           }

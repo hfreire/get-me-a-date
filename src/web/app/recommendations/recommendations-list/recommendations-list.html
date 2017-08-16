@@ -1,0 +1,18 @@
+<!--
+  ~ Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+  ~
+  ~ This source code is licensed under the license found in the
+  ~ LICENSE file in the root directory of this source tree.
+  -->
+
+<div id="recommendations-list">
+
+  <md-grid-list cols="{{ 100 / 4 }}">
+
+    <md-grid-tile *ngFor="let recommendation of recommendations | async; let _index = index">
+      <recommendation-tile [recommendation]="recommendation"
+                           (click)="onRecommendationClick($event, _index)"></recommendation-tile>
+    </md-grid-tile>
+  </md-grid-list>
+
+</div>

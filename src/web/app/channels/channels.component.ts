@@ -11,7 +11,7 @@ import { ChannelsService } from './channels.service'
 
 @Component({
   selector: 'channels',
-  templateUrl: '/app/channels/channels.html',
+  templateUrl: 'channels.html',
   providers: [ ChannelsService ]
 })
 export class ChannelsComponent {

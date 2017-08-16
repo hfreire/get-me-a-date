@@ -26,6 +26,8 @@ const Channel = require('./channel')
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const moment = require('moment')
+
 const { NotAuthorizedError, OutOfLikesError } = require('./errors')
 
 const { TinderWrapper, TinderNotAuthorizedError, TinderOutOfLikesError } = require('tinder-wrapper')
@@ -144,6 +146,7 @@ class Tinder extends Channel {
                         name: match.person.name,
                         photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
                         channelMatchId: match.id,
+                        matchedDate: new Date(match.created_date),
                         data: match.person
                       },
                       messages: _.map(match.messages, (message) => {
@@ -179,7 +182,7 @@ class Tinder extends Channel {
         return Database.channels.find({ where: { name: this._name } })
           .then(({ isOutOfLikes, outOfLikesDate }) => {
             if (isOutOfLikes) {
-              if ((_.now() - outOfLikesDate.getTime()) < 12 * 60 * 60 * 1000) {
+              if (moment().isBefore(moment(outOfLikesDate).add(12, 'hour'))) {
                 throw new OutOfLikesError()
               } else {
                 return Database.channels.update({
@@ -192,7 +195,21 @@ class Tinder extends Channel {
       })
       .then(() => {
         return this._tinder.like(userId, photoId, contentHash, sNumber)
-          .then(({ match }) => match)
+          .then(({ match }) => {
+            if (!match) {
+              return
+            }
+
+            return {
+              channelName: 'tinder',
+              channelRecommendationId: match.person._id,
+              name: match.person.name,
+              photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+              channelMatchId: match.id,
+              matchedDate: new Date(match.created_date),
+              data: match.person
+            }
+          })
           .catch(TinderOutOfLikesError, () => this.onOutOfLikesError())
       })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())

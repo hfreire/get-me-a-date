@@ -10,6 +10,8 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const moment = require('moment')
+
 const { AlreadyCheckedOutEarlierError } = require('./errors')
 
 const Taste = require('../taste')
@@ -29,7 +31,11 @@ class Recommendation {
       .then((recommendation) => {
         recommendation.checkedOutTimes++
 
-        if (recommendation.lastCheckedOutDate) {
+        if (recommendation.isLike || recommendation.isPass) {
+          return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
+        }
+
+        if (moment().isBefore(moment(recommendation.lastCheckedOutDate).add(1, 'day'))) {
           return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
         }
 
@@ -46,6 +52,8 @@ class Recommendation {
             })
               .then(({ photos }) => {
                 recommendation.lastCheckedOutDate = new Date()
+                recommendation.name = channelRecommendation.name
+                recommendation.data = channelRecommendation.data
                 recommendation.photos = photosToCheckOut
                 recommendation.photosSimilarityMean = photos.faceSimilarityMean
 
@@ -97,7 +105,6 @@ class Recommendation {
 
         return this.setUpMatch(recommendation, match)
       })
-      .then((recommendation) => recommendation)
   }
 
   pass (channel, recommendation) {
@@ -169,16 +176,16 @@ class Recommendation {
       })
   }
 
-  setUpMatch (recommendation, match) {
+  setUpMatch (recommendation, channelRecommendation) {
     return Promise.resolve()
       .then(() => {
-        if (!recommendation || !match) {
+        if (!recommendation || !channelRecommendation) {
           throw new Error('invalid arguments')
         }
 
         recommendation.isMatch = true
-        recommendation.channelMatchId = match.channelMatchId
-        recommendation.matchedDate = match.matchedDate
+        recommendation.channelMatchId = channelRecommendation.channelMatchId
+        recommendation.matchedDate = channelRecommendation.matchedDate
 
         return recommendation
       })

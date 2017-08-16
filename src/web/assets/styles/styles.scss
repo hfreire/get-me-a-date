@@ -4,7 +4,6 @@
  * This source code is licensed under the license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 @import '../../../../node_modules/@angular/material/_theming';
 
 @include mat-core();
@@ -16,6 +15,10 @@ $candy-app-theme: mat-dark-theme($candy-app-primary, $candy-app-accent, $candy-a
 
 body {
   font-family: $mat-font-family;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 .mat-dialog-container {
@@ -32,6 +35,10 @@ body {
 
 .mat-dialog-title {
   color: #cacaca;
+}
+
+.mat-progress-bar-buffer {
+  background-color: rgba(66, 66, 66, 1);
 }
 
 #channels {
@@ -136,7 +143,7 @@ body {
 }
 
 #recommendation-dialog {
-  .mat-dialog-title {
+  [md-dialog-title] {
     display: flex;
     align-items: center;
     margin-bottom: 0;
@@ -156,5 +163,11 @@ body {
     position: absolute;
     top: 0px;
     left: 0px;
+  }
+}
+
+#recommendations-list {
+  md-spinner {
+    margin: 30px auto 30px auto;
   }
 }

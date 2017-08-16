@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { NgModule } from '@angular/core'
+import { ApplicationRef, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { HttpModule } from '@angular/http'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
@@ -18,30 +18,21 @@ import {
   MdGridListModule,
   MdIconModule,
   MdInputModule,
-  MdMenuModule,
-  MdPaginatorModule,
   MdProgressSpinnerModule,
-  MdSelectModule,
   MdSidenavModule,
   MdSliderModule,
   MdSlideToggleModule,
-  MdToolbarModule,
-  MdTooltipModule
+  MdToolbarModule
 } from '@angular/material'
+import { createNewHosts, removeNgStyles } from '@angularclass/hmr'
 
-import { MomentModule } from 'angular2-moment'
 import { ChartsModule } from 'ng2-charts'
 
 import { AppComponent } from './app.component'
-import {
-  RecommendationDialogComponent,
-  RecommendationsComponent,
-  RecommendationsCriteriaComponent
-} from './recommendations'
+import { RecommendationsModule } from './recommendations'
 import { ChannelsComponent } from './channels'
 import { SettingsComponent } from './settings'
 import { StatsComponent } from './stats'
-import { CapitalizePipe } from './capitalize.pipe'
 
 @NgModule({
   imports: [
@@ -49,27 +40,39 @@ import { CapitalizePipe } from './capitalize.pipe'
     HttpModule,
     NoopAnimationsModule,
     MdDialogModule,
-    MdTooltipModule,
-    MdButtonModule,
     MdGridListModule,
     MdToolbarModule,
     MdProgressSpinnerModule,
     MdSidenavModule,
     MdCardModule,
-    MomentModule,
-    MdIconModule,
     MdSlideToggleModule,
-    MdSelectModule,
-    MdMenuModule,
     MdCheckboxModule,
     MdInputModule,
     MdSliderModule,
-    MdPaginatorModule,
-    ChartsModule
+    MdButtonModule,
+    MdIconModule,
+    ChartsModule,
+    RecommendationsModule
   ],
-  declarations: [ AppComponent, CapitalizePipe, RecommendationsCriteriaComponent, RecommendationsComponent, RecommendationDialogComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
-  entryComponents: [ RecommendationsCriteriaComponent, RecommendationDialogComponent, RecommendationsComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
+  declarations: [ AppComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
+  entryComponents: [ ChannelsComponent, SettingsComponent, StatsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {
+  constructor (public appRef: ApplicationRef) {
+  }
+
+  hmrOnDestroy (store: any) {
+    const componentLocations = this.appRef.components.map((component) => component.location.nativeElement)
+
+    store.disposeOldHosts = createNewHosts(componentLocations)
+
+    removeNgStyles()
+  }
+
+  hmrAfterDestroy (store: any) {
+    store.disposeOldHosts()
+
+    delete store.disposeOldHosts
+  }
 }

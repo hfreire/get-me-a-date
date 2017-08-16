@@ -5,11 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Component } from '@angular/core'
-
-@Component({
-  selector: 'app',
-  templateUrl: 'app.html'
-})
-export class AppComponent {
-}
+export * from './recommendations-list.component'
+export * from './recommendation-tile'
+export * from './recommendation-dialog'
