@@ -13,16 +13,16 @@
   },
   "homepage": "https://github.com/hfreire/get-me-a-date#readme",
   "dependencies": {
-    "@angular/animations": "4.3.3",
+    "@angular/animations": "4.3.4",
     "@angular/cdk": "2.0.0-beta.8",
     "@angular/common": "4.3.4",
-    "@angular/compiler": "4.3.0",
+    "@angular/compiler": "4.3.4",
     "@angular/core": "4.3.4",
-    "@angular/forms": "4.3.0",
+    "@angular/forms": "4.3.4",
     "@angular/http": "4.3.4",
     "@angular/material": "2.0.0-beta.8",
     "@angular/platform-browser": "4.3.4",
-    "@angular/platform-browser-dynamic": "4.3.0",
+    "@angular/platform-browser-dynamic": "4.3.4",
     "@angular/router": "4.3.4",
     "@types/lodash": "4.14.68",
     "angular-in-memory-web-api": "0.3.2",
@@ -97,7 +97,8 @@
     }
   },
   "release": {
-    "getLastRelease": "last-release-github"
+    "getLastRelease": "last-release-github",
+    "analyzeCommits": "simple-commit-message"
   },
   "scripts": {
     "commit": "./node_modules/.bin/commit-wizard",
