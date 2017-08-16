@@ -146,6 +146,7 @@ class Tinder extends Channel {
                         name: match.person.name,
                         photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
                         channelMatchId: match.id,
+                        matchedDate: new Date(match.created_date),
                         data: match.person
                       },
                       messages: _.map(match.messages, (message) => {
@@ -194,7 +195,21 @@ class Tinder extends Channel {
       })
       .then(() => {
         return this._tinder.like(userId, photoId, contentHash, sNumber)
-          .then(({ match }) => match)
+          .then(({ match }) => {
+            if (!match) {
+              return
+            }
+
+            return {
+              channelName: 'tinder',
+              channelRecommendationId: match.person._id,
+              name: match.person.name,
+              photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+              channelMatchId: match.id,
+              matchedDate: new Date(match.created_date),
+              data: match.person
+            }
+          })
           .catch(TinderOutOfLikesError, () => this.onOutOfLikesError())
       })
       .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())

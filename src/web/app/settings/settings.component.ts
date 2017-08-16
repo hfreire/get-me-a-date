@@ -11,7 +11,7 @@ import { SettingsService } from './settings.service'
 
 @Component({
   selector: 'settings',
-  templateUrl: '/app/settings/settings.html',
+  templateUrl: 'settings.html',
   providers: [ SettingsService ]
 })
 export class SettingsComponent {

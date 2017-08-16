@@ -14,12 +14,21 @@ const { mkdirAsync, existsSync } = Promise.promisifyAll(require('fs'))
 
 const { join } = require('path')
 
+const defaultOptions = {
+  database: {
+    pathDir: join(__dirname, '../tmp/database'),
+    filename: 'get-me-a-date.db'
+  }
+}
+
 class Database {
-  constructor () {
+  constructor (options = {}) {
+    this._options = _.defaultsDeep(options, defaultOptions)
+
     this._sequelize = new Sequelize(null, null, null, {
       dialect: 'sqlite',
       pool: { max: 5, min: 0, idle: 10000 },
-      storage: join(__dirname, '../tmp/get-me-a-date.db'),
+      storage: `${this._options.database.pathDir}/${this._options.database.filename}`,
       logging: false
     })
 
@@ -137,10 +146,8 @@ class Database {
   start () {
     return Promise.resolve()
       .then(() => {
-        const path = join(__dirname, '../../tmp/')
-
-        if (!existsSync(path)) {
-          return mkdirAsync(path)
+        if (!existsSync(this._options.database.pathDir)) {
+          return mkdirAsync(this._options.database.pathDir)
         }
       })
       .then(() => this._sequelize.authenticate())

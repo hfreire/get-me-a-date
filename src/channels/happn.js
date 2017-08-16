@@ -122,6 +122,7 @@ class Happn extends Channel {
                   name: match.notifier.first_name,
                   photos: _.map(match.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
                   channelMatchId: match.notifier.id,
+                  matchedDate: new Date(match.creation_date),
                   data: match.notifier
                 },
                 messages: []
@@ -151,6 +152,8 @@ class Happn extends Channel {
             channelRecommendationId: data.id,
             name: data.first_name,
             photos: _.map(data.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+            channelMatchId: data.id,
+            matchedDate: new Date(),
             data
           }
         }

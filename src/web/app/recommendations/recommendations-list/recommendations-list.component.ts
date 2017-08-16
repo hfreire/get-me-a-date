@@ -17,33 +17,23 @@ import { RecommendationsService } from '../recommendations.service'
 
 @Component({
   selector: 'recommendations-list',
-  templateUrl: '/app/recommendations/recommendations-list/recommendations-list.html',
+  templateUrl: 'recommendations-list.html',
   providers: [ RecommendationsService ]
 })
 export class RecommendationsListComponent {
   @Input()
-  set data (value) {
-    this._data.next(value)
+  set recommendations (value) {
+    this._recommendations.next(value)
   }
 
-  get data () {
-    return this._data.getValue()
+  get recommendations () {
+    return this._recommendations.asObservable()
   }
 
-  recommendationDialog: MdDialogRef<RecommendationDialogComponent>
-
-  recommendations: any = []
-
-  private _data = new BehaviorSubject<any>([])
+  private _recommendations = new BehaviorSubject<any>([])
+  private _dialog: MdDialogRef<RecommendationDialogComponent>
 
   constructor (private recommendationService: RecommendationsService, public dialog: MdDialog) {}
-
-  ngOnInit () {
-    this._data
-      .subscribe((data) => {
-        this.recommendations = data
-      })
-  }
 
   onRecommendationClick (id: string, index: number) {
     this.recommendationService.getById(id)
@@ -52,10 +42,10 @@ export class RecommendationsListComponent {
         config.width = '450px'
         config.data = { recommendation }
 
-        this.recommendationDialog = this.dialog.open(RecommendationDialogComponent, config)
-        this.recommendationDialog.afterClosed()
+        this._dialog = this.dialog.open(RecommendationDialogComponent, config)
+        this._dialog.afterClosed()
           .subscribe(() => {
-            this.recommendations[ index ] = _.pick(config.data.recommendation, _.keys(this.recommendations[ index ]))
+            this._recommendations.getValue()[ index ] = _.pick(config.data.recommendation, _.keys(this._recommendations.getValue()[ index ]))
           })
       })
   }

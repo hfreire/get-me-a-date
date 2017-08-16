@@ -25,6 +25,7 @@ RUN apt-get update &&\
     apt-get clean
 COPY package.json $HOME
 COPY tsconfig.json $HOME
+COPY webpack.config.js $HOME
 RUN npm install
 
 # Copy app source

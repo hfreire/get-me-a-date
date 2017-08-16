@@ -105,7 +105,6 @@ class Recommendation {
 
         return this.setUpMatch(recommendation, match)
       })
-      .then((recommendation) => recommendation)
   }
 
   pass (channel, recommendation) {
@@ -177,16 +176,16 @@ class Recommendation {
       })
   }
 
-  setUpMatch (recommendation, match) {
+  setUpMatch (recommendation, channelRecommendation) {
     return Promise.resolve()
       .then(() => {
-        if (!recommendation || !match) {
+        if (!recommendation || !channelRecommendation) {
           throw new Error('invalid arguments')
         }
 
         recommendation.isMatch = true
-        recommendation.channelMatchId = match.channelMatchId
-        recommendation.matchedDate = match.matchedDate
+        recommendation.channelMatchId = channelRecommendation.channelMatchId
+        recommendation.matchedDate = channelRecommendation.matchedDate
 
         return recommendation
       })
