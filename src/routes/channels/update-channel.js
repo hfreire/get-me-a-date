@@ -35,6 +35,10 @@ class UpdateChannel extends Route {
       })
   }
 
+  cors () {
+    return true
+  }
+
   auth () {
     return false
   }

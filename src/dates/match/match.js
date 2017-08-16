@@ -16,12 +16,10 @@ const { Recommendation, AlreadyCheckedOutEarlierError } = require('../recommenda
 
 const Message = require('./message')
 
-const findOrCreateNewRecommendationFromMatch = function (channel, channelRecommendationId, match) {
-  const channelRecommendation = match.recommendation
-
+const findOrCreateNewRecommendationFromMatch = function (channel, channelRecommendationId, channelRecommendation) {
   return Recommendation.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
     .then((recommendation) => {
-      if (recommendation.match) {
+      if (recommendation.isMatch) {
         return recommendation
       }
 
@@ -30,7 +28,7 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
         recommendation.isHumanDecision = true
       }
 
-      return Recommendation.setUpMatch(recommendation, match)
+      return Recommendation.setUpMatch(recommendation, channelRecommendation)
         .then((recommendation) => {
           return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
             .then(() => recommendation)
@@ -45,7 +43,7 @@ class Match {
     const channelRecommendationId = channelRecommendation.channelRecommendationId
     const messages = match.messages
 
-    return findOrCreateNewRecommendationFromMatch.bind(this)(channel, channelRecommendationId, match)
+    return findOrCreateNewRecommendationFromMatch.bind(this)(channel, channelRecommendationId, channelRecommendation)
       .then((recommendation) => {
         return Message.readMessages(messages)
           .then(() => {

@@ -15,7 +15,7 @@ import * as _ from 'lodash'
 
 @Component({
   selector: 'recommendation-dialog',
-  templateUrl: '/app/recommendations/recommendations-list/recommendation-dialog/recommendation-dialog.html',
+  templateUrl: 'recommendation-dialog.html',
   providers: [ RecommendationsService ],
   animations: [
     trigger('fadeInOut', [

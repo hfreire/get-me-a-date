@@ -5,8 +5,24 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { enableProdMode } from '@angular/core'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
+
+import './assets/styles/styles.scss'
 
 import { AppModule } from './app'
 
-platformBrowserDynamic().bootstrapModule(AppModule)
+if (process.env.NODE_ENV === 'production') {
+  enableProdMode()
+}
+
+export function main () {
+  return platformBrowserDynamic()
+    .bootstrapModule(AppModule)
+}
+
+if (document.readyState === 'complete') {
+  main()
+} else {
+  document.addEventListener('DOMContentLoaded', main)
+}

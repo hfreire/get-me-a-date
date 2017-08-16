@@ -11,7 +11,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 
 @Component({
   selector: 'recommendation-tile',
-  templateUrl: '/app/recommendations/recommendations-list/recommendation-tile/recommendation-tile.html',
+  templateUrl: 'recommendation-tile.html',
   animations: [
     trigger('fadeInOut', [
       state('in', style({ opacity: 1, visibility: 'visible' })),
