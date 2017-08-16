@@ -5,23 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Inject, Injectable } from '@angular/core'
-import { Http } from '@angular/http'
-import 'rxjs/add/operator/map'
-import { DOCUMENT } from '@angular/platform-browser'
+import { Injectable } from '@angular/core'
+
+import { HttpWrapper } from '../utils/http-wrapper/http-wrapper'
+import { Observable } from 'rxjs/Observable'
 
 @Injectable()
 export class ChannelsService {
-  constructor (private http: Http, @Inject(DOCUMENT) private document: any) {
+  constructor (private http: HttpWrapper) {
   }
 
-  getAll () {
-    return this.http.get(`//${this.document.location.hostname}:5940/channels`)
-      .map((res) => res.json())
+  getAll (): Observable<any> {
+    return this.http.get('channels')
   }
 
-  updateChannel (name: string, channel: any) {
-    return this.http.put(`//${this.document.location.hostname}:5940/channels/${name}`, JSON.stringify(channel))
-      .map((res) => res.json())
+  update (name: string, channel: any): Observable<any> {
+    return this.http.put(`channels/${name}`, JSON.stringify(channel))
   }
 }
