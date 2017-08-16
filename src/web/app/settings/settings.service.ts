@@ -5,28 +5,26 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Inject, Injectable } from '@angular/core'
-import { Http } from '@angular/http'
-import 'rxjs/add/operator/map'
-import { DOCUMENT } from '@angular/platform-browser'
+import { Injectable } from '@angular/core'
+
+import { Observable } from 'rxjs/Observable'
+
+import { HttpWrapper } from '../utils'
 
 @Injectable()
 export class SettingsService {
-  constructor (private http: Http, @Inject(DOCUMENT) private document: any) {
+  constructor (private http: HttpWrapper) {
   }
 
-  get () {
-    return this.http.get(`//${this.document.location.hostname}:5940/settings`)
-      .map((res) => res.json())
+  get (): Observable<any> {
+    return this.http.get('settings')
   }
 
-  update (settings: any) {
-    return this.http.put(`//${this.document.location.hostname}:5940/settings`, JSON.stringify(settings))
-      .map((res) => res.json())
+  update (settings: any): Observable<any> {
+    return this.http.put('settings', JSON.stringify(settings))
   }
 
-  delete () {
-    return this.http.delete(`//${this.document.location.hostname}:5940/settings`)
-      .map((res) => res.json())
+  delete (): Observable<any> {
+    return this.http.delete('settings')
   }
 }
