@@ -46,7 +46,17 @@ const likeOrPass = (channel, recommendation, like, pass) => {
 
 class Dates {
   start () {
-    return Promise.all([ Channel.start(), Taste.start() ])
+    const startChannel = () => {
+      return Channel.start()
+        .catch((error) => Logger.warn(error))
+    }
+
+    const startTaste = () => {
+      return Taste.start()
+        .catch((error) => Logger.warn(error))
+    }
+
+    return Promise.all([ startChannel(), startTaste() ])
   }
 
   find () {

@@ -5,19 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import * as _ from 'lodash'
-
-import { Inject, Injectable } from '@angular/core'
-import { DOCUMENT } from '@angular/platform-browser'
-import { Http } from '@angular/http'
+import { Injectable } from '@angular/core'
 
 import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/operator/retryWhen'
-import 'rxjs/add/operator/timeout'
+
+import * as _ from 'lodash'
+import { HttpWrapper } from '../utils'
 
 @Injectable()
 export class RecommendationsService {
-  constructor (private http: Http, @Inject(DOCUMENT) private document: any) {
+  constructor (private http: HttpWrapper) {
   }
 
   getAll (page: number = 0, limit: number = 25, criteria?: any, select?: any, sort?: string): Observable<any> {
@@ -25,26 +22,18 @@ export class RecommendationsService {
     const _select = _.reduce(select, (a, s) => `${a}&select=${s}`, '')
     const _sort = sort ? `&sort=${sort}` : ''
 
-    return this.http.get(`//${this.document.location.hostname}:5940/recommendations?page=${page}&limit=${limit}${_criteria}${_select}${_sort}`)
-      .retryWhen((error: any) => error.delay(500))
-      .timeout(2000)
-      .map((response) => response.json())
+    return this.http.get(`recommendations?page=${page}&limit=${limit}${_criteria}${_select}${_sort}`)
   }
 
-  getById (id: string) {
-    return this.http.get(`//${this.document.location.hostname}:5940/recommendations/${id}`)
-      .retryWhen((error: any) => error.delay(500))
-      .timeout(2000)
-      .map((response) => response.json())
+  getById (id: string): Observable<any> {
+    return this.http.get(`recommendations/${id}`)
   }
 
-  like (id: string) {
-    return this.http.post(`//${this.document.location.hostname}:5940/recommendations/${id}/like`, {})
-      .map((response) => response.json())
+  like (id: string): Observable<any> {
+    return this.http.post(`recommendations/${id}/like`, {})
   }
 
-  pass (id: string) {
-    return this.http.post(`//${this.document.location.hostname}:5940/recommendations/${id}/pass`, {})
-      .map((response) => response.json())
+  pass (id: string): Observable<any> {
+    return this.http.post(`recommendations/${id}/pass`, {})
   }
 }
