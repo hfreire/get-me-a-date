@@ -7,7 +7,6 @@
 
 import { ApplicationRef, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
-import { HttpModule } from '@angular/http'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import 'hammerjs'
 import {
@@ -28,6 +27,8 @@ import { createNewHosts, removeNgStyles } from '@angularclass/hmr'
 
 import { ChartsModule } from 'ng2-charts'
 
+import { HttpWrapperModule } from './utils'
+
 import { AppComponent } from './app.component'
 import { RecommendationsModule } from './recommendations'
 import { ChannelsComponent } from './channels'
@@ -37,7 +38,6 @@ import { StatsComponent } from './stats'
 @NgModule({
   imports: [
     BrowserModule,
-    HttpModule,
     NoopAnimationsModule,
     MdDialogModule,
     MdGridListModule,
@@ -52,6 +52,7 @@ import { StatsComponent } from './stats'
     MdButtonModule,
     MdIconModule,
     ChartsModule,
+    HttpWrapperModule,
     RecommendationsModule
   ],
   declarations: [ AppComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
