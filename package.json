@@ -44,7 +44,7 @@
     "ng2-charts": "1.6.0",
     "request": "2.81.0",
     "rxjs": "5.4.3",
-    "sequelize": "4.6.0",
+    "sequelize": "4.7.0",
     "serverful": "1.1.13",
     "sharp": "0.18.1",
     "sqlite3": "3.1.9",
