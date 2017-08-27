@@ -128,12 +128,16 @@ class Rekognition {
       return Promise.resolve()
     }
 
-    const params = {
-      CollectionId: collectionId,
-      FaceIds: faceIds
+    const _deleteFaces = (collecionId, faceIds) => {
+      const params = {
+        CollectionId: collectionId,
+        FaceIds: faceIds
+      }
+
+      return this._rekognition.deleteFacesCircuitBreaker.exec(params)
     }
 
-    return this._rekognition.deleteFacesCircuitBreaker.exec(params)
+    return Promise.mapSeries(_.chunk(faceIds, 25), (_faceIds) => _deleteFaces(collectionId, _faceIds))
   }
 
   detectFaces (image) {

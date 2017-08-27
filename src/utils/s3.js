@@ -92,8 +92,26 @@ class S3 {
 
     const params = { Bucket: this._options.bucket, Prefix: prefix, MaxKeys: maxKeys }
 
-    return this._s3.listObjectsCircuitBreaker.exec(params)
-      .then((data) => _.map(data.Contents, ({ Key }) => Key))
+    let objects = []
+    const _listObjects = (params) => {
+      return this._s3.listObjectsCircuitBreaker.exec(params)
+        .then((data) => {
+          objects = objects.concat(_.map(data.Contents, ({ Key }) => Key))
+
+          if (data.IsTruncated) {
+            if (data.NextMarker) {
+              params.Marker = data.NextMarker
+            } else {
+              params.Marker = data.Contents[ data.Contents.length - 1 ].Key
+            }
+
+            return _listObjects(params)
+          }
+        })
+    }
+
+    return _listObjects(params)
+      .then(() => objects)
   }
 }
 
