@@ -78,56 +78,64 @@ class Happn extends Channel {
   }
 
   getUpdates () {
-    const getUpdates = (limit, offset, lastActivityDate, updates) => {
-      return this._happn.getUpdates(limit, offset)
-        .then(({ matches }) => {
-          if (_.isEmpty(matches.data) || new Date(matches.data[ 0 ].creation_date).getTime() < lastActivityDate.getTime()) {
-            return updates
-          }
-
-          _.forEach(matches.data, (match) => {
-            if (new Date(match.creation_date).getTime() > lastActivityDate.getTime()) {
-              updates.matches.push(match)
-            }
-          })
-
-          if (new Date(matches.data[ matches.data.length - 1 ].creation_date).getTime() > lastActivityDate.getTime()) {
-            return getUpdates(limit, offset + limit, lastActivityDate, updates)
-          }
-
-          return updates
-        })
-    }
-
     return Promise.try(() => {
       if (!this._happn.accessToken) {
         throw new NotAuthorizedError()
       }
     })
       .then(() => Database.channels.find({ where: { name: this._name } }))
-      .then(({ lastActivityDate }) => {
+      .then(({ lastActivityDate, userId }) => {
         const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
 
-        return getUpdates(10, 0, _lastActivityDate, { matches: [], conversations: [] })
-      })
-      .then(({ matches, conversations }) => {
-        return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
-          .then(() => {
-            return Promise.mapSeries(matches, (match) => {
-              return {
-                isNewMatch: true,
-                recommendation: {
-                  channelName: 'happn',
-                  channelRecommendationId: match.notifier.id,
-                  name: match.notifier.first_name,
-                  photos: _.map(match.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
-                  channelMatchId: match.notifier.id,
-                  matchedDate: new Date(match.creation_date),
-                  data: match.notifier
-                },
-                messages: []
-              }
-            })
+        return this._happn.getUpdates(_lastActivityDate)
+          .then(({ conversations }) => {
+            return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
+              .then(() => {
+                return Promise.mapSeries(conversations, (conversation) => {
+                  const channelRecommendationId = _(conversation.participants)
+                    .map('user.id')
+                    .filter((id) => id !== userId)
+                    .value()[ 0 ]
+
+                  const _isNewMatch = (channelRecommendationId) => {
+                    return Database.recommendations.findOne({
+                      where: {
+                        channelName: 'happn',
+                        channelRecommendationId
+                      }
+                    })
+                      .then((recommendation) => {
+                        if (recommendation === null) {
+                          return true
+                        }
+
+                        return !recommendation.isMatch
+                      })
+                  }
+
+                  return Promise.props({
+                    isNewMatch: _isNewMatch(channelRecommendationId),
+                    recommendation: this.getUser(channelRecommendationId),
+                  })
+                    .then(({ isNewMatch, recommendation }) => {
+                      recommendation.channelMatchId = channelRecommendationId
+                      recommendation.matchedDate = new Date(conversation.creation_date)
+
+                      const messages = _.map(conversation.messages, (message) => {
+                        return {
+                          channelName: 'happn',
+                          channelMessageId: message.id,
+                          recommendationId: channelRecommendationId,
+                          isFromRecommendation: message.sender.id !== userId,
+                          sentDate: new Date(message.creation_date.replace(/T/, ' ').replace(/\..+/, '')),
+                          text: message.message
+                        }
+                      })
+
+                      return { isNewMatch, recommendation, messages }
+                    })
+                })
+              })
           })
       })
       .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
@@ -177,7 +185,7 @@ class Happn extends Channel {
           channelName: 'happn',
           channelRecommendationId: data.id,
           name: data.first_name,
-          photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+          photos: _.map(data.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
           data
         }
       })
