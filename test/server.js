@@ -7,7 +7,7 @@
 
 const { Serverful } = require('serverful')
 
-describe('Server', () => {
+describe.skip('Server', () => {
   let subject
 
   describe('when loading', () => {
