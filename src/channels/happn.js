@@ -115,7 +115,7 @@ class Happn extends Channel {
 
                   return Promise.props({
                     isNewMatch: _isNewMatch(channelRecommendationId),
-                    recommendation: this.getUser(channelRecommendationId),
+                    recommendation: this.getUser(channelRecommendationId)
                   })
                     .then(({ isNewMatch, recommendation }) => {
                       recommendation.channelMatchId = channelRecommendationId
