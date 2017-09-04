@@ -12,7 +12,7 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
-const { NotAuthorizedError, OutOfLikesError } = require('../channels')
+const { OutOfLikesError } = require('../channels')
 
 const Database = require('../database')
 
