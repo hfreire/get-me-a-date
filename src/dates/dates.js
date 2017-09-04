@@ -151,10 +151,6 @@ class Dates {
           }, { concurrency: 1 }))
       })
       .then(() => { return { received, skipped, failed } })
-      .catch(NotAuthorizedError, () => {
-        return channel.authorize()
-          .then(() => this.checkRecommendations(channel))
-      })
       .catch((error) => Logger.error(error))
   }
 
@@ -174,10 +170,6 @@ class Dates {
           accumulator.matches += update.matches
           return accumulator
         }, { messages: 0, matches: 0 })
-      })
-      .catch(NotAuthorizedError, () => {
-        return channel.authorize()
-          .then(() => this.checkUpdates(channel))
       })
       .catch((error) => Logger.error(error))
   }

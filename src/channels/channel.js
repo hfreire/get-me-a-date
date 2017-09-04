@@ -15,7 +15,7 @@ const Logger = require('modern-logger')
 
 const FacebookLogin = require('facebook-login-for-robots')
 
-const { NotAuthorizedError, OutOfLikesError } = require('./errors')
+const { OutOfLikesError } = require('./errors')
 
 const Database = require('../database')
 
@@ -78,9 +78,7 @@ class Channel {
     return Logger.debug(`${_.capitalize(this._name)} got unauthorized`)
       .then(() => {
         return Database.channels.update({ accessToken: null }, { where: { name: this._name } })
-          .then(() => {
-            throw new NotAuthorizedError()
-          })
+          .then(() => this.authorize())
       })
   }
 

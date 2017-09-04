@@ -58,138 +58,152 @@ class Happn extends Channel {
   }
 
   getRecommendations () {
-    return Promise.try(() => {
-      if (!this._happn.accessToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._happn.getRecommendations(16))
-      .then(({ data }) => data)
-      .mapSeries((data) => {
-        return {
-          channelName: 'happn',
-          channelRecommendationId: data.notifier.id,
-          name: data.notifier.first_name,
-          photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
-          data
-        }
+    const _getRecommendations = () => {
+      return this._happn.getRecommendations(16)
+        .then(({ data }) => data)
+        .mapSeries((data) => {
+          return {
+            channelName: 'happn',
+            channelRecommendationId: data.notifier.id,
+            name: data.notifier.first_name,
+            photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+            data
+          }
+        })
+        .catch(HappnNotAuthorizedError, () => { throw new NotAuthorizedError() })
+    }
+
+    return _getRecommendations()
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getRecommendations())
       })
-      .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
   getUpdates () {
-    return Promise.try(() => {
-      if (!this._happn.accessToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => Database.channels.find({ where: { name: this._name } }))
-      .then(({ lastActivityDate, userId }) => {
-        const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
+    const _getUpdates = () => {
+      return Database.channels.find({ where: { name: this._name } })
+        .then(({ lastActivityDate, userId }) => {
+          const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
 
-        return this._happn.getUpdates(_lastActivityDate)
-          .then(({ conversations }) => {
-            return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
-              .then(() => {
-                return Promise.mapSeries(conversations, (conversation) => {
-                  const channelRecommendationId = _(conversation.participants)
-                    .map('user.id')
-                    .filter((id) => id !== userId)
-                    .value()[ 0 ]
+          return this._happn.getUpdates(_lastActivityDate)
+            .then(({ conversations }) => {
+              return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
+                .then(() => {
+                  return Promise.mapSeries(conversations, (conversation) => {
+                    const channelRecommendationId = _(conversation.participants)
+                      .map('user.id')
+                      .filter((id) => id !== userId)
+                      .value()[ 0 ]
 
-                  const _isNewMatch = (channelRecommendationId) => {
-                    return Database.recommendations.findOne({
-                      where: {
-                        channelName: 'happn',
-                        channelRecommendationId
-                      }
-                    })
-                      .then((recommendation) => {
-                        if (recommendation === null) {
-                          return true
-                        }
-
-                        return !recommendation.isMatch
-                      })
-                  }
-
-                  return Promise.props({
-                    isNewMatch: _isNewMatch(channelRecommendationId),
-                    recommendation: this.getUser(channelRecommendationId)
-                  })
-                    .then(({ isNewMatch, recommendation }) => {
-                      recommendation.channelMatchId = channelRecommendationId
-                      recommendation.matchedDate = new Date(conversation.creation_date)
-
-                      const messages = _.map(conversation.messages, (message) => {
-                        return {
+                    const _isNewMatch = (channelRecommendationId) => {
+                      return Database.recommendations.findOne({
+                        where: {
                           channelName: 'happn',
-                          channelMessageId: message.id,
-                          recommendationId: channelRecommendationId,
-                          isFromRecommendation: message.sender.id !== userId,
-                          sentDate: new Date(message.creation_date.replace(/T/, ' ').replace(/\..+/, '')),
-                          text: message.message
+                          channelRecommendationId
                         }
                       })
+                        .then((recommendation) => {
+                          if (recommendation === null) {
+                            return true
+                          }
 
-                      return { isNewMatch, recommendation, messages }
+                          return !recommendation.isMatch
+                        })
+                    }
+
+                    return Promise.props({
+                      isNewMatch: _isNewMatch(channelRecommendationId),
+                      recommendation: this.getUser(channelRecommendationId)
                     })
+                      .then(({ isNewMatch, recommendation }) => {
+                        recommendation.channelMatchId = channelRecommendationId
+                        recommendation.matchedDate = new Date(conversation.creation_date)
+
+                        const messages = _.map(conversation.messages, (message) => {
+                          return {
+                            channelName: 'happn',
+                            channelMessageId: message.id,
+                            recommendationId: channelRecommendationId,
+                            isFromRecommendation: message.sender.id !== userId,
+                            sentDate: new Date(message.creation_date.replace(/T/, ' ').replace(/\..+/, '')),
+                            text: message.message
+                          }
+                        })
+
+                        return { isNewMatch, recommendation, messages }
+                      })
+                  })
                 })
-              })
-          })
+            })
+        })
+        .catch(HappnNotAuthorizedError, () => { throw new NotAuthorizedError() })
+    }
+
+    return _getUpdates()
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getUpdates())
       })
-      .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
   like (userId) {
-    if (!userId) {
-      return Promise.reject(new Error('invalid arguments'))
+    const _like = (userId) => {
+      return Promise.try(() => {
+        if (!userId) {
+          throw new Error('invalid arguments')
+        }
+      })
+        .then(() => this._happn.like(userId))
+        .then(() => this._happn.getUser(userId))
+        .then(({ data }) => {
+          if (data.my_relation === 4) {
+            return {
+              channelName: 'happn',
+              channelRecommendationId: data.id,
+              name: data.first_name,
+              photos: _.map(data.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
+              channelMatchId: data.id,
+              matchedDate: new Date(),
+              data
+            }
+          }
+        })
+        .catch(HappnNotAuthorizedError, () => { throw new NotAuthorizedError() })
     }
 
-    return Promise.try(() => {
-      if (!this._happn.accessToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._happn.like(userId))
-      .then(() => this._happn.getUser(userId))
-      .then(({ data }) => {
-        if (data.my_relation === 4) {
+    return _like(userId)
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _like(userId))
+      })
+  }
+
+  getUser (userId) {
+    const _getUser = (userId) => {
+      return Promise.try(() => {
+        if (!userId) {
+          throw new Error('invalid arguments')
+        }
+      })
+        .then(() => this._happn.getUser(userId))
+        .then(({ data }) => {
           return {
             channelName: 'happn',
             channelRecommendationId: data.id,
             name: data.first_name,
             photos: _.map(data.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
-            channelMatchId: data.id,
-            matchedDate: new Date(),
             data
           }
-        }
-      })
-      .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
-  }
-
-  getUser (userId) {
-    if (!userId) {
-      return Promise.reject(new Error('invalid arguments'))
+        })
+        .catch(HappnNotAuthorizedError, () => { throw new NotAuthorizedError() })
     }
 
-    return Promise.try(() => {
-      if (!this._happn.accessToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._happn.getUser(userId))
-      .then(({ data }) => {
-        return {
-          channelName: 'happn',
-          channelRecommendationId: data.id,
-          name: data.first_name,
-          photos: _.map(data.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
-          data
-        }
+    return _getUser(userId)
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getUser(userId))
       })
-      .catch(HappnNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
   }
 
   onNotAuthorizedError () {

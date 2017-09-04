@@ -73,169 +73,184 @@ class Tinder extends Channel {
   }
 
   getAccount () {
-    return Promise.try(() => {
-      if (!this._tinder.authToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._tinder.getAccount())
-      .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
+    const _getAccount = () => {
+      return this._tinder.getAccount()
+        .catch(TinderNotAuthorizedError, () => { throw new NotAuthorizedError() })
+    }
+
+    return _getAccount()
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getAccount())
+      })
   }
 
   getRecommendations () {
-    return Promise.try(() => {
-      if (!this._tinder.authToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._tinder.getRecommendations())
-      .then(({ results }) => results)
-      .mapSeries((result) => {
-        return {
-          channelName: 'tinder',
-          channelRecommendationId: result._id,
-          name: result.name,
-          photos: _.map(result.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
-          data: result
-        }
+    const _getRecommendations = () => {
+      return this._tinder.getRecommendations()
+        .then(({ results }) => results)
+        .mapSeries((result) => {
+          return {
+            channelName: 'tinder',
+            channelRecommendationId: result._id,
+            name: result.name,
+            photos: _.map(result.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+            data: result
+          }
+        })
+        .catch(TinderNotAuthorizedError, () => { throw new NotAuthorizedError() })
+    }
+
+    return _getRecommendations()
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getRecommendations())
       })
-      .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
 
   getUpdates () {
-    return Promise.try(() => {
-      if (!this._tinder.authToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => Database.channels.find({ where: { name: this._name } }))
-      .then(({ lastActivityDate, userId }) => {
-        const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
+    const _getUpdates = () => {
+      return Database.channels.find({ where: { name: this._name } })
+        .then(({ lastActivityDate, userId }) => {
+          const _lastActivityDate = !lastActivityDate ? undefined : lastActivityDate
 
-        return this._tinder.getUpdates(_lastActivityDate)
-          .then((data) => {
-            return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
-              .then(() => {
-                return Promise.mapSeries((data.matches), (match) => {
-                  if (match.is_new_message) {
-                    const channelRecommendationId = match.messages[ 0 ].from === userId ? match.messages[ 0 ].to : match.messages[ 0 ].from
-                    const channelMatchId = match.messages[ 0 ].match_id
-                    const messages = _.map(match.messages, (message) => {
-                      return {
-                        channelName: 'tinder',
-                        channelMessageId: message._id,
-                        recommendationId: channelRecommendationId,
-                        isFromRecommendation: message.from !== userId,
-                        sentDate: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
-                        text: message.message
-                      }
-                    })
-
-                    return this.getUser(channelRecommendationId)
-                      .then((channelRecommendation) => {
-                        channelRecommendation.channelMatchId = channelMatchId
-
-                        return { recommendation: channelRecommendation, messages }
-                      })
-                  } else {
-                    return {
-                      isNewMatch: true,
-                      recommendation: {
-                        channelName: 'tinder',
-                        channelRecommendationId: match.person._id,
-                        name: match.person.name,
-                        photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
-                        channelMatchId: match.id,
-                        matchedDate: new Date(match.created_date),
-                        data: match.person
-                      },
-                      messages: _.map(match.messages, (message) => {
+          return this._tinder.getUpdates(_lastActivityDate)
+            .then((data) => {
+              return Database.channels.update({ lastActivityDate: new Date() }, { where: { name: this._name } })
+                .then(() => {
+                  return Promise.mapSeries((data.matches), (match) => {
+                    if (match.is_new_message) {
+                      const channelRecommendationId = match.messages[ 0 ].from === userId ? match.messages[ 0 ].to : match.messages[ 0 ].from
+                      const channelMatchId = match.messages[ 0 ].match_id
+                      const messages = _.map(match.messages, (message) => {
                         return {
                           channelName: 'tinder',
                           channelMessageId: message._id,
-                          recommendationId: message.from === userId ? message.to : message.from,
+                          recommendationId: channelRecommendationId,
                           isFromRecommendation: message.from !== userId,
                           sentDate: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
                           text: message.message
                         }
                       })
+
+                      return this.getUser(channelRecommendationId)
+                        .then((channelRecommendation) => {
+                          channelRecommendation.channelMatchId = channelMatchId
+
+                          return { recommendation: channelRecommendation, messages }
+                        })
+                    } else {
+                      return {
+                        isNewMatch: true,
+                        recommendation: {
+                          channelName: 'tinder',
+                          channelRecommendationId: match.person._id,
+                          name: match.person.name,
+                          photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+                          channelMatchId: match.id,
+                          matchedDate: new Date(match.created_date),
+                          data: match.person
+                        },
+                        messages: _.map(match.messages, (message) => {
+                          return {
+                            channelName: 'tinder',
+                            channelMessageId: message._id,
+                            recommendationId: message.from === userId ? message.to : message.from,
+                            isFromRecommendation: message.from !== userId,
+                            sentDate: new Date(message.sent_date.replace(/T/, ' ').replace(/\..+/, '')),
+                            text: message.message
+                          }
+                        })
+                      }
                     }
-                  }
+                  })
                 })
-              })
-          })
+            })
+        })
+        .catch(TinderNotAuthorizedError, () => { throw new NotAuthorizedError() })
+    }
+
+    return _getUpdates()
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getUpdates())
       })
-      .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
 
   like (userId, photoId, contentHash, sNumber) {
-    if (!userId) {
-      return Promise.reject(new Error('invalid arguments'))
+    const _like = (userId, photoId, contentHash, sNumber) => {
+      return Promise.try(() => {
+        if (!userId) {
+          throw new Error('invalid arguments')
+        }
+      })
+        .then(() => Database.channels.find({ where: { name: this._name } }))
+        .then(({ isOutOfLikes, outOfLikesDate }) => {
+          if (isOutOfLikes) {
+            if (moment().isBefore(moment(outOfLikesDate).add(12, 'hour'))) {
+              throw new OutOfLikesError()
+            } else {
+              return Database.channels.update({
+                isOutOfLikes: false,
+                outOfLikesDate: null
+              }, { where: { name: this._name } })
+            }
+          }
+        })
+        .then(() => {
+          return this._tinder.like(userId, photoId, contentHash, sNumber)
+            .then(({ match }) => {
+              if (!match) {
+                return
+              }
+
+              return {
+                channelName: 'tinder',
+                channelRecommendationId: match.person._id,
+                name: match.person.name,
+                photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+                channelMatchId: match.id,
+                matchedDate: new Date(match.created_date),
+                data: match.person
+              }
+            })
+            .catch(TinderOutOfLikesError, () => this.onOutOfLikesError())
+        })
+        .catch(TinderNotAuthorizedError, () => { throw new NotAuthorizedError() })
     }
 
-    return Promise.try(() => {
-      if (!this._tinder.authToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => {
-        return Database.channels.find({ where: { name: this._name } })
-          .then(({ isOutOfLikes, outOfLikesDate }) => {
-            if (isOutOfLikes) {
-              if (moment().isBefore(moment(outOfLikesDate).add(12, 'hour'))) {
-                throw new OutOfLikesError()
-              } else {
-                return Database.channels.update({
-                  isOutOfLikes: false,
-                  outOfLikesDate: null
-                }, { where: { name: this._name } })
-              }
-            }
-          })
+    return _like(userId, photoId, contentHash, sNumber)
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _like(userId, photoId, contentHash, sNumber))
       })
-      .then(() => {
-        return this._tinder.like(userId, photoId, contentHash, sNumber)
-          .then(({ match }) => {
-            if (!match) {
-              return
-            }
-
-            return {
-              channelName: 'tinder',
-              channelRecommendationId: match.person._id,
-              name: match.person.name,
-              photos: _.map(match.person.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
-              channelMatchId: match.id,
-              matchedDate: new Date(match.created_date),
-              data: match.person
-            }
-          })
-          .catch(TinderOutOfLikesError, () => this.onOutOfLikesError())
-      })
-      .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError())
   }
 
   getUser (userId) {
-    if (!userId) {
-      return Promise.reject(new Error('invalid arguments'))
-    }
-
-    return Promise.try(() => {
-      if (!this._tinder.authToken) {
-        throw new NotAuthorizedError()
-      }
-    })
-      .then(() => this._tinder.getUser(userId))
-      .then(({ results }) => {
-        return {
-          channelName: 'tinder',
-          channelRecommendationId: results._id,
-          name: results.name,
-          photos: _.map(results.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
-          data: results
+    const _getUser = (userId) => {
+      return Promise.try(() => {
+        if (!userId) {
+          throw new Error('invalid arguments')
         }
       })
-      .catch(TinderNotAuthorizedError, () => this.onNotAuthorizedError.bind(this)())
+        .then(() => this._tinder.getUser(userId))
+        .then(({ results }) => {
+          return {
+            channelName: 'tinder',
+            channelRecommendationId: results._id,
+            name: results.name,
+            photos: _.map(results.photos, (photo) => _.pick(photo, [ 'url', 'id' ])),
+            data: results
+          }
+        })
+        .catch(TinderNotAuthorizedError, () => { throw new NotAuthorizedError() })
+    }
+
+    return _getUser(userId)
+      .catch(NotAuthorizedError, () => {
+        return this.onNotAuthorizedError.bind(this)()
+          .then(() => _getUser(userId))
+      })
   }
 
   onNotAuthorizedError () {
