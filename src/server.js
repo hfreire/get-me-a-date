@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const FIND_DATES_PERIOD = process.env.FIND_DATES_PERIOD || 10 * 60 * 1000
+const FIND_DATES_PERIOD = (process.env.FIND_DATES_PERIOD || 10 * 60) * 1000
 
 const { Serverful } = require('serverful')
 
