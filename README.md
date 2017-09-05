@@ -28,6 +28,7 @@ docker run -d -p "5940:3000" hfreire/get-me-a-date
 #### Available environment variables
 Variable | Description | Required | Default value
 :---:|:---:|:---:|:---:
+FIND_DATES_PERIOD | The time period (in seconds) between finding dates. | false | `600000`
 PORT | The port to be used by the HTTP server | false | `5940`
 API_KEYS | The secret keys that should be used when securing endpoints | false | `undefined`
 SO_TIMEOUT | TCP socket connection timeout | false | `120000`
