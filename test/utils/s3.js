@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+/* eslint-disable promise/no-callback-in-promise */
+
 describe('S3', () => {
   let subject
   let AWS
@@ -12,7 +14,7 @@ describe('S3', () => {
   before(() => {
     AWS = td.object([ 'config' ])
     AWS.config.update = td.function()
-    AWS.S3 = td.constructor([ 'putObject', 'copyObject', 'getObject', 'deleteObject', 'listObjects' ])
+    AWS.S3 = td.constructor([ 'listBuckets', 'createBucket', 'putBucketPolicy', 'putObject', 'copyObject', 'getObject', 'deleteObject', 'listObjects' ])
   })
 
   afterEach(() => td.reset())
@@ -42,21 +44,104 @@ describe('S3', () => {
     })
   })
 
-  describe('when putting an object', () => {
-    const bucket = 'my-bucket'
-    const key = 'my-key'
-    const data = 'my-data'
-    const options = { bucket }
+  describe('when listing buckets', () => {
+    const options = {}
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.listBuckets(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback({})
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
       subject = new S3(options)
+      subject.listBuckets()
+    })
 
-      td.when(AWS.S3.prototype.putObject(), { ignoreExtraArgs: true }).thenCallback()
+    it('should call AWS S3 listBuckets', () => {
+      td.verify(AWS.S3.prototype.listBuckets({}), { ignoreExtraArgs: true, times: 1 })
+    })
+  })
 
-      subject.putObject(key, data)
+  describe('when creating a bucket', () => {
+    const bucket = 'my-bucket'
+    const policy = JSON.stringify({
+      Version: '2008-10-17',
+      Statement: [
+        {
+          Sid: 'AllowPublicRead',
+          Effect: 'Allow',
+          Principal: {
+            AWS: '*'
+          },
+          Action: 's3:GetObject',
+          Resource: `arn:aws:s3:::${bucket}/*`
+        }
+      ]
+    })
+    const options = { bucket }
+
+    beforeEach(() => {
+      td.when(AWS.S3.prototype.createBucket(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
+      td.when(AWS.S3.prototype.putBucketPolicy(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
+      td.replace('aws-sdk', AWS)
+
+      const S3 = require('../../src/utils/s3')
+      subject = new S3(options)
+    })
+
+    it('should call AWS S3 createBucket', () => {
+      return subject.createBucket(bucket)
+        .then(() => {
+          td.verify(AWS.S3.prototype.createBucket({ Bucket: bucket }), { ignoreExtraArgs: true, times: 1 })
+        })
+    })
+
+    it('should call AWS S3 putBucketPolicy', () => {
+      return subject.createBucket(bucket)
+        .then(() => {
+          td.verify(AWS.S3.prototype.putBucketPolicy({ Bucket: bucket, Policy: policy }), {
+            ignoreExtraArgs: true,
+            times: 1
+          })
+        })
+    })
+  })
+
+  describe('when creating a bucket with invalid arguments', () => {
+    const bucket = 'my-bucket'
+    const bucketName = undefined
+    const options = { bucket }
+
+    beforeEach(() => {
+      td.when(AWS.S3.prototype.createBucket(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
+      td.replace('aws-sdk', AWS)
+
+      const S3 = require('../../src/utils/s3')
+      subject = new S3(options)
+    })
+
+    it('should reject with invalid arguments error', (done) => {
+      subject.createBucket(bucketName)
+        .catch((error) => {
+          error.should.be.instanceOf(Error)
+          error.message.should.be.equal('invalid arguments')
+
+          done()
+        })
+    })
+  })
+
+  describe('when putting an object', () => {
+    const bucket = 'my-bucket'
+    const key = 'my-key'
+    const data = 'my-data'
+
+    beforeEach(() => {
+      td.when(AWS.S3.prototype.putObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
+      td.replace('aws-sdk', AWS)
+
+      const S3 = require('../../src/utils/s3')
+      subject = new S3()
+      subject.putObject(bucket, key, data)
     })
 
     it('should call AWS S3 putObject', () => {
@@ -72,22 +157,22 @@ describe('S3', () => {
     const bucket = 'my-bucket'
     const key = undefined
     const data = undefined
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.putObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      td.when(AWS.S3.prototype.putObject(), { ignoreExtraArgs: true }).thenCallback()
+      subject = new S3()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.putObject(key, data)
+    it('should reject with invalid arguments error', (done) => {
+      subject.putObject(bucket, key, data)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })
@@ -96,17 +181,14 @@ describe('S3', () => {
     const bucket = 'my-bucket'
     const srcKey = 'my-source-key'
     const dstKey = 'my-destination-key'
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.copyObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      td.when(AWS.S3.prototype.copyObject(), { ignoreExtraArgs: true }).thenCallback()
-
-      subject.copyObject(srcKey, dstKey)
+      subject = new S3()
+      subject.copyObject(bucket, srcKey, dstKey)
     })
 
     it('should call AWS S3 copyObject', () => {
@@ -122,22 +204,22 @@ describe('S3', () => {
     const bucket = 'my-bucket'
     const srcKey = undefined
     const dstKey = undefined
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.copyObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      td.when(AWS.S3.prototype.copyObject(), { ignoreExtraArgs: true }).thenCallback()
+      subject = new S3()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.copyObject(srcKey, dstKey)
+    it('should reject with invalid arguments error', (done) => {
+      subject.copyObject(bucket, srcKey, dstKey)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })
@@ -145,15 +227,14 @@ describe('S3', () => {
   describe('when getting an object', () => {
     const bucket = 'my-bucket'
     const key = 'my-key'
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.getObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      subject.getObject(key)
+      subject = new S3()
+      subject.getObject(bucket, key)
     })
 
     it('should call AWS S3 getObject', () => {
@@ -167,22 +248,22 @@ describe('S3', () => {
   describe('when getting an object with invalid arguments', () => {
     const bucket = 'my-bucket'
     const key = undefined
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.getObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      td.when(AWS.S3.prototype.getObject(), { ignoreExtraArgs: true }).thenCallback()
+      subject = new S3()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.getObject(key)
+    it('should reject with invalid arguments error', (done) => {
+      subject.getObject(bucket, key)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })
@@ -190,15 +271,14 @@ describe('S3', () => {
   describe('when deleting an object', () => {
     const bucket = 'my-bucket'
     const key = 'my-key'
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.deleteObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      subject.deleteObject(key)
+      subject = new S3()
+      subject.deleteObject(bucket, key)
     })
 
     it('should call AWS S3 deleteObject', () => {
@@ -212,22 +292,22 @@ describe('S3', () => {
   describe('when deleting an object with invalid arguments', () => {
     const bucket = 'my-bucket'
     const key = undefined
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.deleteObject(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      td.when(AWS.S3.prototype.deleteObject(), { ignoreExtraArgs: true }).thenCallback()
+      subject = new S3()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.deleteObject(key)
+    it('should reject with invalid arguments error', (done) => {
+      subject.deleteObject(bucket, key)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })
@@ -235,15 +315,14 @@ describe('S3', () => {
   describe('when listing objects', () => {
     const bucket = 'my-bucket'
     const prefix = 'my-prefix'
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.listObjects(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback({})
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      subject.listObjects(prefix)
+      subject = new S3()
+      subject.listObjects(bucket, prefix)
     })
 
     it('should call AWS S3 listObjectsAsync', () => {
@@ -258,22 +337,22 @@ describe('S3', () => {
   describe('when listing objects with invalid arguments', () => {
     const bucket = 'my-bucket'
     const prefix = undefined
-    const options = { bucket }
 
     beforeEach(() => {
+      td.when(AWS.S3.prototype.listObjects(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback()
       td.replace('aws-sdk', AWS)
 
       const S3 = require('../../src/utils/s3')
-      subject = new S3(options)
-
-      td.when(AWS.S3.prototype.listObjects(), { ignoreExtraArgs: true }).thenCallback()
+      subject = new S3()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.listObjects(prefix)
+    it('should reject with invalid arguments error', (done) => {
+      subject.listObjects(bucket, prefix)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })

@@ -15,6 +15,7 @@ const Boom = require('boom')
 const Logger = require('modern-logger')
 
 const Database = require('../../database')
+const { Dates } = require('../../dates')
 
 class UpdateChannel extends Route {
   constructor () {
@@ -26,8 +27,16 @@ class UpdateChannel extends Route {
 
     return Promise.try(() => JSON.parse(payload))
       .then((channel) => Database.channels.update(channel, { where: { name } }))
-      .then(() => Database.channels.find({ where: { name } }))
-      .then((channel) => reply(channel))
+      .then(() => {
+        return Database.channels.find({ where: { name } })
+          .then((channel) => {
+            if (channel && !channel.lastActivityDate && channel.isEnabled) {
+              Dates.findByChannelName(channel.name)
+            }
+
+            return reply(channel)
+          })
+      })
       .catch((error) => {
         Logger.error(error)
 

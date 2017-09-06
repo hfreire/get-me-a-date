@@ -30,6 +30,9 @@ class S3 {
 
     this._breaker = new Brakes(this._options.breaker)
 
+    this._s3.listBucketsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.listBucketsAsync(params), this._options.retry))
+    this._s3.createBucketCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.createBucketAsync(params), this._options.retry))
+    this._s3.putBucketPolicyCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.putBucketPolicyAsync(params), this._options.retry))
     this._s3.putObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.putObjectAsync(params), this._options.retry))
     this._s3.copyObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.copyObjectAsync(params), this._options.retry))
     this._s3.getObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.getObjectAsync(params), this._options.retry))
@@ -45,58 +48,100 @@ class S3 {
     }))
   }
 
-  putObject (key, data) {
-    if (!key || !data) {
+  listBuckets () {
+    const params = {}
+
+    return this._s3.listBucketsCircuitBreaker.exec(params)
+      .then(({ Buckets }) => _.map(Buckets, 'Name'))
+  }
+
+  createBucket (bucket) {
+    if (!bucket) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const params = { Bucket: this._options.bucket, Key: key, Body: data }
+    const params = {
+      Bucket: bucket
+    }
+
+    return this._s3.createBucketCircuitBreaker.exec(params)
+      .then(() => {
+        const policy = {
+          Version: '2008-10-17',
+          Statement: [
+            {
+              Sid: 'AllowPublicRead',
+              Effect: 'Allow',
+              Principal: {
+                AWS: '*'
+              },
+              Action: 's3:GetObject',
+              Resource: `arn:aws:s3:::${bucket}/*`
+            }
+          ]
+        }
+
+        const params = {
+          Bucket: bucket,
+          Policy: JSON.stringify(policy)
+        }
+
+        return this._s3.putBucketPolicyCircuitBreaker.exec(params)
+      })
+  }
+
+  putObject (bucket, key, data) {
+    if (!bucket || !key || !data) {
+      return Promise.reject(new Error('invalid arguments'))
+    }
+
+    const params = { Bucket: bucket, Key: key, Body: data }
 
     return this._s3.putObjectCircuitBreaker.exec(params)
   }
 
-  copyObject (srcKey, dstKey) {
-    if (!srcKey || !dstKey) {
+  copyObject (bucket, srcKey, dstKey) {
+    if (!bucket || !srcKey || !dstKey) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const params = { Bucket: this._options.bucket, CopySource: srcKey, Key: dstKey }
+    const params = { Bucket: bucket, CopySource: srcKey, Key: dstKey }
 
     return this._s3.copyObjectCircuitBreaker.exec(params)
   }
 
-  getObject (key) {
-    if (!key) {
+  getObject (bucket, key) {
+    if (!bucket || !key) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const params = { Bucket: this._options.bucket, Key: key }
+    const params = { Bucket: bucket, Key: key }
 
     return this._s3.getObjectCircuitBreaker.exec(params)
   }
 
-  deleteObject (key) {
-    if (!key) {
+  deleteObject (bucket, key) {
+    if (!bucket || !key) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const params = { Bucket: this._options.bucket, Key: key }
+    const params = { Bucket: bucket, Key: key }
 
     return this._s3.deleteObjectCircuitBreaker.exec(params)
   }
 
-  listObjects (prefix, maxKeys = 1000) {
-    if (!prefix) {
+  listObjects (bucket, prefix, maxKeys = 1000) {
+    if (!bucket || !prefix) {
       return Promise.reject(new Error('invalid arguments'))
     }
 
-    const params = { Bucket: this._options.bucket, Prefix: prefix, MaxKeys: maxKeys }
+    const params = { Bucket: bucket, Prefix: prefix, MaxKeys: maxKeys }
 
     let objects = []
     const _listObjects = (params) => {
       return this._s3.listObjectsCircuitBreaker.exec(params)
         .then((data) => {
-          objects = objects.concat(_.map(data.Contents, ({ Key }) => Key))
+          objects = objects.concat(_.map(data.Contents, 'Key'))
 
           if (data.IsTruncated) {
             if (data.NextMarker) {

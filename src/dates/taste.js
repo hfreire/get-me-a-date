@@ -10,8 +10,8 @@ const _ = require('lodash')
 const AWS_REGION = process.env.AWS_REGION
 const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
-const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || `get-me-a-date-${_.now()}-${_.uniqueId()}`
-const AWS_REKOGNITION_COLLECTION = process.env.AWS_REKOGNITION_COLLECTION || 'get-me-a-date'
+const AWS_REKOGNITION_COLLECTION = process.env.AWS_REKOGNITION_COLLECTION
+const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET
 
 const Promise = require('bluebird')
 
@@ -29,7 +29,7 @@ const sharp = require('sharp')
 const { parse } = require('url')
 
 const deleteFaces = function (faces) {
-  return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, faces)
+  return this._rekognition.deleteFaces(this._rekognitionCollection, faces)
     .then(() => faces.length)
     .catch((error) => Logger.warn(error))
 }
@@ -38,7 +38,7 @@ const indexFacesFromImages = function (images) {
   let indexedFaces = 0
 
   return Promise.map(images, (image) => {
-    return this.rekognition.indexFaces(AWS_REKOGNITION_COLLECTION, AWS_S3_BUCKET, image)
+    return this._rekognition.indexFaces(this._rekognitionCollection, this._s3Bucket, image)
       .then((data) => {
         if (!data.FaceRecords) {
           return
@@ -46,9 +46,9 @@ const indexFacesFromImages = function (images) {
 
         // delete images with no or multiple faces
         if (data.FaceRecords.length !== 1) {
-          return this.rekognition.deleteFaces(AWS_REKOGNITION_COLLECTION, _.map(data.FaceRecords, ({ Face }) => Face.FaceId))
+          return this._rekognition.deleteFaces(this._rekognitionCollection, _.map(data.FaceRecords, ({ Face }) => Face.FaceId))
             .then(() => {
-              return this.s3.deleteObject(image)
+              return this._s3.deleteObject(this._s3Bucket, image)
             })
         }
 
@@ -56,7 +56,7 @@ const indexFacesFromImages = function (images) {
       })
       .catch((error) => {
         if (_.some([ 'InvalidImageFormatException', 'InvalidParameterException' ], (message) => _.includes(error.code, message))) {
-          return this.s3.deleteObject(image)
+          return this._s3.deleteObject(this._s3Bucket, image)
         }
 
         return Logger.warn(error)
@@ -95,14 +95,14 @@ const savePhoto = function (channelName, photo, options = {}) {
       return body
     })
     .then((body) => {
-      let pathname = url.pathname.substring(1).replace('cache/images/', '').replace(`${AWS_S3_BUCKET}/photos/${channelName}/`, '')
+      let pathname = url.pathname.substring(1).replace('cache/images/', '').replace(`${this._s3Bucket}/photos/${channelName}/`, '')
       if (options.rename) {
         pathname = _.split(pathname, '/')[ 0 ] + `/${options.rename.prepend}` + _.split(pathname, '/')[ 1 ]
       }
 
-      return this.s3.putObject(`photos/${channelName}/${pathname}`, body)
+      return this._s3.putObject(this._s3Bucket, `photos/${channelName}/${pathname}`, body)
         .then(() => {
-          photo.url = `https://s3-${AWS_REGION}.amazonaws.com/${AWS_S3_BUCKET}/photos/${channelName}/${pathname}`
+          photo.url = `https://s3-${AWS_REGION}.amazonaws.com/${this._s3Bucket}/photos/${channelName}/${pathname}`
 
           return body
         })
@@ -110,7 +110,7 @@ const savePhoto = function (channelName, photo, options = {}) {
 }
 
 const compareFacesFromImage = function (photo, image) {
-  return this.rekognition.searchFacesByImage(AWS_REKOGNITION_COLLECTION, image)
+  return this._rekognition.searchFacesByImage(this._rekognitionCollection, image)
     .then(({ FaceMatches }) => {
       photo.similarity = _.round(_.max(_.map(FaceMatches, 'Similarity')), 2) || 0
       photo.similarity_date = new Date().toISOString()
@@ -131,30 +131,54 @@ const compareFacesFromImage = function (photo, image) {
 
 class Taste {
   constructor () {
-    this.rekognition = new Rekognition({
+    this._rekognitionCollection = AWS_REKOGNITION_COLLECTION
+    this._s3Bucket = AWS_S3_BUCKET
+
+    this._rekognition = new Rekognition({
       region: AWS_REGION,
       accessKeyId: AWS_ACCESS_KEY_ID,
       secretAccessKey: AWS_SECRET_ACCESS_KEY
     })
 
-    this.s3 = new S3({
+    this._s3 = new S3({
       region: AWS_REGION,
-      bucket: AWS_S3_BUCKET,
       accessKeyId: AWS_ACCESS_KEY_ID,
       secretAccessKey: AWS_SECRET_ACCESS_KEY
     })
   }
 
   start () {
-    return this.createRekognitionCollectionIfNeeded()
+    return Promise.all([
+      this.createRekognitionCollectionIfNeeded(),
+      this.createS3BucketIfNeeded()
+    ])
       .then(() => this.syncS3BucketAndRekognitionCollection())
   }
 
   createRekognitionCollectionIfNeeded () {
-    return this.rekognition.listCollections()
+    return this._rekognition.listCollections()
       .then((collectionIds) => {
-        if (!_.includes(collectionIds, AWS_REKOGNITION_COLLECTION)) {
-          return this.rekognition.createCollection(AWS_REKOGNITION_COLLECTION)
+        this._rekognitionCollection = this._rekognitionCollection ||
+          _.find(collectionIds, (collectionId) => _.startsWith(collectionId, 'get-me-a-date-')) ||
+          `get-me-a-date-${_.now()}-${_.random(9)}`
+
+        if (!_.includes(collectionIds, this._rekognitionCollection)) {
+          return Logger.debug(`Creating AWS Rekognition collection ${this._rekognitionCollection}`)
+            .then(() => this._rekognition.createCollection(this._rekognitionCollection))
+        }
+      })
+  }
+
+  createS3BucketIfNeeded () {
+    return this._s3.listBuckets()
+      .then((buckets) => {
+        this._s3Bucket = this._s3Bucket ||
+          _.find(buckets, (bucket) => _.startsWith(bucket, 'get-me-a-date-')) ||
+          `get-me-a-date-${_.now()}-${_.random(9)}`
+
+        if (!_.includes(buckets, this._s3Bucket)) {
+          return Logger.debug(`Creating AWS S3 bucket ${this._s3Bucket}`)
+            .then(() => this._s3.createBucket(this._s3Bucket))
         }
       })
   }
@@ -163,8 +187,8 @@ class Taste {
     const start = _.now()
 
     return Promise.props({
-      currentFaces: this.rekognition.listFaces(AWS_REKOGNITION_COLLECTION),
-      availableImages: this.s3.listObjects('train')
+      currentFaces: this._rekognition.listFaces(this._rekognitionCollection),
+      availableImages: this._s3.listObjects(this._s3Bucket, 'train')
     })
       .then(({ currentFaces, availableImages }) => {
         const { Faces } = currentFaces
@@ -258,9 +282,9 @@ class Taste {
       }
 
       const srcKey = url.pathname
-      const dstKey = srcKey.replace(`/${AWS_S3_BUCKET}/photos`, 'train')
+      const dstKey = srcKey.replace(`/${this._s3Bucket}/photos`, 'train')
 
-      return this.s3.copyObject(srcKey, dstKey)
+      return this._s3.copyObject(this._s3Bucket, srcKey, dstKey)
         .then(() => dstKey)
     }, { concurrency: 2 })
       .then((images) => indexFacesFromImages.bind(this)(images))

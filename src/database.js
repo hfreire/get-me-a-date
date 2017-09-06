@@ -111,7 +111,7 @@ class Database {
         isEnabled: { type: Sequelize.BOOLEAN, defaultValue: false },
         userId: { type: Sequelize.STRING, defaultValue: false },
         accessToken: { type: Sequelize.TEXT, defaultValue: null },
-        lastActivityDate: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.NOW },
+        lastActivityDate: { type: Sequelize.DATE, defaultValue: null },
         isOutOfLikes: { type: Sequelize.BOOLEAN, defaultValue: false },
         outOfLikesDate: { type: Sequelize.DATE, defaultValue: null }
       }),

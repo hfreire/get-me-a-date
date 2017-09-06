@@ -40,15 +40,17 @@ class Channel {
   }
 
   getByName (name) {
-    if (!name) {
-      throw new Error('invalid arguments')
-    }
+    return Promise.try(() => {
+      if (!name) {
+        throw new Error('invalid arguments')
+      }
 
-    if (!this._channels[ name ]) {
-      throw new Error(`channel ${name} not found`)
-    }
+      if (!this._channels[ name ]) {
+        throw new Error(`channel ${name} not found`)
+      }
 
-    return this._channels[ name ]
+      return this._channels[ name ]
+    })
   }
 }
 

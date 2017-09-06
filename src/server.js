@@ -9,7 +9,6 @@ const FIND_DATES_PERIOD = (process.env.FIND_DATES_PERIOD || 10 * 60) * 1000
 
 const { Serverful } = require('serverful')
 
-const _ = require('lodash')
 const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
@@ -18,19 +17,12 @@ const Database = require('./database')
 const { Dates } = require('./dates')
 
 const findDates = function () {
-  const startDate = _.now()
-
-  Logger.info('Started finding dates')
+  clearTimeout(this._timeout)
 
   return Dates.find()
     .catch((error) => Logger.error(error))
     .finally(() => {
-      const stopDate = _.now()
-      const duration = _.round((stopDate - startDate) / 1000, 1)
-
-      Logger.info(`Finished finding dates (time = ${duration}s)`)
-
-      this.timeout = setTimeout(() => findDates(), FIND_DATES_PERIOD)
+      this._timeout = setTimeout(() => findDates(), FIND_DATES_PERIOD)
     })
 }
 

@@ -44,6 +44,23 @@ const likeOrPass = (channel, recommendation, like, pass) => {
   return Promise.resolve(recommendation)
 }
 
+const findByChannel = function (channel) {
+  const checkRecommendations = function (channel) {
+    return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} channel`)
+      .then(() => this.checkRecommendations(channel))
+      .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} channel (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
+  }
+
+  const checkUpdates = function (channel) {
+    return Logger.info(`Started checking updates from ${_.capitalize(channel.name)} `)
+      .then(() => this.checkUpdates(channel))
+      .then(({ matches = 0, messages = 0 }) => Logger.info(`Finished checking updates from ${_.capitalize(channel.name)} (matches = ${matches}, messages = ${messages})`))
+  }
+
+  return checkRecommendations.bind(this)(channel)
+    .then(() => checkUpdates.bind(this)(channel))
+}
+
 class Dates {
   start () {
     const startChannel = () => {
@@ -60,11 +77,9 @@ class Dates {
   }
 
   find () {
-    const findByChannel = function (channel) {
-      return Logger.info(`Started finding dates in ${_.capitalize(channel.name)} channel`)
-        .then(() => this.findByChannel(channel))
-        .finally(() => Logger.info(`Finished finding dates in ${_.capitalize(channel.name)} channel`))
-    }
+    const startDate = _.now()
+
+    Logger.info('Started finding dates')
 
     const updateStats = () => {
       return Logger.info('Started updating stats')
@@ -78,28 +93,24 @@ class Dates {
           return
         }
 
-        const channel = Channel.getByName(name)
-
-        return findByChannel.bind(this)(channel)
+        return this.findByChannelName(name)
       })
       .then(() => updateStats())
+      .finally(() => {
+        const stopDate = _.now()
+        const duration = _.round((stopDate - startDate) / 1000, 1)
+
+        Logger.info(`Finished finding dates (time = ${duration}s)`)
+      })
   }
 
-  findByChannel (channel) {
-    const checkRecommendations = function (channel) {
-      return Logger.info(`Started checking recommendations from ${_.capitalize(channel.name)} channel`)
-        .then(() => this.checkRecommendations(channel))
-        .then(({ received = 0, skipped = 0, failed = 0 }) => Logger.info(`Finished checking recommendations from ${_.capitalize(channel.name)} channel (received = ${received}, skipped = ${skipped}, failed = ${failed})`))
-    }
-
-    const checkUpdates = function (channel) {
-      return Logger.info(`Started checking updates from ${_.capitalize(channel.name)} `)
-        .then(() => this.checkUpdates(channel))
-        .then(({ matches = 0, messages = 0 }) => Logger.info(`Finished checking updates from ${_.capitalize(channel.name)} (matches = ${matches}, messages = ${messages})`))
-    }
-
-    return checkRecommendations.bind(this)(channel)
-      .then(() => checkUpdates.bind(this)(channel))
+  findByChannelName (channelName) {
+    return Channel.getByName(channelName)
+      .then((channel) => {
+        return Logger.info(`Started finding dates in ${_.capitalize(channel.name)} channel`)
+          .then(() => findByChannel.bind(this)(channel))
+          .finally(() => Logger.info(`Finished finding dates in ${_.capitalize(channel.name)} channel`))
+      })
   }
 
   checkRecommendations (channel) {
