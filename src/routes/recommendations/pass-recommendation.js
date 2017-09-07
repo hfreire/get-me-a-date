@@ -17,9 +17,9 @@ const { Recommendation, Stats, Channel } = require('../../dates')
 
 const pass = (recommendation) => {
   const channelName = recommendation.channelName
-  const channel = Channel.getByName(channelName)
 
-  return Recommendation.pass(channel, recommendation)
+  return Channel.getByName(channelName)
+    .then((channel) => Recommendation.pass(channel, recommendation))
     .then((recommendation) => {
       recommendation.isHumanDecision = true
       recommendation.decisionDate = new Date()

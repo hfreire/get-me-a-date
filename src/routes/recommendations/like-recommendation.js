@@ -18,9 +18,9 @@ const { Recommendation, Stats, Channel } = require('../../dates')
 
 const like = (recommendation) => {
   const channelName = recommendation.channelName
-  const channel = Channel.getByName(channelName)
 
-  return Recommendation.like(channel, recommendation)
+  return Channel.getByName(channelName)
+    .then((channel) => Recommendation.like(channel, recommendation))
     .then((recommendation) => {
       recommendation.isHumanDecision = true
       recommendation.decisionDate = new Date()
