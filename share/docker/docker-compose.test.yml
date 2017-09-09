@@ -1,7 +1,8 @@
-version: "3"
+version: "3.3"
 
-sut:
-  build:
-    context: ../../
-    dockerfile: ./Dockerfile
-  command: /test.sh
+services:
+  sut:
+    build:
+      context: ../../
+      dockerfile: ./Dockerfile
+    command: /test.sh
