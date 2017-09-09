@@ -1,3 +1,5 @@
 sut:
-  build: .
+  build:
+    context: ../../
+    dockerfile: ./Dockerfile
   command: /test.sh
