@@ -4,5 +4,5 @@ services:
   sut:
     build:
       context: ../../
-      dockerfile: ./Dockerfile
+      dockerfile: share/docker/Dockerfile
     command: /test.sh
