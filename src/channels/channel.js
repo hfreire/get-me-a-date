@@ -13,7 +13,23 @@ const Promise = require('bluebird')
 
 const Logger = require('modern-logger')
 
+const Health = require('health-checkup')
+
 const FacebookLogin = require('facebook-login-for-robots')
+const facebookLogin = new FacebookLogin({
+  facebook: {
+    email: FACEBOOK_USER_EMAIL,
+    password: FACEBOOK_USER_PASSWORD
+  }
+})
+
+Health.addCheck('facebook', () => new Promise((resolve, reject) => {
+  if (facebookLogin.circuitBreaker.isOpen()) {
+    return reject(new Error(`circuit breaker is open`))
+  } else {
+    return resolve()
+  }
+}))
 
 const { OutOfLikesError } = require('./errors')
 
@@ -31,13 +47,6 @@ const createChannelIfNeeded = function () {
 class Channel {
   constructor (name) {
     this._name = name
-
-    this._facebookLogin = new FacebookLogin({
-      facebook: {
-        email: FACEBOOK_USER_EMAIL,
-        password: FACEBOOK_USER_PASSWORD
-      }
-    })
   }
 
   get name () {
@@ -63,7 +72,7 @@ class Channel {
 
         return Logger.debug(`Started Facebook Login for ${_.capitalize(this.name)} channel`)
           .then(() => {
-            return this._facebookLogin.oauthDialog(clientId, redirectUri, optionalParams)
+            return facebookLogin.oauthDialog(clientId, redirectUri, optionalParams)
               .finally(() => Logger.debug(`Finished Facebook Login for ${_.capitalize(this.name)} channel`))
           })
           .then(({ facebookAccessToken, facebookUserId }) => authorize({ facebookAccessToken, facebookUserId }))
@@ -89,7 +98,7 @@ class Channel {
           isOutOfLikes: true,
           outOfLikesDate: new Date()
         }, { where: { name: this._name } })
-          .then((d) => {
+          .then(() => {
             throw new OutOfLikesError()
           })
       })

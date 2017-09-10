@@ -28,19 +28,19 @@ class S3 {
 
     this._s3 = Promise.promisifyAll(new AWS.S3())
 
-    this._breaker = new Brakes(this._options.breaker)
+    this._circuitBreaker = new Brakes(this._options.breaker)
 
-    this._s3.listBucketsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.listBucketsAsync(params), this._options.retry))
-    this._s3.createBucketCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.createBucketAsync(params), this._options.retry))
-    this._s3.putBucketPolicyCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.putBucketPolicyAsync(params), this._options.retry))
-    this._s3.putObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.putObjectAsync(params), this._options.retry))
-    this._s3.copyObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.copyObjectAsync(params), this._options.retry))
-    this._s3.getObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.getObjectAsync(params), this._options.retry))
-    this._s3.deleteObjectCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.deleteObjectAsync(params), this._options.retry))
-    this._s3.listObjectsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._s3.listObjectsAsync(params), this._options.retry))
+    this._s3.listBucketsCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.listBucketsAsync(params), this._options.retry))
+    this._s3.createBucketCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.createBucketAsync(params), this._options.retry))
+    this._s3.putBucketPolicyCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.putBucketPolicyAsync(params), this._options.retry))
+    this._s3.putObjectCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.putObjectAsync(params), this._options.retry))
+    this._s3.copyObjectCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.copyObjectAsync(params), this._options.retry))
+    this._s3.getObjectCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.getObjectAsync(params), this._options.retry))
+    this._s3.deleteObjectCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.deleteObjectAsync(params), this._options.retry))
+    this._s3.listObjectsCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._s3.listObjectsAsync(params), this._options.retry))
 
     Health.addCheck('s3', () => new Promise((resolve, reject) => {
-      if (this._breaker.isOpen()) {
+      if (this._circuitBreaker.isOpen()) {
         return reject(new Error(`circuit breaker is open`))
       } else {
         return resolve()

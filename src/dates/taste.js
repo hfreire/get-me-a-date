@@ -85,7 +85,11 @@ const savePhoto = function (channelName, photo, options = {}) {
   }
 
   return request.getAsync(url.href)
-    .then(({ body }) => {
+    .then(({ body, statusCode, statusMessage }) => {
+      if (statusCode !== 200) {
+        throw new Error(`${statusCode} ${statusMessage}`)
+      }
+
       if (options.resize) {
         return sharp(body)
           .resize(options.resize.width, options.resize.height)

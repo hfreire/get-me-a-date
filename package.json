@@ -33,10 +33,10 @@
     "brakes": "2.5.3",
     "chart.js": "2.6.0",
     "core-js": "2.5.1",
-    "facebook-login-for-robots": "1.0.3",
+    "facebook-login-for-robots": "1.0.4",
     "font-awesome": "4.7.0",
     "hammerjs": "2.0.8",
-    "happn-wrapper": "1.1.3",
+    "happn-wrapper": "1.1.4",
     "health-checkup": "1.0.12",
     "lodash": "4.17.4",
     "modern-logger": "1.3.22",
@@ -48,7 +48,7 @@
     "serverful": "1.1.13",
     "sharp": "0.18.1",
     "sqlite3": "3.1.10",
-    "tinder-wrapper": "1.0.5",
+    "tinder-wrapper": "1.0.6",
     "zone.js": "0.8.16"
   },
   "devDependencies": {

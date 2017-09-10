@@ -47,19 +47,19 @@ class Rekognition {
 
     this._rekognition = Promise.promisifyAll(new AWS.Rekognition())
 
-    this._breaker = new Brakes(this._options.breaker)
+    this._circuitBreaker = new Brakes(this._options.breaker)
 
-    this._rekognition.listCollectionsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.listCollectionsAsync(params), this._options.retry))
-    this._rekognition.createCollectionCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.createCollectionAsync(params), this._options.retry))
-    this._rekognition.indexFacesCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.indexFacesAsync(params), this._options.retry))
-    this._rekognition.listFacesCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.listFacesAsync(params), this._options.retry))
-    this._rekognition.deleteFacesCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.deleteFacesAsync(params), this._options.retry))
-    this._rekognition.detectFacesCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.detectFacesAsync(params), this._options.retry))
-    this._rekognition.detectLabelsCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.detectLabelsAsync(params), this._options.retry))
-    this._rekognition.searchFacesByImageCircuitBreaker = this._breaker.slaveCircuit((params) => retry(() => this._rekognition.searchFacesByImageAsync(params), this._options.retry))
+    this._rekognition.listCollectionsCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.listCollectionsAsync(params), this._options.retry))
+    this._rekognition.createCollectionCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.createCollectionAsync(params), this._options.retry))
+    this._rekognition.indexFacesCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.indexFacesAsync(params), this._options.retry))
+    this._rekognition.listFacesCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.listFacesAsync(params), this._options.retry))
+    this._rekognition.deleteFacesCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.deleteFacesAsync(params), this._options.retry))
+    this._rekognition.detectFacesCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.detectFacesAsync(params), this._options.retry))
+    this._rekognition.detectLabelsCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.detectLabelsAsync(params), this._options.retry))
+    this._rekognition.searchFacesByImageCircuitBreaker = this._circuitBreaker.slaveCircuit((params) => retry(() => this._rekognition.searchFacesByImageAsync(params), this._options.retry))
 
     Health.addCheck('rekognition', () => new Promise((resolve, reject) => {
-      if (this._breaker.isOpen()) {
+      if (this._circuitBreaker.isOpen()) {
         return reject(new Error(`circuit breaker is open`))
       } else {
         return resolve()

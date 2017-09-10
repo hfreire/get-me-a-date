@@ -16,6 +16,8 @@ const Channel = require('./channel')
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const Health = require('health-checkup')
+
 const { NotAuthorizedError } = require('./errors')
 
 const { HappnWrapper, HappnNotAuthorizedError } = require('happn-wrapper')
@@ -40,6 +42,14 @@ class Happn extends Channel {
     this._options = _.defaults(options, defaultOptions)
 
     this._happn = new HappnWrapper()
+
+    Health.addCheck(this.name, () => new Promise((resolve, reject) => {
+      if (this._happn.circuitBreaker.isOpen()) {
+        return reject(new Error(`circuit breaker is open`))
+      } else {
+        return resolve()
+      }
+    }))
   }
 
   authorize () {

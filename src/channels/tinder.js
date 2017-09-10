@@ -26,6 +26,8 @@ const Channel = require('./channel')
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const Health = require('health-checkup')
+
 const moment = require('moment')
 
 const { NotAuthorizedError, OutOfLikesError } = require('./errors')
@@ -52,6 +54,14 @@ class Tinder extends Channel {
     this._options = _.defaults(options, defaultOptions)
 
     this._tinder = new TinderWrapper()
+
+    Health.addCheck(this.name, () => new Promise((resolve, reject) => {
+      if (this._tinder.circuitBreaker.isOpen()) {
+        return reject(new Error(`circuit breaker is open`))
+      } else {
+        return resolve()
+      }
+    }))
   }
 
   authorize () {
