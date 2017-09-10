@@ -22,7 +22,7 @@ const Database = require('../database')
 const S3 = require('../utils/s3')
 const Rekognition = require('../utils/rekognition')
 
-const request = Promise.promisifyAll(require('request').defaults({ encoding: null }))
+const Request = require('request-on-steroids')
 
 const sharp = require('sharp')
 
@@ -72,6 +72,7 @@ const checkPhotoOut = function (channelName, photo) {
 
   return savePhoto.bind(this)(channelName, photo)
     .then((image) => compareFacesFromImage.bind(this)(photo, image))
+    .catch((error) => Logger.warn(error))
 }
 
 const savePhoto = function (channelName, photo, options = {}) {
@@ -84,10 +85,10 @@ const savePhoto = function (channelName, photo, options = {}) {
     return Promise.reject(new Error('invalid photo url'))
   }
 
-  return request.getAsync(url.href)
+  return this._request.get({ url: url.href })
     .then(({ body, statusCode, statusMessage }) => {
       if (statusCode !== 200) {
-        throw new Error(`${statusCode} ${statusMessage}`)
+        throw new Error(`Unable to download photo ${url.href} because of ${statusCode} ${statusMessage}`)
       }
 
       if (options.resize) {
@@ -137,6 +138,8 @@ class Taste {
   constructor () {
     this._rekognitionCollection = AWS_REKOGNITION_COLLECTION
     this._s3Bucket = AWS_S3_BUCKET
+
+    this._request = new Request({ request: { encoding: null } })
 
     this._rekognition = new Rekognition({
       region: AWS_REGION,
@@ -249,7 +252,8 @@ class Taste {
 
     const notCheckedOutPhotos = _.filter(photos, (photo) => !photo.similarity_date)
 
-    return Promise.map(photos, (photo) => checkPhotoOut.bind(this)(channelName, photo), { concurrency: 2 })
+    return Promise.resolve(photos)
+      .map((photo) => checkPhotoOut.bind(this)(channelName, photo), { concurrency: 2 })
       .then((faceSimilarities) => {
         const faceSimilarityMax = _.max(faceSimilarities)
         const faceSimilarityMin = _.min(faceSimilarities)
