@@ -9,7 +9,7 @@
 
 Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based image recognition to help you automate your date discovery.
 
-<p align="center"><img src="share/github/overview.png" width="720"></p>
+<p align="center"><img src="share/github/overview.gif" width="720"></p>
 
 ### Features
 * Supports [Tinder](https://github.com/hfreire/tinder-wrapper) dating app :white_check_mark:
