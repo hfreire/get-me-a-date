@@ -78,7 +78,7 @@
     "mocha": "3.4.2",
     "node-sass": "4.5.3",
     "null-loader": "0.1.1",
-    "pre-git": "3.15.2",
+    "pre-git": "3.15.3",
     "raw-loader": "0.5.1",
     "sass-loader": "6.0.6",
     "semantic-release": "7.0.2",
