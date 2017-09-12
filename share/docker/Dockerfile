@@ -41,8 +41,6 @@ RUN apt-get remove --purge -y build-essential git python &&\
 
 COPY share/docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-COPY share/docker/test.sh /test.sh
-RUN chmod +x /test.sh
 
 EXPOSE 3000
 ENTRYPOINT [ "/entrypoint.sh" ]
