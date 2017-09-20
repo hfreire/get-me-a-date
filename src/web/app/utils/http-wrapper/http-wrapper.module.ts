@@ -6,14 +6,18 @@
  */
 
 import { NgModule } from '@angular/core'
-import { HttpModule } from '@angular/http'
 
 import { HttpWrapper } from './http-wrapper'
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
+import { HttpBaseApiUrlInterceptor } from './http-base-api-url.interceptor'
 
 @NgModule({
-  imports: [ HttpModule ],
+  imports: [ HttpClientModule ],
   declarations: [],
-  providers: [ HttpWrapper ]
+  providers: [
+    HttpWrapper,
+    { provide: HTTP_INTERCEPTORS, useClass: HttpBaseApiUrlInterceptor, multi: true }
+  ]
 })
 export class HttpWrapperModule {
 }

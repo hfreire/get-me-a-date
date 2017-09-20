@@ -10,6 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin')
+const EnvironmentPlugin = require('webpack/lib/EnvironmentPlugin')
 
 const { resolve } = require('path')
 
@@ -46,7 +47,8 @@ module.exports = {
     }),
     new ContextReplacementPlugin(/angular(\\|\/)core(\\|\/)@angular/, resolve(__dirname, 'src'), {}),
     new CopyWebpackPlugin([ { from: 'src/web/assets/images', to: 'assets/images' } ]),
-    new NamedModulesPlugin()
+    new NamedModulesPlugin(),
+    new EnvironmentPlugin([ 'NODE_ENV', 'BASE_API_URL' ])
   ],
   devServer: {
     port: 3000,
