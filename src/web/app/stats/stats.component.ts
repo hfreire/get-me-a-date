@@ -70,7 +70,7 @@ export class StatsComponent {
   constructor (private statsService: StatsService) {}
 
   public ngOnInit () {
-    this.getPage(1, 15)
+    this.getPage(1)
   }
 
   getPage (page: number, limit: number = 25) {

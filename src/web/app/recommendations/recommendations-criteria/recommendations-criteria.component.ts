@@ -7,7 +7,7 @@
 
 import * as _ from 'lodash'
 
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 
 @Component({
   selector: 'recommendations-criteria',
@@ -41,7 +41,16 @@ export class RecommendationsCriteriaComponent {
   ]
   _sort: any = this.availableSorts[ 0 ].value
 
-  setPageCriterion ({ value }: any) {
+  @Input()
+  set searchCriteria (value: string) {
+    if (!_.isError(value)) {
+      this._criteria = _.assign(this._criteria, value)
+
+      this.criteria.emit(this._criteria)
+    }
+  }
+
+  setPageCriterion ({ value = {} }: any) {
     this._criteria = _.assign(this._criteria, value)
 
     this.criteria.emit(this._criteria)

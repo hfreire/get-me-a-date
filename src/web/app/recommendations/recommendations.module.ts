@@ -12,6 +12,7 @@ import {
   MdCardModule,
   MdGridListModule,
   MdIconModule,
+  MdInputModule,
   MdMenuModule,
   MdPaginatorModule,
   MdProgressBarModule,
@@ -29,10 +30,13 @@ import {
   RecommendationsListComponent,
   RecommendationTileComponent
 } from './recommendations-list'
+import { FormsModule } from '@angular/forms'
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
+    MdInputModule,
     MdButtonModule,
     MdCardModule,
     MdGridListModule,
