@@ -67,4 +67,12 @@ export class RecommendationDialogComponent {
         this.data.recommendation = recommendation
       })
   }
+
+  checkOut () {
+    this.recommendationService.checkOut(this.recommendation.id)
+      .subscribe((recommendation) => {
+        this.recommendation = recommendation
+        this.data.recommendation = recommendation
+      })
+  }
 }

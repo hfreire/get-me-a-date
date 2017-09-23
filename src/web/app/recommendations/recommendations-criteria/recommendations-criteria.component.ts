@@ -51,7 +51,9 @@ export class RecommendationsCriteriaComponent {
   }
 
   setPageCriterion ({ value = {} }: any) {
-    this._criteria = _.assign(this._criteria, value)
+    if (_.isEmpty)
+
+      this._criteria = _.assign(this._criteria, value)
 
     this.criteria.emit(this._criteria)
   }

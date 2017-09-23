@@ -7,67 +7,73 @@
 
 <div id="recommendation-dialog">
 
-    <div md-dialog-title>
-        <h2>{{ recommendation.name }}, {{ age || (today | amDifference :
-          recommendation.data.birth_date :'years' || recommendation.data.notifier.age) }}
-        </h2>
+  <div md-dialog-title>
+    <h2>{{ recommendation.name }}, {{ age || (today | amDifference :
+      recommendation.data.birth_date :'years' || recommendation.data.notifier.age) }}
+    </h2>
 
-      <div>
-            <button md-icon-button [mdMenuTriggerFor]="menu">
-                <md-icon>more_vert</md-icon>
-            </button>
-            <md-menu #menu="mdMenu">
-                <button md-menu-item>
-                    <md-icon>dialpad</md-icon>
-                    <span>Redial</span>
-                </button>
-                <button md-menu-item disabled>
-                    <md-icon>voicemail</md-icon>
-                    <span>Check voicemail</span>
-                </button>
-                <button md-menu-item>
-                    <md-icon>notifications_off</md-icon>
-                    <span>Disable alerts</span>
-                </button>
-            </md-menu>
-        </div>
+    <div>
+      <button md-icon-button [mdMenuTriggerFor]="menu">
+        <md-icon>more_vert</md-icon>
+      </button>
+      <md-menu #menu="mdMenu">
+        <button md-menu-item (click)="checkOut()">
+          <md-icon>autorenew</md-icon>
+          <span>Check out</span>
+        </button>
+        <button md-menu-item disabled>
+          <md-icon>voicemail</md-icon>
+          <span>Check voicemail</span>
+        </button>
+        <button md-menu-item>
+          <md-icon>notifications_off</md-icon>
+          <span>Disable alerts</span>
+        </button>
+      </md-menu>
     </div>
+  </div>
 
-    <h3>{{ occupation }}</h3>
+  <h3>{{ occupation }}</h3>
 
-    <md-dialog-content>
-        <p md-line>{{ description }} </p>
+  <md-dialog-content>
+    <md-chip-list>
+      <md-chip>First time {{ recommendation.createdAt | amTimeAgo }}</md-chip>
+      <md-chip>Last time {{ recommendation.lastCheckedOutDate | amTimeAgo }}</md-chip>
+      <md-chip>{{ recommendation.checkedOutTimes }} time(s)</md-chip>
+    </md-chip-list>
 
-        <md-grid-list cols="4">
-            <md-grid-tile *ngFor="let photo of recommendation.photos">
-                <img [@fadeInOut]="fadeInState"
-                     alt="placeholder"
-                     src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/wAALCABUAFQBAREA/8QAHAABAAIDAQEBAAAAAAAAAAAAAAYHAwQFAgEJ/8QAOBAAAQMDAQMJBgUFAQAAAAAAAQACAwQFEQYSITEHExdBUVOBk9IUIjJhodEjQoKRwUNScbHh8P/aAAgBAQAAPwD9U0RFoXK+0FnA9sqo4Cd4a45cfAb1hi1TaJoOebcacMzj3pA0/sd66UM0dRG2SJ7ZI3bw5hyD4r2iIiIotrrVbtPUbIaYj22fOySM7Det38D/AIqkqKiWrmfNNI6WV5y57zklY11tP6mrdO1LXwSF0BOZIHH3Xj+D81dVvrorlRQ1UDtqKVoc0rYRERYK6tgt1LJUVEgiijGS4n/29UlqW+P1Ddpatzdhpw2Nn9rRw+/iuWiKyOSy9bcNRbJHb2fixA9h+Ifvg+JVgIiIobynXGOKx+yZJlle04HYDnf9FVKIiyU1TLRzsmhkdFKw5a5pwQrX0FqWqv0M7apjy6MDE2z7rjvzv4Z4blLURFUHKVE6PVMrnYw+Njm47MY/2CosiIit7k+0/UWO2SOqnYkqCHiIHIYMftk/wFKkRFB+UPSdRdnMuFG1r5Ioy2SP8zgN4x2njuVXoiKXaG0W2/l1XVlzaON2yGt3GR3Xv6grYY0MaGjOAMbzlekREUfv2ibdfI98YpZhnEsLQN545HWqiu9vNqudTSF/OczIWbeMZx14Wop3yc6WpbpBUV1bE2eMO5pkbxuzgEn6j6qyKaliooGQwRtiiYMNYwYAWVEREWjeLzSWOjdUVcgYwbmtHxPPYB1qj7rXuulyqatw2TNIX7PZngFqqd8nGqqa2sfbqt3NNkk245XH3ckAbJ7OHFWYDkZC+oiLkX/VFDpyIGqeTK4ZZDHve77D5lQS48qdfOXNo4IqVnU53vu+30USr7lVXSczVc755D+Z54fIdi1kRd2z61u1ljbFDUc7C3hFMNoD/HWPAqVWvlXje8MuFGYwf6kByB+k/dTqirYLjTMqKaVs0Lxlr28Cs6xzzMpoJJXnDI2l7j2ADJVD3e5zXi4z1c7iXyOyAT8I6gPkFpoiIiKZ8mN6fSXd1A934FSCWtJ3B4Gc+Iz9Faq1rjQsudDNSyOeyOVuy4xnBx1qMdF1n7yq8welOi6z95VeYPSnRdZ+8qvMHpTous/eVXmD0p0XWfvKrzB6U6LbP3lV5g9KdFtn7yr8xvpTots/eVfmN9KzUXJzbKCrhqYZqpssTg9p5xvEfpUqX//Z"/>
+    <p md-line>{{ description }} </p>
 
-                <img [@fadeInOut]="fadeOutState"
-                     class="thumbnail"
-                     [src]="photo.url"
-                     mdTooltip="Similarity: {{photo.similarity}}%"
-                     tooltipPosition="bottom"
-                     width="100"
-                     onError="this.src = './assets/images/placeholder.jpg'"
-                     (load)="isLoaded($event)"/>
-            </md-grid-tile>
-        </md-grid-list>
-    </md-dialog-content>
+    <md-grid-list cols="4">
+      <md-grid-tile *ngFor="let photo of recommendation.photos">
+        <img [@fadeInOut]="fadeInState"
+             alt="placeholder"
+             src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/wAALCABUAFQBAREA/8QAHAABAAIDAQEBAAAAAAAAAAAAAAYHAwQFAgEJ/8QAOBAAAQMDAQMJBgUFAQAAAAAAAQACAwQFEQYSITEHExdBUVOBk9IUIjJhodEjQoKRwUNScbHh8P/aAAgBAQAAPwD9U0RFoXK+0FnA9sqo4Cd4a45cfAb1hi1TaJoOebcacMzj3pA0/sd66UM0dRG2SJ7ZI3bw5hyD4r2iIiIotrrVbtPUbIaYj22fOySM7Det38D/AIqkqKiWrmfNNI6WV5y57zklY11tP6mrdO1LXwSF0BOZIHH3Xj+D81dVvrorlRQ1UDtqKVoc0rYRERYK6tgt1LJUVEgiijGS4n/29UlqW+P1Ddpatzdhpw2Nn9rRw+/iuWiKyOSy9bcNRbJHb2fixA9h+Ifvg+JVgIiIobynXGOKx+yZJlle04HYDnf9FVKIiyU1TLRzsmhkdFKw5a5pwQrX0FqWqv0M7apjy6MDE2z7rjvzv4Z4blLURFUHKVE6PVMrnYw+Njm47MY/2CosiIit7k+0/UWO2SOqnYkqCHiIHIYMftk/wFKkRFB+UPSdRdnMuFG1r5Ioy2SP8zgN4x2njuVXoiKXaG0W2/l1XVlzaON2yGt3GR3Xv6grYY0MaGjOAMbzlekREUfv2ibdfI98YpZhnEsLQN545HWqiu9vNqudTSF/OczIWbeMZx14Wop3yc6WpbpBUV1bE2eMO5pkbxuzgEn6j6qyKaliooGQwRtiiYMNYwYAWVEREWjeLzSWOjdUVcgYwbmtHxPPYB1qj7rXuulyqatw2TNIX7PZngFqqd8nGqqa2sfbqt3NNkk245XH3ckAbJ7OHFWYDkZC+oiLkX/VFDpyIGqeTK4ZZDHve77D5lQS48qdfOXNo4IqVnU53vu+30USr7lVXSczVc755D+Z54fIdi1kRd2z61u1ljbFDUc7C3hFMNoD/HWPAqVWvlXje8MuFGYwf6kByB+k/dTqirYLjTMqKaVs0Lxlr28Cs6xzzMpoJJXnDI2l7j2ADJVD3e5zXi4z1c7iXyOyAT8I6gPkFpoiIiKZ8mN6fSXd1A934FSCWtJ3B4Gc+Iz9Faq1rjQsudDNSyOeyOVuy4xnBx1qMdF1n7yq8welOi6z95VeYPSnRdZ+8qvMHpTous/eVXmD0p0XWfvKrzB6U6LbP3lV5g9KdFtn7yr8xvpTots/eVfmN9KzUXJzbKCrhqYZqpssTg9p5xvEfpUqX//Z"/>
 
-    <md-dialog-actions>
-        <button md-raised-button
-                md-button
-                md-small
-                color="primary"
-                [disabled]="recommendation.isLike || recommendation.isPass"
-                (click)="like()">Like
-        </button>
+        <img [@fadeInOut]="fadeOutState"
+             class="thumbnail"
+             [src]="photo.url"
+             mdTooltip="Similarity: {{photo.similarity}}%"
+             tooltipPosition="bottom"
+             width="100"
+             onError="this.src = './assets/images/placeholder.jpg'"
+             (load)="isLoaded($event)"/>
+      </md-grid-tile>
+    </md-grid-list>
+  </md-dialog-content>
 
-        <button md-button
-                [disabled]="recommendation.isLike || recommendation.isPass"
-                (click)="pass()">Pass
-        </button>
-    </md-dialog-actions>
+  <md-dialog-actions>
+    <button md-raised-button
+            md-button
+            md-small
+            color="primary"
+            [disabled]="recommendation.isLike || recommendation.isPass"
+            (click)="like()">Like
+    </button>
+
+    <button md-button
+            [disabled]="recommendation.isLike || recommendation.isPass"
+            (click)="pass()">Pass
+    </button>
+  </md-dialog-actions>
 </div>

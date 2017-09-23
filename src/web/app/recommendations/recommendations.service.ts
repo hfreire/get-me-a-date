@@ -36,4 +36,8 @@ export class RecommendationsService {
   pass (id: string): Observable<any> {
     return this.http.post(`recommendations/${id}/pass`, {})
   }
+
+  checkOut (id: string): Observable<any> {
+    return this.http.post(`recommendations/${id}/checkout`, {})
+  }
 }

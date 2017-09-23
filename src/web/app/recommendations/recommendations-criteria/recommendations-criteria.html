@@ -23,6 +23,6 @@
   </md-option>
 </md-select>
 
-<md-input-container id="name">
-  <input #name mdInput placeholder="Name" (keyup.enter)="setPageCriterion({ value: { name: name.value }})">
+<md-input-container>
+  <input #name mdInput placeholder="Name" (keyup.enter)="setPageCriterion({ value: { name: name.value || undefined }})">
 </md-input-container>

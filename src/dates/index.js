@@ -9,6 +9,7 @@ module.exports = {
   Dates: require('./dates'),
   Taste: require('./taste'),
   Recommendation: require('./recommendation').Recommendation,
+  AlreadyCheckedOutEarlierError: require('./recommendation').AlreadyCheckedOutEarlierError,
   Stats: require('./stats'),
   Channel: require('./channel')
 }

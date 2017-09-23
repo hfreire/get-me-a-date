@@ -31,7 +31,7 @@ const { parse } = require('url')
 const deleteFaces = function (faces) {
   return this._rekognition.deleteFaces(this._rekognitionCollection, faces)
     .then(() => faces.length)
-    .catch((error) => Logger.warn(error))
+    .catch((error) => Logger.warn(error.message))
 }
 
 const indexFacesFromImages = function (images) {
@@ -59,7 +59,7 @@ const indexFacesFromImages = function (images) {
           return this._s3.deleteObject(this._s3Bucket, image)
         }
 
-        return Logger.warn(error)
+        return Logger.warn(error.message)
       })
   }, { concurrency: 2 })
     .then(() => indexedFaces)
@@ -72,7 +72,7 @@ const checkPhotoOut = function (channelName, photo) {
 
   return savePhoto.bind(this)(channelName, photo)
     .then((image) => compareFacesFromImage.bind(this)(photo, image))
-    .catch((error) => Logger.warn(error))
+    .catch((error) => Logger.warn(error.message))
 }
 
 const savePhoto = function (channelName, photo, options = {}) {

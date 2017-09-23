@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common'
 import {
   MdButtonModule,
   MdCardModule,
+  MdChipsModule,
   MdGridListModule,
   MdIconModule,
   MdInputModule,
@@ -45,6 +46,7 @@ import { FormsModule } from '@angular/forms'
     MdPaginatorModule,
     MdSelectModule,
     MdTooltipModule,
+    MdChipsModule,
     MdProgressSpinnerModule,
     MdProgressBarModule,
     MomentModule

@@ -10,6 +10,8 @@ const Promise = require('bluebird')
 
 const Database = require('../database')
 
+const moment = require('moment')
+
 const stats = [
   { name: 'machineLikes', metric: 'decisionDate', criteria: { isHumanDecision: false, isLike: true } },
   { name: 'humanLikes', metric: 'decisionDate', criteria: { isHumanDecision: true, isLike: true } },
@@ -28,10 +30,7 @@ class Stats {
           return this.updateFromStart()
         }
 
-        const date = new Date()
-        date.setHours(0, 0, 0, 0)
-
-        return this.updateByDate(date)
+        return this.updateByDate(new Date())
       })
   }
 
@@ -52,7 +51,14 @@ class Stats {
   }
 
   updateByDate (date) {
-    return Promise.mapSeries((stats), (stats) => this.updateByStatsAndDate(stats, date))
+    return Promise.try(() => {
+      if (!_.isDate(date)) {
+        throw new Error('invalid arguments')
+      }
+
+      return moment(date).startOf('day').toDate()
+    })
+      .then((date) => Promise.mapSeries((stats), (stats) => this.updateByStatsAndDate(stats, date)))
   }
 
   updateByStatsAndDate ({ name, metric, criteria }, date) {

@@ -20,14 +20,12 @@ const Database = require('../../database')
 
 class Recommendation {
   checkOut (channel, channelRecommendationId, channelRecommendation) {
-    if (!channel || !channelRecommendationId) {
-      return Promise.reject(new Error('invalid arguments'))
-    }
-
-    let like
-    let pass
-
-    return this.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation)
+    return Promise.try(() => {
+      if (!channel || !channelRecommendationId || !channelRecommendation) {
+        throw new Error('invalid arguments')
+      }
+    })
+      .then(() => this.findOrCreateNewRecommendation(channel, channelRecommendationId, channelRecommendation))
       .then((recommendation) => {
         recommendation.checkedOutTimes++
 
@@ -39,6 +37,8 @@ class Recommendation {
           return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
         }
 
+        let like
+        let pass
         const channelName = channel.name
 
         return Promise.resolve()
