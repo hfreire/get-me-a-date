@@ -25,7 +25,7 @@ export class RecommendationsCriteriaComponent {
     { value: { channelName: 'tinder' }, label: 'Tinder' },
     { value: { channelName: 'happn' }, label: 'Happn' }
   ]
-  availableActionCriteria: any = [
+  availableMyActionCriteria: any = [
     { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'All' },
     { value: { isLike: true, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'Liked' },
     { value: { isLike: undefined, isPass: 1, isMatch: undefined, isTrain: undefined }, label: 'Passed' },
@@ -33,7 +33,11 @@ export class RecommendationsCriteriaComponent {
     { value: { isLike: undefined, isPass: undefined, isMatch: 1, isTrain: undefined }, label: 'Matched' },
     { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: 1 }, label: 'Trained' }
   ]
-  _criteria: any = _.assign({}, this.availableChannelCriteria[ 0 ].value, this.availableActionCriteria[ 0 ].value)
+  availableTheirActionCriteria: any = [
+    { value: { isTheirLike: undefined }, label: 'All' },
+    { value: { isTheirLike: true }, label: 'Liked' },
+  ]
+  _criteria: any = _.assign({}, this.availableChannelCriteria[ 0 ].value, this.availableMyActionCriteria[ 0 ].value, this.availableTheirActionCriteria[ 0 ].value)
 
   availableSorts: any = [
     { value: 'lastCheckedOutDate', label: 'Last checked out' },

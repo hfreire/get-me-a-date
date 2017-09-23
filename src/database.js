@@ -69,6 +69,7 @@ class Database {
         matchedDate: { type: Sequelize.DATE, defaultValue: null },
         isTrain: { type: Sequelize.BOOLEAN, defaultValue: false },
         trainedDate: { type: Sequelize.DATE, defaultValue: null },
+        isTheirLike: { type: Sequelize.BOOLEAN, defaultValue: false },
         data: {
           type: Sequelize.TEXT,
           defaultValue: null,

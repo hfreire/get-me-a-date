@@ -11,8 +11,14 @@
   </md-option>
 </md-select>
 
-<md-select id="action" placeholder="Action" (change)="setPageCriterion($event)">
-  <md-option *ngFor="let actionCriterion of availableActionCriteria" [value]="actionCriterion.value">
+<md-select id="my-action" placeholder="My action" (change)="setPageCriterion($event)">
+  <md-option *ngFor="let actionCriterion of availableMyActionCriteria" [value]="actionCriterion.value">
+    {{ actionCriterion.label }}
+  </md-option>
+</md-select>
+
+<md-select id="their-action" placeholder="Their action" (change)="setPageCriterion($event)">
+  <md-option *ngFor="let actionCriterion of availableTheirActionCriteria" [value]="actionCriterion.value">
     {{ actionCriterion.label }}
   </md-option>
 </md-select>
