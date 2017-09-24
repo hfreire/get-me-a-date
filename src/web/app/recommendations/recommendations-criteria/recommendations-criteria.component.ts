@@ -28,10 +28,10 @@ export class RecommendationsCriteriaComponent {
   availableMyActionCriteria: any = [
     { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'All' },
     { value: { isLike: true, isPass: undefined, isMatch: undefined, isTrain: undefined }, label: 'Liked' },
-    { value: { isLike: undefined, isPass: 1, isMatch: undefined, isTrain: undefined }, label: 'Passed' },
-    { value: { isLike: false, isPass: 0, isMatch: undefined, isTrain: undefined }, label: 'Waiting' },
-    { value: { isLike: undefined, isPass: undefined, isMatch: 1, isTrain: undefined }, label: 'Matched' },
-    { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: 1 }, label: 'Trained' }
+    { value: { isLike: undefined, isPass: true, isMatch: undefined, isTrain: undefined }, label: 'Passed' },
+    { value: { isLike: false, isPass: false, isMatch: undefined, isTrain: undefined }, label: 'Waiting' },
+    { value: { isLike: undefined, isPass: undefined, isMatch: true, isTrain: undefined }, label: 'Matched' },
+    { value: { isLike: undefined, isPass: undefined, isMatch: undefined, isTrain: true }, label: 'Trained' }
   ]
   availableTheirActionCriteria: any = [
     { value: { isTheirLike: undefined }, label: 'All' },
