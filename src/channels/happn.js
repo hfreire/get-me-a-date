@@ -70,7 +70,12 @@ class Happn extends Channel {
   getRecommendations () {
     const _getRecommendations = () => {
       return this._happn.getRecommendations(16)
-        .then(({ data }) => data)
+        .then(({ data }) => {
+          const _data = _.concat([], data)
+
+          return this._happn.getRecommendations(16, 16)
+            .then(({ data }) => _.concat(_data, data))
+        })
         .mapSeries((data) => {
           return {
             channelName: 'happn',
