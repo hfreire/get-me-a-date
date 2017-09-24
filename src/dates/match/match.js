@@ -28,6 +28,8 @@ const findOrCreateNewRecommendationFromMatch = function (channel, channelRecomme
         recommendation.isHumanDecision = true
       }
 
+      recommendation.isTheirLike = true
+
       return Recommendation.setUpMatch(recommendation, channelRecommendation)
         .then((recommendation) => {
           return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)

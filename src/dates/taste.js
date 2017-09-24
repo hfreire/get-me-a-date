@@ -245,6 +245,17 @@ class Taste {
       .then(() => thumbnail.url)
   }
 
+  findOrCreateNewSettings () {
+    return Database.settings.findById(1)
+      .then((settings) => {
+        if (!settings) {
+          return Database.settings.create({})
+        }
+
+        return settings
+      })
+  }
+
   checkPhotosOut (channelName, photos) {
     if (!channelName || !photos) {
       return Promise.reject(new Error('invalid arguments'))
@@ -259,7 +270,7 @@ class Taste {
         const faceSimilarityMin = _.min(faceSimilarities)
         const faceSimilarityMean = _.round(_.mean(_.without(faceSimilarities, 0, undefined)), 2) || 0
 
-        return Database.settings.findById(1)
+        return this.findOrCreateNewSettings()
           .then((settings) => {
             const like = !_.isEmpty(faceSimilarities) && faceSimilarityMean > settings.likePhotosThreshold
 

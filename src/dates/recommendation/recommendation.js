@@ -29,12 +29,14 @@ class Recommendation {
       .then((recommendation) => {
         recommendation.checkedOutTimes++
 
-        if (recommendation.isLike || recommendation.isPass) {
-          return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
-        }
+        if (recommendation.lastCheckedOutDate) {
+          if (recommendation.isLike || recommendation.isPass) {
+            return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
+          }
 
-        if (moment().isBefore(moment(recommendation.lastCheckedOutDate).add(1, 'day'))) {
-          return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
+          if (moment().isBefore(moment(recommendation.lastCheckedOutDate).add(1, 'day'))) {
+            return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
+          }
         }
 
         let like
@@ -51,7 +53,6 @@ class Recommendation {
               photos: Taste.checkPhotosOut(channelName, photosToCheckOut)
             })
               .then(({ photos }) => {
-                recommendation.lastCheckedOutDate = new Date()
                 recommendation.name = channelRecommendation.name
                 recommendation.data = channelRecommendation.data
                 recommendation.photos = photosToCheckOut
@@ -72,6 +73,8 @@ class Recommendation {
             }
           })
           .then(() => {
+            recommendation.lastCheckedOutDate = new Date()
+
             return { recommendation, like, pass }
           })
       })
@@ -139,7 +142,7 @@ class Recommendation {
     return Taste.acquireTaste(photos)
       .then(() => _.merge(recommendation, {
         isTrain: true,
-        trained_date: new Date()
+        trainedDate: new Date()
       }))
   }
 

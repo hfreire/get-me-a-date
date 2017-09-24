@@ -35,12 +35,13 @@ export class RecommendationsCriteriaComponent {
   ]
   availableTheirActionCriteria: any = [
     { value: { isTheirLike: undefined }, label: 'All' },
-    { value: { isTheirLike: true }, label: 'Liked' },
+    { value: { isTheirLike: true }, label: 'Liked' }
   ]
   _criteria: any = _.assign({}, this.availableChannelCriteria[ 0 ].value, this.availableMyActionCriteria[ 0 ].value, this.availableTheirActionCriteria[ 0 ].value)
 
   availableSorts: any = [
     { value: 'lastCheckedOutDate', label: 'Last checked out' },
+    { value: 'matchedDate', label: 'Last matched' },
     { value: 'checkedOutTimes', label: 'Number of times checked out' }
   ]
   _sort: any = this.availableSorts[ 0 ].value
