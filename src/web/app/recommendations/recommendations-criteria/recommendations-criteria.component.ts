@@ -40,8 +40,8 @@ export class RecommendationsCriteriaComponent {
   _criteria: any = _.assign({}, this.availableChannelCriteria[ 0 ].value, this.availableMyActionCriteria[ 0 ].value, this.availableTheirActionCriteria[ 0 ].value)
 
   availableSorts: any = [
-    { value: 'lastCheckedOutDate', label: 'Last checked out' },
-    { value: 'matchedDate', label: 'Last matched' },
+    { value: 'lastCheckedOutDate', label: 'Checked out date' },
+    { value: 'matchedDate', label: 'Match date' },
     { value: 'checkedOutTimes', label: 'Number of times checked out' }
   ]
   _sort: any = this.availableSorts[ 0 ].value
