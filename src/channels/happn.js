@@ -82,7 +82,7 @@ class Happn extends Channel {
             channelRecommendationId: data.notifier.id,
             name: data.notifier.first_name,
             photos: _.map(data.notifier.profiles, (photo) => _.pick(photo, [ 'url', 'id' ])),
-            isTheirLike: data.notifier.is_accepted === 1 ? true : undefined,
+            isTheirLike: data.notifier.is_accepted ? true : undefined,
             isLike: data.notifier.my_relation === 1 ? true : undefined,
             isMatch: data.notifier.my_relation === 4 ? true : undefined,
             data
