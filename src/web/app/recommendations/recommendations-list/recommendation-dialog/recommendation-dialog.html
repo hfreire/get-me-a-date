@@ -40,15 +40,8 @@
   <md-dialog-content>
 
     <md-tab-group>
-      <md-tab label="Description">
-        <div>
-          <p md-line>{{ description }} </p>
-        </div>
-      </md-tab>
       <md-tab label="Photos">
-        <ng-template md-tab-label>
-          ⭐
-        </ng-template>
+        <ng-template md-tab-label>🖼</ng-template>
         <md-grid-list cols="4">
           <md-grid-tile *ngFor="let photo of recommendation.photos">
             <img [@fadeInOut]="fadeInState"
@@ -65,6 +58,13 @@
                  (load)="isLoaded($event)"/>
           </md-grid-tile>
         </md-grid-list>
+      </md-tab>
+
+      <md-tab label="Description">
+        <ng-template md-tab-label>🗒</ng-template>
+        <div>
+          <p md-line>{{ description }} </p>
+        </div>
       </md-tab>
     </md-tab-group>
 
