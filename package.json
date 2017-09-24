@@ -91,6 +91,11 @@
     "webpack": "3.6.0",
     "webpack-dev-server": "2.8.2"
   },
+  "greenkeeper": {
+    "ignore": [
+      "semantic-release"
+    ]
+  },
   "config": {
     "pre-git": {
       "commit-msg": "conventional"
