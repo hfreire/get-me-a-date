@@ -76,7 +76,7 @@ class Dates {
     return Promise.all([ startChannel(), startTaste() ])
   }
 
-  find () {
+  find (channelNames = []) {
     const startDate = _.now()
 
     Logger.info('Started finding dates')
@@ -89,7 +89,8 @@ class Dates {
 
     return Database.channels.findAll()
       .mapSeries(({ name, isEnabled }) => {
-        if (!isEnabled) {
+        if ((_.isEmpty(channelNames) && !isEnabled) ||
+          (!_.isEmpty(channelNames) && !_.includes(channelNames, name))) {
           return
         }
 

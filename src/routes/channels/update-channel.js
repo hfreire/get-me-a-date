@@ -31,7 +31,8 @@ class UpdateChannel extends Route {
         return Database.channels.find({ where: { name } })
           .then((channel) => {
             if (channel && !channel.lastActivityDate && channel.isEnabled) {
-              Dates.findByChannelName(channel.name)
+              Dates.find([ channel.name ])
+                .catch((error) => Logger.error(error))
             }
 
             return reply(channel)
