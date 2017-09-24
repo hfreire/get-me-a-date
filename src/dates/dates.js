@@ -22,7 +22,7 @@ const { Match } = require('./match')
 const Stats = require('./stats')
 const Channel = require('./channel')
 
-const likeOrPass = (channel, recommendation, like, pass) => {
+const likePassOrWait = (channel, recommendation, like, pass) => {
   if (like) {
     return Recommendation.like(channel, recommendation)
       .then((recommendation) => {
@@ -41,7 +41,8 @@ const likeOrPass = (channel, recommendation, like, pass) => {
       })
   }
 
-  return Promise.resolve(recommendation)
+  return Logger.info(`${recommendation.name} has to wait :raised_hand:(photos = ${recommendation.photosSimilarityMean}%)`)
+    .then(() => recommendation)
 }
 
 const findByChannel = function (channel) {
@@ -128,25 +129,8 @@ class Dates {
             const { channelRecommendationId } = channelRecommendation
 
             return Recommendation.checkOut(channel, channelRecommendationId, channelRecommendation)
-              .then(({ recommendation, like, pass }) => likeOrPass(channel, recommendation, like, pass))
-              .then((recommendation) => {
-                return recommendation.save()
-                  .then(() => {
-                    if (recommendation.isMatch) {
-                      return Logger.info(`${recommendation.name} is a :fire:(photos = ${recommendation.photosSimilarityMean}%)`)
-                    }
-
-                    if (recommendation.isLike) {
-                      return Logger.info(`${recommendation.name} got a like :+1:(photos = ${recommendation.photosSimilarityMean}%)`)
-                    }
-
-                    if (recommendation.isPass) {
-                      return Logger.info(`${recommendation.name} got a pass :-1:(photos = ${recommendation.photosSimilarityMean}%)`)
-                    }
-
-                    return Logger.info(`${recommendation.name} has to wait :raised_hand:(photos = ${recommendation.photosSimilarityMean}%)`)
-                  })
-              })
+              .then(({ recommendation, like, pass }) => likePassOrWait(channel, recommendation, like, pass))
+              .then((recommendation) => recommendation.save())
               .catch(AlreadyCheckedOutEarlierError, ({ recommendation }) => {
                 skipped++
 

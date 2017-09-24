@@ -10,6 +10,8 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
+const Logger = require('modern-logger')
+
 const moment = require('moment')
 
 const { AlreadyCheckedOutEarlierError } = require('./errors')
@@ -100,13 +102,16 @@ class Recommendation {
 
     return channel.like(channelRecommendationId, photoId, content_hash, s_number)
       .then((match) => {
-        recommendation.isLike = true
+        return Logger.info(`${recommendation.name} got a like :+1:(photos = ${recommendation.photosSimilarityMean}%)`)
+          .then(() => {
+            recommendation.isLike = true
 
-        if (!match) {
-          return recommendation
-        }
+            if (!match) {
+              return recommendation
+            }
 
-        return this.setUpMatch(recommendation, match)
+            return this.setUpMatch(recommendation, match)
+          })
       })
   }
 
@@ -125,7 +130,8 @@ class Recommendation {
 
     recommendation.isPass = true
 
-    return Promise.resolve(recommendation)
+    return Logger.info(`${recommendation.name} got a pass :-1:(photos = ${recommendation.photosSimilarityMean}%)`)
+      .then(() => recommendation)
   }
 
   fallInLove (recommendation) {
@@ -190,7 +196,8 @@ class Recommendation {
         recommendation.channelMatchId = channelRecommendation.channelMatchId
         recommendation.matchedDate = channelRecommendation.matchedDate
 
-        return recommendation
+        return Logger.info(`${recommendation.name} is a :fire:(photos = ${_.defaultTo(recommendation.photosSimilarityMean, 0)}%)`)
+          .then(() => recommendation)
       })
   }
 }
