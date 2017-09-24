@@ -19,6 +19,7 @@ import {
   MdProgressBarModule,
   MdProgressSpinnerModule,
   MdSelectModule,
+  MdTabsModule,
   MdTooltipModule
 } from '@angular/material'
 import { MomentModule } from 'angular2-moment'
@@ -49,6 +50,7 @@ import { FormsModule } from '@angular/forms'
     MdChipsModule,
     MdProgressSpinnerModule,
     MdProgressBarModule,
+    MdTabsModule,
     MomentModule
   ],
   declarations: [

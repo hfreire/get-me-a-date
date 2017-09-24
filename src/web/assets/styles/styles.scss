@@ -148,15 +148,32 @@ body {
     align-items: center;
     margin-bottom: 0;
 
-    h2 {
+    .md-dialog-title-left {
       flex: 1 1 auto;
-      margin: 0;
-      font-size: 26px;
+
+      h2 {
+        display: inline-block;
+        margin: 0;
+        font-size: 26px;
+      }
+
+      md-icon {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: 15px;
+        margin-left: 5px;
+      }
     }
   }
 
   h3 {
     margin-top: 0;
+    margin-bottom: 7px;
+  }
+
+  h6 {
+    margin-top: 0;
+    margin-bottom: 15px;
   }
 
   .thumbnail {
