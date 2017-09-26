@@ -16,17 +16,17 @@ import * as _ from 'lodash'
 })
 export class StatsComponent {
   public lineChartData: Array<any> = [
-    { label: 'Machine likes', data: [] },
-    { label: 'Human likes', data: [] },
-    { label: 'Machine passes', data: [] },
-    { label: 'Human passes', data: [] },
-    { label: 'Matches', data: [] }
+    { label: 'Machine likes', data: [], type: 'line' },
+    { label: 'Human likes', data: [], type: 'line' },
+    { label: 'Machine passes', data: [], type: 'line' },
+    { label: 'Human passes', data: [], type: 'line' },
+    { label: 'Matches', data: [], yAxisID: "y-axis-2" }
   ]
   public lineChartLabels: Array<any>
-  public lineChartType: string = 'line'
+  public lineChartType: string = 'bar'
   public lineChartColors: Array<any> = [
     {
-      backgroundColor: 'rgba(194, 24, 91, 0.1)',
+      backgroundColor: 'rgba(194, 24, 91, 0.3)',
       borderColor: 'rgba(194, 24, 91, 1)',
       pointBackgroundColor: 'rgba(194, 24, 91, 1)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
@@ -58,14 +58,36 @@ export class StatsComponent {
       pointHoverBorderColor: 'rgba(255, 0, 21, 0.5)'
     },
     {
-      backgroundColor: 'rgba(189, 128, 18, 0.1)',
+      backgroundColor: 'rgba(189, 128, 18, 0.3)',
       borderColor: 'rgba(189, 128, 18, 1)',
       pointBackgroundColor: 'rgba(189, 128, 18, 1)',
       pointBorderColor: 'rgba(212, 203, 207, 1)',
       pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
       pointHoverBorderColor: 'rgba(189, 128, 18, 1)'
-    }
+    },
   ]
+  public lineChartOptions: any = {
+    scales: {
+      tooltips: {
+        mode: 'index',
+        intersect: true
+      },
+      yAxes: [{
+        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+        display: true,
+        position: "left",
+        id: "y-axis-1",
+      }, {
+        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+        display: true,
+        position: "right",
+        id: "y-axis-2",
+        gridLines: {
+          drawOnChartArea: false
+        }
+      }]
+    }
+  }
 
   constructor (private statsService: StatsService) {}
 

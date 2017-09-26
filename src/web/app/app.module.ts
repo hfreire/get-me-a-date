@@ -24,15 +24,13 @@ import {
 } from '@angular/material'
 import { createNewHosts, removeNgStyles } from '@angularclass/hmr'
 
-import { ChartsModule } from 'ng2-charts'
-
 import { HttpWrapperModule } from './utils'
 
 import { AppComponent } from './app.component'
 import { RecommendationsModule } from './recommendations'
 import { ChannelsComponent } from './channels'
 import { SettingsComponent } from './settings'
-import { StatsComponent } from './stats'
+import { StatsModule } from './stats'
 
 @NgModule({
   imports: [
@@ -49,12 +47,12 @@ import { StatsComponent } from './stats'
     MdSliderModule,
     MdButtonModule,
     MdIconModule,
-    ChartsModule,
     HttpWrapperModule,
-    RecommendationsModule
+    RecommendationsModule,
+    StatsModule
   ],
-  declarations: [ AppComponent, ChannelsComponent, SettingsComponent, StatsComponent ],
-  entryComponents: [ ChannelsComponent, SettingsComponent, StatsComponent ],
+  declarations: [ AppComponent, ChannelsComponent, SettingsComponent ],
+  entryComponents: [ ChannelsComponent, SettingsComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {
