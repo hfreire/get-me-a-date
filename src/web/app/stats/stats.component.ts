@@ -20,7 +20,7 @@ export class StatsComponent {
     { label: 'Human likes', data: [], type: 'line' },
     { label: 'Machine passes', data: [], type: 'line' },
     { label: 'Human passes', data: [], type: 'line' },
-    { label: 'Matches', data: [], yAxisID: "y-axis-2" }
+    { label: 'Matches', data: [], yAxisID: 'y-axis-2' }
   ]
   public lineChartLabels: Array<any>
   public lineChartType: string = 'bar'
@@ -64,7 +64,7 @@ export class StatsComponent {
       pointBorderColor: 'rgba(212, 203, 207, 1)',
       pointHoverBackgroundColor: 'rgba(212, 203, 207, 1)',
       pointHoverBorderColor: 'rgba(189, 128, 18, 1)'
-    },
+    }
   ]
   public lineChartOptions: any = {
     scales: {
@@ -73,15 +73,15 @@ export class StatsComponent {
         intersect: true
       },
       yAxes: [{
-        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
         display: true,
-        position: "left",
-        id: "y-axis-1",
+        position: 'left',
+        id: 'y-axis-1'
       }, {
-        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
         display: true,
-        position: "right",
-        id: "y-axis-2",
+        position: 'right',
+        id: 'y-axis-2',
         gridLines: {
           drawOnChartArea: false
         }
