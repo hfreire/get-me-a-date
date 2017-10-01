@@ -24,7 +24,7 @@ const Channel = require('./channel')
 
 const likePassOrWait = (channel, recommendation, like, pass) => {
   return Promise.try(() => {
-    if (!channel || !recommendation || !like || !pass) {
+    if (!channel || !recommendation) {
       throw new Error('invalid arguments')
     }
   })
