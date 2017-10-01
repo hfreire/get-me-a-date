@@ -6,5 +6,7 @@
  */
 
 module.exports = {
-  AlreadyCheckedOutEarlierError: require('./already-checked-out-earlier-error')
+  AlreadyCheckedOutEarlierError: require('./already-checked-out-earlier-error'),
+  AlreadyLikedError: require('./already-liked-error'),
+  AlreadyPassedError: require('./already-passed-error')
 }

@@ -17,32 +17,40 @@ const { OutOfLikesError } = require('../channels')
 const Database = require('../database')
 
 const Taste = require('./taste')
-const { Recommendation, AlreadyCheckedOutEarlierError } = require('./recommendation')
+const { Recommendation, AlreadyCheckedOutEarlierError, AlreadyLikedError, AlreadyPassedError } = require('./recommendation')
 const { Match } = require('./match')
 const Stats = require('./stats')
 const Channel = require('./channel')
 
 const likePassOrWait = (channel, recommendation, like, pass) => {
-  if (like) {
-    return Recommendation.like(channel, recommendation)
-      .then((recommendation) => {
-        recommendation.isHumanDecision = false
-        recommendation.decisionDate = new Date()
+  return Promise.try(() => {
+    if (!channel || !recommendation || !like || !pass) {
+      throw new Error('invalid arguments')
+    }
+  })
+    .then(() => {
+      if (like) {
+        return Recommendation.like(channel, recommendation)
+          .then((recommendation) => {
+            recommendation.isHumanDecision = false
+            recommendation.decisionDate = new Date()
 
-        return recommendation
-      })
-  } else if (pass) {
-    return Recommendation.pass(channel, recommendation)
-      .then((recommendation) => {
-        recommendation.isHumanDecision = false
-        recommendation.decisionDate = new Date()
+            return recommendation
+          })
+      } else if (pass) {
+        return Recommendation.pass(channel, recommendation)
+          .then((recommendation) => {
+            recommendation.isHumanDecision = false
+            recommendation.decisionDate = new Date()
 
-        return recommendation
-      })
-  }
+            return recommendation
+          })
+      }
 
-  return Logger.info(`${recommendation.name} has to wait :raised_hand:(photos = ${recommendation.photosSimilarityMean}%)`)
-    .then(() => recommendation)
+      return Logger.info(`${recommendation.name} has to wait :raised_hand:(photos = ${recommendation.photosSimilarityMean}%)`)
+        .then(() => recommendation)
+    })
+    .catch(AlreadyLikedError, AlreadyPassedError, () => recommendation)
 }
 
 const findByChannel = function (channel) {

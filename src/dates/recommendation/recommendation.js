@@ -14,7 +14,7 @@ const Logger = require('modern-logger')
 
 const moment = require('moment')
 
-const { AlreadyCheckedOutEarlierError } = require('./errors')
+const { AlreadyCheckedOutEarlierError, AlreadyLikedError, AlreadyPassedError } = require('./errors')
 
 const Taste = require('../taste')
 
@@ -83,55 +83,61 @@ class Recommendation {
   }
 
   like (channel, recommendation) {
-    if (!channel || !recommendation) {
-      return Promise.reject(new Error('invalid arguments'))
-    }
+    return Promise.try(() => {
+      if (!channel || !recommendation) {
+        throw new Error('invalid arguments')
+      }
 
-    if (recommendation.isLike) {
-      return Promise.reject(new Error('already liked'))
-    }
+      if (recommendation.isLike) {
+        throw new AlreadyLikedError(recommendation)
+      }
 
-    if (recommendation.isPass) {
-      return Promise.reject(new Error('already passed'))
-    }
+      if (recommendation.isPass) {
+        throw new AlreadyPassedError(recommendation)
+      }
+    })
+      .then(() => {
+        const channelRecommendationId = recommendation.channelRecommendationId
 
-    const channelRecommendationId = recommendation.channelRecommendationId
+        const { photos, content_hash, s_number } = recommendation.data
+        const photoId = _.get(photos, '[0].id')
 
-    const { photos, content_hash, s_number } = recommendation.data
-    const photoId = _.get(photos, '[0].id')
+        return channel.like(channelRecommendationId, photoId, content_hash, s_number)
+          .then((match) => {
+            return Logger.info(`${recommendation.name} got a like :+1:(photos = ${recommendation.photosSimilarityMean}%)`)
+              .then(() => {
+                recommendation.isLike = true
 
-    return channel.like(channelRecommendationId, photoId, content_hash, s_number)
-      .then((match) => {
-        return Logger.info(`${recommendation.name} got a like :+1:(photos = ${recommendation.photosSimilarityMean}%)`)
-          .then(() => {
-            recommendation.isLike = true
+                if (!match) {
+                  return recommendation
+                }
 
-            if (!match) {
-              return recommendation
-            }
-
-            return this.setUpMatch(recommendation, match)
+                return this.setUpMatch(recommendation, match)
+              })
           })
       })
   }
 
   pass (channel, recommendation) {
-    if (!channel || !recommendation) {
-      return Promise.reject(new Error('invalid arguments'))
-    }
+    return Promise.try(() => {
+      if (!channel || !recommendation) {
+        throw new Error('invalid arguments')
+      }
 
-    if (recommendation.isPass) {
-      return Promise.resolve()
-    }
+      if (recommendation.isPass) {
+        throw new AlreadyPassedError(recommendation)
+      }
 
-    if (recommendation.isLike) {
-      return Promise.reject(new Error('can not pass'))
-    }
+      if (recommendation.isLike) {
+        throw new AlreadyLikedError(recommendation)
+      }
+    })
+      .then(() => {
+        recommendation.isPass = true
 
-    recommendation.isPass = true
-
-    return Logger.info(`${recommendation.name} got a pass :-1:(photos = ${recommendation.photosSimilarityMean}%)`)
-      .then(() => recommendation)
+        return Logger.info(`${recommendation.name} got a pass :-1:(photos = ${recommendation.photosSimilarityMean}%)`)
+          .then(() => recommendation)
+      })
   }
 
   fallInLove (recommendation) {

@@ -7,5 +7,7 @@
 
 module.exports = {
   Recommendation: require('./recommendation'),
-  AlreadyCheckedOutEarlierError: require('./errors').AlreadyCheckedOutEarlierError
+  AlreadyCheckedOutEarlierError: require('./errors').AlreadyCheckedOutEarlierError,
+  AlreadyLikedError: require('./errors').AlreadyLikedError,
+  AlreadyPassedError: require('./errors').AlreadyPassedError
 }
