@@ -25,7 +25,7 @@
     "@angular/platform-browser-dynamic": "4.4.3",
     "@angular/router": "4.4.4",
     "@types/lodash": "4.14.77",
-    "angular-in-memory-web-api": "0.4.6",
+    "angular-in-memory-web-api": "0.5.0",
     "angular2-moment": "1.7.0",
     "aws-sdk": "2.128.0",
     "bluebird": "3.5.1",
