@@ -44,7 +44,7 @@
     "ng2-charts": "1.6.0",
     "request-on-steroids": "1.1.6",
     "rxjs": "5.4.3",
-    "sequelize": "4.13.12",
+    "sequelize": "4.13.13",
     "serverful": "1.1.19",
     "sharp": "0.18.4",
     "sqlite3": "3.1.13",
