@@ -1,7 +1,16 @@
 #!/bin/bash
 
+[ -z ${DOCKER_REPO-} ] && exit 1
+[ -z ${NAME-} ] && exit 1
+
 VERSION=$(if [ -z ${VERSION-} ]; then echo latest; else echo $VERSION; fi)
 
-IMAGE_NAME=$(if [ -z ${IMAGE_NAME-} ]; then echo hfreire/$NAME:$VERSION; else echo $IMAGE_NAME; fi)
+IMAGE_NAME=$(if [ -z ${IMAGE_NAME-} ]; then echo $DOCKER_REPO/$NAME:$VERSION; else echo $IMAGE_NAME; fi)
+
+pushd $(cd -P -- "$(dirname -- "$0")" && pwd -P)/..
 
 $(which docker) push ${IMAGE_NAME}
+
+popd
+
+exit 0

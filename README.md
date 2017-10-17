@@ -49,12 +49,7 @@ Change current directory
 cd get-me-a-date
 ```
 
-Install dependencies
-```
-npm install
-```
-
 Run the NPM script that will build the Docker image
 ```
-npm run build
+DOCKER_REPO=hfreire npm run build
 ```
