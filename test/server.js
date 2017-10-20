@@ -23,6 +23,8 @@ describe('Server', () => {
     Dates = td.object([ 'start' ])
   })
 
+  after(() => td.reset())
+
   describe('when exporting', () => {
     beforeEach(() => {
       td.replace('serverful', serverful)
