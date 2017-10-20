@@ -129,8 +129,8 @@
     "webpack:server": "./node_modules/.bin/webpack-dev-server --progress --hot --content-base src/web",
     "compile": "npm run clean && npm run webpack",
     "semantic-release": "./node_modules/.bin/semantic-release pre && node_modules/.bin/semantic-release post",
-    "build": "NAME=$npm_package_name ./share/docker/hooks/build",
-    "push": "NAME=$npm_package_name ./share/docker/hooks/push",
+    "build": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/build",
+    "push": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/push",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "start": "node src/app.js"
   }

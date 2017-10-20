@@ -51,5 +51,5 @@ cd get-me-a-date
 
 Run the NPM script that will build the Docker image
 ```
-DOCKER_REPO=hfreire npm run build
+npm run build
 ```
