@@ -39,8 +39,13 @@ RUN npm prune --production
 RUN apt-get remove --purge -y build-essential git python &&\
     apt-get autoremove --purge -y
 
-COPY share/docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY share/docker/start.sh /start.sh
+RUN chmod +x /start.sh
+COPY share/docker/test.sh /test.sh
+RUN chmod +x /test.sh
 
 EXPOSE 3000
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "/start.sh" ]
+
+HEALTHCHECK --start-period=10s --interval=5m --timeout=3s \
+  CMD nc -z localhost 3000 || exit 1

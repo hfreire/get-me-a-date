@@ -5,18 +5,41 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const { Serverful } = require('serverful')
-
-describe.skip('Server', () => {
+describe('Server', () => {
   let subject
+  let serverful
+  let Logger
+  let Database
+  let Dates
 
-  describe('when loading', () => {
+  before(() => {
+    serverful = td.object([])
+    serverful.Serverful = td.constructor([])
+
+    Logger = td.object([ 'error' ])
+
+    Database = td.object([ 'start' ])
+
+    Dates = td.object([ 'start' ])
+  })
+
+  after(() => td.reset())
+
+  describe('when exporting', () => {
     beforeEach(() => {
+      td.replace('serverful', serverful)
+
+      td.replace('modern-logger', Logger)
+
+      td.replace('../src/database', Database)
+
+      td.replace('../src/dates', Dates)
+
       subject = require('../src/server')
     })
 
-    it('should return an instance of serverful', () => {
-      subject.should.be.instanceOf(Serverful)
+    it('should be instance of serverful', () => {
+      subject.should.be.instanceOf(serverful.Serverful)
     })
   })
 })
