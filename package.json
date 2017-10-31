@@ -87,7 +87,7 @@
     "to-string-loader": "1.1.5",
     "tslint": "5.8.0",
     "tslint-config-standard": "7.0.0",
-    "typescript": "2.5.3",
+    "typescript": "2.6.1",
     "webpack": "3.8.1",
     "webpack-dev-server": "2.9.3"
   },
