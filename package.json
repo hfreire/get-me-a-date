@@ -27,7 +27,7 @@
     "@types/lodash": "4.14.80",
     "angular-in-memory-web-api": "0.5.0",
     "angular2-moment": "1.7.0",
-    "aws-sdk": "2.141.0",
+    "aws-sdk": "2.142.0",
     "bluebird": "3.5.1",
     "bluebird-retry": "0.11.0",
     "brakes": "2.5.3",
