@@ -9,7 +9,7 @@
 [![Docker Stars](https://img.shields.io/docker/stars/hfreire/get-me-a-date.svg)](https://hub.docker.com/r/hfreire/get-me-a-date/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/hfreire/get-me-a-date.svg)](https://hub.docker.com/r/hfreire/get-me-a-date/)
 
-Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based image recognition to help you automate your date discovery.
+> Uses [AWS Rekognition](https://aws.amazon.com/rekognition) deep learning-based image recognition to help you automate your date discovery.
 
 <p align="center"><img src="share/github/overview.gif" width="720"></p>
 
