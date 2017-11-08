@@ -1,4 +1,4 @@
-FROM node:6.11.3
+FROM node:8.9.0
 
 MAINTAINER hugo@exec.sh
 
@@ -21,7 +21,7 @@ WORKDIR $HOME
 # Install app runtime and build dependencies
 RUN apt-get update &&\
     apt-get install -y libgtk2.0-0 libgconf-2-4 libasound2 libxtst6 libxss1 libnss3 xvfb &&\
-    apt-get install -y build-essential git python &&\
+    apt-get install -y build-essential git netcat python &&\
     apt-get clean
 COPY package.json $HOME
 COPY tsconfig.json $HOME
@@ -35,9 +35,9 @@ COPY src $HOME/src
 RUN npm run compile
 
 # Remove app build dependencies
-RUN npm prune --production
 RUN apt-get remove --purge -y build-essential git python &&\
     apt-get autoremove --purge -y
+RUN npm prune --production
 
 COPY share/docker/start.sh /start.sh
 RUN chmod +x /start.sh
