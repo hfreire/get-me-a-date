@@ -40,7 +40,7 @@
     "health-checkup": "1.0.17",
     "lodash": "4.17.4",
     "modern-logger": "1.5.3",
-    "moment": "2.19.1",
+    "moment": "2.19.2",
     "ng2-charts": "1.6.0",
     "request-on-steroids": "1.1.11",
     "rxjs": "5.5.2",
