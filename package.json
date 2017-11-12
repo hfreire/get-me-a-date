@@ -76,7 +76,7 @@
     "istanbul": "0.4.5",
     "last-release-github": "1.1.1",
     "mocha": "4.0.1",
-    "node-sass": "4.6.0",
+    "node-sass": "4.6.1",
     "null-loader": "0.1.1",
     "pre-git": "3.16.0",
     "raw-loader": "0.5.1",
