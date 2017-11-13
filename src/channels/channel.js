@@ -23,11 +23,9 @@ const facebookLogin = new FacebookLogin({
   }
 })
 
-Health.addCheck('facebook', () => new Promise((resolve, reject) => {
+Health.addCheck('facebook', () => Promise.try(() => {
   if (facebookLogin.circuitBreaker.isOpen()) {
-    return reject(new Error(`circuit breaker is open`))
-  } else {
-    return resolve()
+    throw new Error(`circuit breaker is open`)
   }
 }))
 
