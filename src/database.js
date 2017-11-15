@@ -23,7 +23,7 @@ const defaultOptions = {
 
 class Database {
   constructor (options = {}) {
-    this._options = _.defaultsDeep(options, defaultOptions)
+    this._options = _.defaultsDeep({}, options, defaultOptions)
 
     this._sequelize = new Sequelize(null, null, null, {
       dialect: 'sqlite',
