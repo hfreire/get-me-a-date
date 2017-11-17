@@ -17,6 +17,7 @@
 * Supports [Tinder](https://github.com/hfreire/tinder-wrapper) dating app :white_check_mark:
 * Supports [Happn](https://github.com/hfreire/happn-wrapper) dating app :white_check_mark:
 * Uses your existing matches :revolving_hearts: for machine-learning :robot: when to :+1: or :-1: new recommendations :white_check_mark:
+* Uses [Request on Steroids](https://github.com/hfreire/request-on-steroids) to rate limit, retry and circuit break outgoing HTTP requests :white_check_mark:
 * Periodically :clock10: gets dating app :girl::woman: recommendations and automatically :robot: :+1: or :-1: :white_check_mark:
 * Launch :rocket: inside a Docker container :whale: so you don't need to manage the dependencies :raised_hands: :white_check_mark:
 
