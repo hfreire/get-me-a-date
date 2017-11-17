@@ -20,7 +20,7 @@ WORKDIR $HOME
 
 # Install app runtime and build dependencies
 RUN apt-get update &&\
-    apt-get install -y libatk-bridge2.0-0 libgtk-3-0 &&\
+    apt-get install -y libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libnss3 libxss1 libgconf-2-4 libasound2 &&\
     apt-get install -y build-essential git netcat &&\
     apt-get clean
 COPY package.json $HOME
