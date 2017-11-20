@@ -45,7 +45,7 @@
     "request-on-steroids": "1.1.12",
     "rxjs": "5.5.2",
     "sequelize": "4.22.6",
-    "serverful": "1.1.24",
+    "serverful": "1.1.25",
     "sharp": "0.18.4",
     "sqlite3": "3.1.13",
     "tinder-wrapper": "1.0.9",
