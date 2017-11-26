@@ -61,7 +61,7 @@
     "copy-webpack-plugin": "4.2.3",
     "coveralls": "2.13.3",
     "css-loader": "0.28.7",
-    "eslint": "4.11.0",
+    "eslint": "4.12.0",
     "eslint-config-hfreire": "1.0.10",
     "eslint-plugin-import": "2.8.0",
     "eslint-plugin-json": "1.2.0",
