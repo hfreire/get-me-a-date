@@ -38,6 +38,11 @@ SO_TIMEOUT | TCP socket connection timeout. | false | `120000`
 LOG_LEVEL | The log level verbosity. | false | `info`
 ENVIRONMENT | The environment the app is running on. | false | `undefined`
 ROLLBAR_API_KEY | The server API key used to talk with Rollbar. | false | `undefined`
+AWS_REGION | Aws region. | true | `undefined`
+AWS_ACCESS_KEY_ID | Aws access key. | true | `undefined`
+AWS_SECRET_ACCESS_KEY | Aws secret key. | true | `undefined`
+FACEBOOK_USER_EMAIL | Facebook email. | true | `undefined`
+FACEBOOK_USER_PASSWORD | Facebook password. | true | `undefined`
 
 ### How to build
 Clone the GitHub repo
