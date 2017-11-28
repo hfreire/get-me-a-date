@@ -28,9 +28,18 @@ Run the Docker image in a container exposing the port `5940`
 ```
 docker run -d -p "5940:3000" hfreire/get-me-a-date
 ```
+
+#### Available REST API endpoints
+Swagger documentation available `http://localhost:5940/docs`
+
 #### Available environment variables
 Variable | Description | Required | Default value
 :---:|:---:|:---:|:---:
+FACEBOOK_USER_EMAIL | Facebook user e-mail address used for login. | true | `undefined`
+FACEBOOK_USER_PASSWORD | Facebook user password used for login. | true | `undefined`
+AWS_REGION | AWS region used for S3 and Rekognition. | true | `undefined`
+AWS_ACCESS_KEY_ID | AWS access key  used for S3 and Rekognition. | true | `undefined`
+AWS_SECRET_ACCESS_KEY | AWS secret access key used for S3 and Rekognition. | true | `undefined`
 FIND_DATES_PERIOD | The time period (in seconds) between finding dates. | false | `600`
 PORT | The port to be used by the HTTP server. | false | `3000`
 API_KEYS | The secret keys that should be used when securing endpoints. | false | `undefined`
@@ -38,11 +47,6 @@ SO_TIMEOUT | TCP socket connection timeout. | false | `120000`
 LOG_LEVEL | The log level verbosity. | false | `info`
 ENVIRONMENT | The environment the app is running on. | false | `undefined`
 ROLLBAR_API_KEY | The server API key used to talk with Rollbar. | false | `undefined`
-AWS_REGION | Aws region. | true | `undefined`
-AWS_ACCESS_KEY_ID | Aws access key. | true | `undefined`
-AWS_SECRET_ACCESS_KEY | Aws secret key. | true | `undefined`
-FACEBOOK_USER_EMAIL | Facebook email. | true | `undefined`
-FACEBOOK_USER_PASSWORD | Facebook password. | true | `undefined`
 
 ### How to build
 Clone the GitHub repo
@@ -59,3 +63,6 @@ Run the NPM script that will build the Docker image
 ```
 npm run build
 ```
+
+### How to contribute
+Contributing :construction_worker: guidelines available [here](./CONTRIBUTING.md)
