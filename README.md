@@ -30,7 +30,7 @@ docker run -d -p "5940:3000" hfreire/get-me-a-date
 ```
 
 #### Available REST API endpoints
-Swagger documentation available `http://localhost:5940/docs`
+Swagger documentation available at `http://localhost:5940/docs`.
 
 #### Available environment variables
 Variable | Description | Required | Default value
@@ -65,4 +65,4 @@ npm run build
 ```
 
 ### How to contribute
-Contributing :construction_worker: guidelines available [here](./CONTRIBUTING.md)
+Contributing :construction_worker: guidelines available [here](./CONTRIBUTING.md).
