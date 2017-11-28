@@ -112,7 +112,8 @@
   },
   "config": {
     "pre-git": {
-      "commit-msg": "conventional"
+      "commit-msg": "conventional",
+      "allow-untracked-files": true
     }
   },
   "release": {
