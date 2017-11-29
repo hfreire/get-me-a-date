@@ -2,6 +2,9 @@
   "name": "get-me-a-date",
   "description": "Help me get a date tonight",
   "version": "0.0.0",
+  "engines": {
+    "node": ">= 6.0.0"
+  },
   "author": "Hugo Freire <hugo@exec.sh>",
   "license": "MIT",
   "repository": {
