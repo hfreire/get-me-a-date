@@ -1,5 +1,5 @@
 # Contributing
-This repo follows the [GitHub Flow](https://guides.github.com/introduction/flow/) git workflow. In essence, you contribute by making changes in your fork and then generating a pull request of those changes to be merged with the upstream. 
+This GitHub repo follows the [GitHub Flow](https://guides.github.com/introduction/flow/) git workflow. In essence, you contribute by making changes in your fork and then generating a pull request of those changes to be merged with the upstream. 
 
 ### How to fork this repo
 You can read more about forking a GitHub repo [here](https://help.github.com/articles/fork-a-repo). Once you've forked this repo, you're now ready to clone the repo in your computer and start hacking and tinkering with its code.
