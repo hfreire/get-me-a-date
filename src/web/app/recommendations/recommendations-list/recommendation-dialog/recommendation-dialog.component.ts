@@ -57,6 +57,7 @@ export class RecommendationDialogComponent {
       .subscribe((recommendation: any) => {
         this.recommendation = recommendation
         this.data.recommendation = recommendation
+        this.dialogRef.close()
       })
   }
 
@@ -65,6 +66,7 @@ export class RecommendationDialogComponent {
       .subscribe((recommendation) => {
         this.recommendation = recommendation
         this.data.recommendation = recommendation
+        this.dialogRef.close()
       })
   }
 
