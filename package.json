@@ -2,6 +2,9 @@
   "name": "get-me-a-date",
   "description": "Help me get a date tonight",
   "version": "0.0.0",
+  "engines": {
+    "node": ">= 6.0.0"
+  },
   "author": "Hugo Freire <hugo@exec.sh>",
   "license": "MIT",
   "repository": {
@@ -24,10 +27,10 @@
     "@angular/platform-browser": "4.4.4",
     "@angular/platform-browser-dynamic": "4.4.4",
     "@angular/router": "4.4.4",
-    "@types/lodash": "4.14.85",
+    "@types/lodash": "4.14.86",
     "angular-in-memory-web-api": "0.5.0",
     "angular2-moment": "1.7.0",
-    "aws-sdk": "2.156.0",
+    "aws-sdk": "2.160.0",
     "bluebird": "3.5.1",
     "bluebird-retry": "0.11.0",
     "brakes": "2.5.3",
@@ -40,7 +43,7 @@
     "health-checkup": "1.0.18",
     "lodash": "4.17.4",
     "modern-logger": "1.5.5",
-    "moment": "2.19.2",
+    "moment": "2.19.3",
     "ng2-charts": "1.6.0",
     "request-on-steroids": "1.1.17",
     "rxjs": "5.5.2",
@@ -61,7 +64,7 @@
     "copy-webpack-plugin": "4.2.3",
     "coveralls": "2.13.3",
     "css-loader": "0.28.7",
-    "eslint": "4.12.0",
+    "eslint": "4.12.1",
     "eslint-config-hfreire": "1.0.10",
     "eslint-plugin-import": "2.8.0",
     "eslint-plugin-json": "1.2.0",
@@ -89,7 +92,7 @@
     "tslint-config-standard": "7.0.0",
     "typescript": "2.5.3",
     "webpack": "3.8.1",
-    "webpack-dev-server": "2.9.4"
+    "webpack-dev-server": "2.9.5"
   },
   "greenkeeper": {
     "ignore": [
@@ -112,7 +115,8 @@
   },
   "config": {
     "pre-git": {
-      "commit-msg": "conventional"
+      "commit-msg": "conventional",
+      "allow-untracked-files": true
     }
   },
   "release": {
