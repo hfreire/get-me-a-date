@@ -51,7 +51,7 @@ module.exports = {
     new EnvironmentPlugin([ 'NODE_ENV', 'BASE_API_URL' ])
   ],
   devServer: {
-    port: 3000,
+    port: process.env.WEBPACK_DEV_PORT || 3000,
     host: '0.0.0.0',
     historyApiFallback: true,
     stats: 'minimal'
