@@ -22,12 +22,17 @@ npm install
 ### How to keep your fork synced
 It's generally a good idea to pull upstream changes and merge them with your fork regularly. [Greenkeeper app](https://github.com/marketplace/greenkeeper) is installed in this GitHub project, it will automatically update dependencies and merge them with upstream if possible.
 
-Fetch from upstream remote master
+Add remote upstream
+```
+git remote add upstream https://github.com/hfreire/get-me-a-date
+```
+
+Fetch from remote upstream master branch
 ```
 git fetch upstream master
 ```
 
-Merge upstream with your local master
+Merge upstream with your local master branch
 ```
 git merge upstream/master
 ```
