@@ -33,7 +33,7 @@
     "aws-sdk": "2.170.0",
     "bluebird": "3.5.1",
     "bluebird-retry": "0.11.0",
-    "brakes": "2.5.3",
+    "brakes": "2.6.0",
     "chart.js": "2.7.1",
     "core-js": "2.5.3",
     "facebook-login-for-robots": "1.1.6",
