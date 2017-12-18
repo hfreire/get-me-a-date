@@ -1,11 +1,8 @@
 # :heart_eyes: Help me get a :cupid: date tonight :first_quarter_moon_with_face:
 
-[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Build Status](https://travis-ci.org/hfreire/get-me-a-date.svg?branch=master)](https://travis-ci.org/hfreire/get-me-a-date)
 [![Coverage Status](https://coveralls.io/repos/github/hfreire/get-me-a-date/badge.svg?branch=master)](https://coveralls.io/github/hfreire/get-me-a-date?branch=master)
-[![Greenkeeper badge](https://badges.greenkeeper.io/hfreire/get-me-a-date.svg)](https://greenkeeper.io/)
 [![](https://img.shields.io/github/release/hfreire/get-me-a-date.svg)](https://github.com/hfreire/get-me-a-date/releases)
-[![](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docker Stars](https://img.shields.io/docker/stars/hfreire/get-me-a-date.svg)](https://hub.docker.com/r/hfreire/get-me-a-date/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/hfreire/get-me-a-date.svg)](https://hub.docker.com/r/hfreire/get-me-a-date/)
 
@@ -28,9 +25,18 @@ Run the Docker image in a container exposing the port `5940`
 ```
 docker run -d -p "5940:3000" hfreire/get-me-a-date
 ```
+
+#### Available REST API endpoints
+Swagger documentation available at `http://localhost:5940/docs`.
+
 #### Available environment variables
 Variable | Description | Required | Default value
 :---:|:---:|:---:|:---:
+FACEBOOK_USER_EMAIL | Facebook user e-mail address used for login. | true | `undefined`
+FACEBOOK_USER_PASSWORD | Facebook user password used for login. | true | `undefined`
+AWS_REGION | AWS region used for S3 and Rekognition. | true | `undefined`
+AWS_ACCESS_KEY_ID | AWS access key  used for S3 and Rekognition. | true | `undefined`
+AWS_SECRET_ACCESS_KEY | AWS secret access key used for S3 and Rekognition. | true | `undefined`
 FIND_DATES_PERIOD | The time period (in seconds) between finding dates. | false | `600`
 PORT | The port to be used by the HTTP server. | false | `3000`
 API_KEYS | The secret keys that should be used when securing endpoints. | false | `undefined`
@@ -38,11 +44,6 @@ SO_TIMEOUT | TCP socket connection timeout. | false | `120000`
 LOG_LEVEL | The log level verbosity. | false | `info`
 ENVIRONMENT | The environment the app is running on. | false | `undefined`
 ROLLBAR_API_KEY | The server API key used to talk with Rollbar. | false | `undefined`
-AWS_REGION | Aws region. | true | `undefined`
-AWS_ACCESS_KEY_ID | Aws access key. | true | `undefined`
-AWS_SECRET_ACCESS_KEY | Aws secret key. | true | `undefined`
-FACEBOOK_USER_EMAIL | Facebook email. | true | `undefined`
-FACEBOOK_USER_PASSWORD | Facebook password. | true | `undefined`
 
 ### How to build
 Clone the GitHub repo
@@ -59,3 +60,11 @@ Run the NPM script that will build the Docker image
 ```
 npm run build
 ```
+
+### How to contribute
+You can contribute either with code (e.g., new features, bug fixes and documentation) or by [donating 5 EUR](https://paypal.me/hfreire/5). You can read the [contributing guidelines](./docs/CONTRIBUTING.md) for instructions on how to contribute with code. 
+
+All donation proceedings will go to the [Sverige för UNHCR](https://sverigeforunhcr.se), a swedish partner of the [UNHCR - The UN Refugee Agency](http://www.unhcr.org), a global organisation dedicated to saving lives, protecting rights and building a better future for refugees, forcibly displaced communities and stateless people.
+
+### License
+Read the [license](./LICENSE.md) for permissions and limitations.
