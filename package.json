@@ -92,7 +92,7 @@
     "tslint-config-standard": "7.0.0",
     "typescript": "2.5.3",
     "webpack": "3.10.0",
-    "webpack-dev-server": "2.9.7"
+    "webpack-dev-server": "2.10.0"
   },
   "greenkeeper": {
     "ignore": [
