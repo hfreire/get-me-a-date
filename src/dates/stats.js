@@ -2,7 +2,7 @@
  * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
- * LICENSE file in the root directory of this source tree.
+ * LICENSE.md file in the root directory of this source tree.
  */
 
 const _ = require('lodash')
@@ -63,7 +63,7 @@ class Stats {
 
   updateByStatsAndDate ({ name, metric, criteria }, date) {
     const where = _.merge({
-      [metric]: {
+      [ metric ]: {
         $gte: date,
         $lt: Database._sequelize.fn('strftime', '%Y-%m-%dT%H:%M:%fZ', Database._sequelize.fn('datetime', date, '+1 day'))
       }
@@ -71,7 +71,7 @@ class Stats {
 
     return Database.recommendations.findAll({ where })
       .then((results) => {
-        return Database.stats.upsert({ date, [name]: results.length }, { where: { date } })
+        return Database.stats.upsert({ date, [ name ]: results.length }, { where: { date } })
       })
   }
 }

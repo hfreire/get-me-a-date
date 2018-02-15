@@ -2,7 +2,7 @@
  * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
- * LICENSE file in the root directory of this source tree.
+ * LICENSE.md file in the root directory of this source tree.
  */
 
 /* eslint-disable no-unused-vars,unicorn/no-process-exit */
@@ -62,12 +62,13 @@ describe('App', () => {
     before(() => {
       on = process.on
       exit = process.exit
+
+      process.on = td.function()
+
+      process.exit = td.function()
     })
 
     beforeEach(() => {
-      process.on = td.function()
-      process.exit = td.function()
-
       td.when(process.on('SIGINT'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
       td.replace('modern-logger', Logger)
@@ -106,12 +107,13 @@ describe('App', () => {
     before(() => {
       on = process.on
       exit = process.exit
+
+      process.on = td.function()
+
+      process.exit = td.function()
     })
 
     beforeEach(() => {
-      process.on = td.function()
-      process.exit = td.function()
-
       td.when(process.on('SIGTERM'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
       td.replace('modern-logger', Logger)
@@ -150,12 +152,13 @@ describe('App', () => {
     before(() => {
       on = process.on
       exit = process.exit
+
+      process.on = td.function()
+
+      process.exit = td.function()
     })
 
     beforeEach(() => {
-      process.on = td.function()
-      process.exit = td.function()
-
       td.when(process.on('SIGHUP'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
       td.replace('modern-logger', Logger)
@@ -189,17 +192,17 @@ describe('App', () => {
   describe('when catching an abort signal', () => {
     let on
     let exit
-    let callback
 
     before(() => {
       on = process.on
       exit = process.exit
+
+      process.on = td.function()
+
+      process.exit = td.function()
     })
 
     beforeEach(() => {
-      process.on = td.function()
-      process.exit = td.function()
-
       td.when(process.on('SIGABRT'), { ignoreExtraArgs: true }).thenCallback()
 
       td.replace('modern-logger', Logger)
@@ -229,6 +232,10 @@ describe('App', () => {
     before(() => {
       on = process.on
       exit = process.exit
+
+      process.on = td.function()
+
+      process.exit = td.function()
     })
 
     beforeEach(() => {
@@ -282,6 +289,10 @@ describe('App', () => {
     before(() => {
       on = process.on
       exit = process.exit
+
+      process.on = td.function()
+
+      process.exit = td.function()
     })
 
     beforeEach(() => {
