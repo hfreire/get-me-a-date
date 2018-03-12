@@ -92,7 +92,8 @@
     "tslint-config-standard": "7.0.0",
     "typescript": "2.5.3",
     "webpack": "3.10.0",
-    "webpack-dev-server": "2.11.1"
+    "webpack-dev-server": "2.11.1",
+    "webpack-merge": "4.1.1"
   },
   "greenkeeper": {
     "ignore": [
@@ -113,7 +114,8 @@
       "awesome-typescript-loader",
       "semantic-release",
       "webpack",
-      "webpack-dev-server"
+      "webpack-dev-server",
+      "webpack-merge"
     ]
   },
   "config": {
@@ -133,7 +135,7 @@
     "coverage": "node_modules/.bin/istanbul cover --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
     "test": "npm run clean && npm run lint && npm run coverage",
     "webpack": "./node_modules/.bin/webpack -p",
-    "webpack:server": "./node_modules/.bin/webpack-dev-server --progress --hot --content-base src/web",
+    "webpack:start": "./node_modules/.bin/webpack-dev-server --config ./webpack.start.js --progress --hot --content-base src/web",
     "compile": "npm run clean && npm run webpack",
     "semantic-release": "./node_modules/.bin/semantic-release pre && node_modules/.bin/semantic-release post",
     "build": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/build",

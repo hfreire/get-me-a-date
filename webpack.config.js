@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ * Copyright (c) 2018, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
- * LICENSE file in the root directory of this source tree.
+ * LICENSE.md file in the root directory of this source tree.
  */
 
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin')
@@ -50,12 +50,6 @@ module.exports = {
     new NamedModulesPlugin(),
     new EnvironmentPlugin([ 'NODE_ENV', 'BASE_API_URL' ])
   ],
-  devServer: {
-    port: process.env.WEBPACK_DEV_PORT || 3000,
-    host: '0.0.0.0',
-    historyApiFallback: true,
-    stats: 'minimal'
-  },
   node: {
     global: true,
     crypto: 'empty',
