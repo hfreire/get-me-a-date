@@ -83,7 +83,7 @@
     "pre-git": "3.17.1",
     "raw-loader": "0.5.1",
     "sass-loader": "6.0.7",
-    "semantic-release": "15.1.4",
+    "semantic-release": "15.1.5",
     "style-loader": "0.20.3",
     "testdouble": "3.7.0",
     "to-string-loader": "1.1.5",
