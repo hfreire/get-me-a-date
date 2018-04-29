@@ -85,7 +85,7 @@
     "sass-loader": "7.0.1",
     "semantic-release": "15.1.7",
     "style-loader": "0.21.0",
-    "testdouble": "3.7.0",
+    "testdouble": "3.8.0",
     "to-string-loader": "1.1.5",
     "tslint": "5.9.0",
     "tslint-config-standard": "7.0.0",
