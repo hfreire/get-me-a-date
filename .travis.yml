@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- 8.9.0
+  - 8.9.0
 addons:
   apt:
     sources:
@@ -20,6 +20,8 @@ notifications:
     on_success: never
     on_failure: always
     on_pull_requests: false
+install:
+  - npm install
 before_install:
   - npm install -g greenkeeper-lockfile@1
 before_script:
