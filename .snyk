@@ -1,0 +1,8 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.12.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:lodash:20180130':
+    - request-on-steroids > socks5-http-client > npm > cli-table2 > lodash:
+        patched: '2018-08-17T07:34:16.777Z'
