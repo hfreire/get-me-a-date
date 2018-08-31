@@ -88,7 +88,7 @@
     "testdouble": "3.8.1",
     "to-string-loader": "1.1.5",
     "tslint": "5.9.0",
-    "tslint-config-standard": "7.1.0",
+    "tslint-config-standard": "8.0.0",
     "typescript": "2.5.3",
     "webpack": "3.10.0",
     "webpack-dev-server": "2.11.1",
