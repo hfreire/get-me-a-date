@@ -11,7 +11,7 @@ git clone https://github.com/my-github-username/get-me-a-date
 
 Change current directory
 ```
-cd get-me-date
+cd get-me-a-date
 ```
 
 Install NPM dependencies

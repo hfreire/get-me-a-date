@@ -42,6 +42,7 @@
     "happn-wrapper": "1.1.10",
     "health-checkup": "1.0.19",
     "lodash": "4.17.9",
+    "mint-wrapper": "1.0.6",
     "modern-logger": "1.5.17",
     "moment": "2.22.1",
     "ng2-charts": "1.6.0",
@@ -59,13 +60,12 @@
     "@angularclass/hmr-loader": "3.0.4",
     "angular2-template-loader": "0.6.2",
     "awesome-typescript-loader": "3.5.0",
-    "chai": "4.1.2",
-    "chai-as-promised": "7.1.1",
     "copy-webpack-plugin": "4.5.1",
     "coveralls": "2.13.3",
     "css-loader": "0.28.11",
+    "eslint-config-hfreire": "1.1.3",
+    "eslint-plugin-jest": "21.15.0",
     "eslint": "4.19.1",
-    "eslint-config-hfreire": "1.1.0",
     "eslint-plugin-import": "2.12.0",
     "eslint-plugin-json": "1.2.0",
     "eslint-plugin-mocha": "5.0.0",
@@ -75,6 +75,9 @@
     "eslint-plugin-unicorn": "4.0.3",
     "file-loader": "1.1.11",
     "html-loader": "0.5.4",
+    "html-webpack-plugin": "3.0.7",
+    "jest": "22.4.2",
+    "node-sass": "4.8.1",
     "html-webpack-plugin": "3.0.8",
     "istanbul": "0.4.5",
     "mocha": "5.2.0",
@@ -82,6 +85,8 @@
     "null-loader": "0.1.1",
     "pre-git": "3.17.1",
     "raw-loader": "0.5.1",
+    "style-loader": "0.20.3",
+    "testdouble-jest": "1.0.1",
     "sass-loader": "7.0.1",
     "semantic-release": "15.3.0",
     "style-loader": "0.21.0",
@@ -122,6 +127,20 @@
       "allow-untracked-files": true
     }
   },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./test/helper.js",
+    "testMatch": [
+      "<rootDir>/test/**.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "./test/helper.js"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
+  },
   "release": {
     "publish": [
       {
@@ -132,18 +151,20 @@
     ]
   },
   "scripts": {
-    "commit": "./node_modules/.bin/commit-wizard",
-    "clean": "rm -rf coverage && rm -rf tmp/web",
-    "lint": "node_modules/.bin/eslint . --ext .json --ext .js && node_modules/.bin/tslint 'src/web/**/*.ts'",
-    "coverage": "node_modules/.bin/istanbul cover --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
-    "test": "npm run clean && npm run lint && npm run coverage",
+    "eslint": "./node_modules/.bin/eslint . --ext .json --ext .js ",
+    "tslint": "node_modules/.bin/tslint 'src/web/**/*.ts'",
+    "jest": "./node_modules/.bin/jest",
     "webpack": "./node_modules/.bin/webpack -p",
     "webpack:start": "./node_modules/.bin/webpack-dev-server --config ./webpack.start.js --progress --hot --content-base src/web",
-    "compile": "npm run clean && npm run webpack",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "semantic-release": "./node_modules/.bin/semantic-release",
+    "clean": "rm -rf coverage && rm -rf tmp/web",
+    "lint": "npm run eslint && npm run tslint",
+    "test": "npm run clean && npm run lint && npm run jest",
+    "compile": "npm run clean && npm run webpack",
+    "commit": "./node_modules/.bin/commit-wizard",
     "build": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/build",
     "push": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/push",
-    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "start": "node src/app.js"
   }
 }

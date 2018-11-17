@@ -8,14 +8,15 @@
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const { Tinder, Happn } = require('../channels')
+const { Tinder, Happn, Mint } = require('../channels')
 const Database = require('../database')
 
 class Channel {
   constructor () {
     this._channels = {
       'tinder': Tinder,
-      'happn': Happn
+      'happn': Happn,
+      'mint': Mint
     }
   }
 

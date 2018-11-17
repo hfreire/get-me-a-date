@@ -12,34 +12,26 @@ describe('App', () => {
   let Logger
   let Server
 
-  before(() => {
-    Logger = td.object([ 'info', 'error' ])
-
-    Server = td.object([ 'start', 'stop' ])
-  })
-
-  afterEach(() => td.reset())
-
   describe('when running', () => {
     const VERSION = 'my-version'
     const VERSION_COMMIT = 'my-version-commint'
     const VERSION_BUILD_DATE = 'my-version-build-date'
 
-    before(() => {
+    beforeAll(() => {
       process.env.VERSION = VERSION
       process.env.VERSION_COMMIT = VERSION_COMMIT
       process.env.VERSION_BUILD_DATE = VERSION_BUILD_DATE
     })
 
     beforeEach(() => {
-      td.replace('modern-logger', Logger)
+      Logger = td.replace('modern-logger')
 
-      td.replace('../src/server', Server)
+      Server = td.replace('../src/server')
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       delete process.env.VERSION
       delete process.env.VERSION_COMMIT
       delete process.env.VERSION_BUILD_DATE
@@ -59,7 +51,7 @@ describe('App', () => {
     let exit
     let callback
 
-    before(() => {
+    beforeAll(() => {
       on = process.on
       exit = process.exit
 
@@ -71,15 +63,15 @@ describe('App', () => {
     beforeEach(() => {
       td.when(process.on('SIGINT'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
-      td.replace('modern-logger', Logger)
+      td.replace('modern-logger')
 
+      Server = td.replace('../src/server')
       td.when(Server.stop()).thenResolve()
-      td.replace('../src/server', Server)
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       process.on = on
       process.exit = exit
     })
@@ -104,7 +96,7 @@ describe('App', () => {
     let exit
     let callback
 
-    before(() => {
+    beforeAll(() => {
       on = process.on
       exit = process.exit
 
@@ -116,15 +108,15 @@ describe('App', () => {
     beforeEach(() => {
       td.when(process.on('SIGTERM'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
-      td.replace('modern-logger', Logger)
+      td.replace('modern-logger')
 
+      Server = td.replace('../src/server')
       td.when(Server.stop()).thenResolve()
-      td.replace('../src/server', Server)
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       process.on = on
       process.exit = exit
     })
@@ -149,7 +141,7 @@ describe('App', () => {
     let exit
     let callback
 
-    before(() => {
+    beforeAll(() => {
       on = process.on
       exit = process.exit
 
@@ -161,15 +153,15 @@ describe('App', () => {
     beforeEach(() => {
       td.when(process.on('SIGHUP'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
-      td.replace('modern-logger', Logger)
+      td.replace('modern-logger')
 
+      Server = td.replace('../src/server')
       td.when(Server.stop()).thenResolve()
-      td.replace('../src/server', Server)
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       process.on = on
       process.exit = exit
     })
@@ -193,7 +185,7 @@ describe('App', () => {
     let on
     let exit
 
-    before(() => {
+    beforeAll(() => {
       on = process.on
       exit = process.exit
 
@@ -205,15 +197,15 @@ describe('App', () => {
     beforeEach(() => {
       td.when(process.on('SIGABRT'), { ignoreExtraArgs: true }).thenCallback()
 
-      td.replace('modern-logger', Logger)
+      td.replace('modern-logger')
 
+      Server = td.replace('../src/server')
       td.when(Server.stop()).thenResolve()
-      td.replace('../src/server', Server)
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       process.on = on
       process.exit = exit
     })
@@ -229,7 +221,7 @@ describe('App', () => {
     let exit
     let callback
 
-    before(() => {
+    beforeAll(() => {
       on = process.on
       exit = process.exit
 
@@ -244,16 +236,16 @@ describe('App', () => {
 
       td.when(process.on('uncaughtException'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
+      Logger = td.replace('modern-logger')
       td.when(Logger.error(), { ignoreExtraArgs: true }).thenResolve()
-      td.replace('modern-logger', Logger)
 
+      Server = td.replace('../src/server')
       td.when(Server.stop()).thenResolve()
-      td.replace('../src/server', Server)
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       process.on = on
       process.exit = exit
     })
@@ -286,7 +278,7 @@ describe('App', () => {
     let exit
     let callback
 
-    before(() => {
+    beforeAll(() => {
       on = process.on
       exit = process.exit
 
@@ -301,16 +293,16 @@ describe('App', () => {
 
       td.when(process.on('unhandledRejection'), { ignoreExtraArgs: true }).thenDo((event, _callback) => { callback = _callback })
 
+      Logger = td.replace('modern-logger')
       td.when(Logger.error(), { ignoreExtraArgs: true }).thenResolve()
-      td.replace('modern-logger', Logger)
 
+      Server = td.replace('../src/server')
       td.when(Server.stop()).thenResolve()
-      td.replace('../src/server', Server)
 
       subject = require('../src/app')
     })
 
-    after(() => {
+    afterAll(() => {
       process.on = on
       process.exit = exit
     })

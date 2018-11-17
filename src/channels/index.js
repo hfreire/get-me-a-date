@@ -8,6 +8,7 @@
 module.exports = {
   Tinder: require('./tinder'),
   Happn: require('./happn'),
+  Mint: require('./mint'),
   NotAuthorizedError: require('./errors').NotAuthorizedError,
   OutOfLikesError: require('./errors').OutOfLikesError
 }

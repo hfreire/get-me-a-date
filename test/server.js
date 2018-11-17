@@ -12,7 +12,7 @@ describe('Server', () => {
   let Database
   let Dates
 
-  before(() => {
+  beforeAll(() => {
     serverful = td.object([])
     serverful.Serverful = td.constructor([])
 
@@ -22,8 +22,6 @@ describe('Server', () => {
 
     Dates = td.object([ 'start' ])
   })
-
-  after(() => td.reset())
 
   describe('when exporting', () => {
     beforeEach(() => {
