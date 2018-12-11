@@ -1,6 +1,6 @@
 #!/bin/sh
 
-/start.sh >/dev/null 2>&1 &
+./start.sh &
 
 sleep 10
 
