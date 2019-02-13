@@ -68,7 +68,7 @@
     "eslint-config-hfreire": "1.1.0",
     "eslint-plugin-import": "2.16.0",
     "eslint-plugin-json": "1.2.1",
-    "eslint-plugin-mocha": "5.2.1",
+    "eslint-plugin-mocha": "5.3.0",
     "eslint-plugin-node": "7.0.1",
     "eslint-plugin-promise": "4.0.1",
     "eslint-plugin-standard": "4.0.0",
