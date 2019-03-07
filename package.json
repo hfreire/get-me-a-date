@@ -63,7 +63,7 @@
     "chai-as-promised": "7.1.1",
     "copy-webpack-plugin": "5.0.0",
     "coveralls": "3.0.3",
-    "css-loader": "2.1.0",
+    "css-loader": "2.1.1",
     "eslint": "5.15.1",
     "eslint-config-hfreire": "1.1.0",
     "eslint-plugin-import": "2.16.0",
