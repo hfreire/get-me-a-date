@@ -78,7 +78,7 @@
     "html-webpack-plugin": "3.0.8",
     "istanbul": "0.4.5",
     "mocha": "6.1.4",
-    "node-sass": "4.11.0",
+    "node-sass": "4.12.0",
     "null-loader": "0.1.1",
     "pre-git": "3.17.1",
     "raw-loader": "1.0.0",
