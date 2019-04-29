@@ -1,14 +1,14 @@
 language: node_js
 node_js:
-  - 8.9.0
+- 8.9.0
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
+    - g++-4.8
 env:
-  - CXX=g++-4.8
+- CXX=g++-4.8
 cache:
   directories:
   - node_modules
@@ -16,19 +16,19 @@ notifications:
   email: false
   slack:
     rooms:
-      secure: iiJS8LAUiJUJxP28NNyM4t2ePWRYs9wvIui8kUvefuC3RI5rzURsQeriOXoRxz/x1P4zUi+lW3D1HguumCi7SkonZNT7anm3kK/M5GfeMbNXl4MoYroyWCz7/EJ58W2LP+Wpe9Bxeb2+wbVa80Tysxkk2xYTu1r7S3YWUK+C9Rmf0r6IF8wYTIbuv6MFXinAO9r8uifydbjpC3bMP4RTH44EZy2XszXdi5EQ4zmtJnyskoUddGi2O+j9YmirEpO9WfjRHF57mAu+4a1SIjTlnqn0pnHfNEujUY65xnYH8HD11vNPEIfyn5rOyHWKD/zCfREddZUBuFaFpSuBb2zeteijT+em7XHlJVuQY7EZvabRlA1emU86LMmYSA7yALfMTlfeiDaXzSrpSzxiG1ZL0KUcZqztE7u3kHYDu0kwjtTRtShLtpT9GoUzduhRkcdVL2MKeWeLB3Mj9L9p6roqhwzhEOS2z1W1Sa5otv89qCgtAQZGbzvOkURoYnhm/xV9qTDu44jLHuUqtwzcZeuFwNmE1tHuyebiMXIzaJVgo/4aX2W/Njt5VxTzSLp6vhtDCMM4X/rQyoj3Y3BWapKuyEHICiVvp3KPf7yrqVWZHVo+vHJLCfSH2wmCqYvmGrefnb2NI3xuZ1FA3OqdDV78MSOz/EsMNVXySoMpGgSDLhk=
+      secure: AEFdpieglyZhEne4AGmeBTIYuCFtWggHqMZn5dfkjZ/TIqQ5dkqWKow84UDeL7ACDSMs5zCRAL3ROkJsjAy0DVZWju1FHFLcx3Dsl5BTdbIlDhgRXSb0LVGk68xjfSHkFuuTzeje8WX9HKREHGeEfo4SJj7YtW8G93ZORgPGd4wBo5GUkzIo3BqqpkOvLsSvD0mfDmkeW613NmtyH5lQSG17hsp4JZmTFn+/854DPuthJ/TJjFPuZ07Loj5hiriZPTapMc2FIffntw6TPNB0aU7kQVvAa0lMeiwWI/vftaSQAwBVHWMvTJdQr18Y2ceRt+z6eUuy4tkiXbRNffAZvJzO7l30FqvN/Ezz4mdBtAOl8kDjJ2tRz6NF7j1VXGFD71Rs6P4TGrscoFnOXSulK1EMSWvL8NHL4VSGcvwZf9qBsGxbuK7BQE9BqKfPVAkJ9IqnUTOaFS0qpGyALcaTguEfWots4bcflIVzjtVOMIRe/WyXHxVwZf9OKWrBSW77rqtWre0MtSVFpGDR8bnTUSv4crd0/uUGhP9MfD2M4vac63bP2wjmm7EJ0YT+o5ro4ZO7IBzSqKQWdBIkAD0V3sLlqQ5hZ/Inwpb4EUYR6xv69pa/mChbBq+PegUYmT/OUCMLHHKHmKXd3rf/FbYjAcIpy3dvLE/7lNfzNP+9Wyg=
     on_success: never
     on_failure: always
     on_pull_requests: false
 install:
-  - npm install
+- npm install
 before_install:
-  - npm install -g greenkeeper-lockfile@1
+- npm install -g greenkeeper-lockfile@1
 before_script:
-  - npm prune
-  - greenkeeper-lockfile-update
+- npm prune
+- greenkeeper-lockfile-update
 after_success:
-  - npm run coveralls
-  - npm run semantic-release
+- npm run coveralls
+- npm run semantic-release
 after_script:
-  - greenkeeper-lockfile-upload
+- greenkeeper-lockfile-upload
