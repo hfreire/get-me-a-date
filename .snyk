@@ -1,0 +1,59 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:extend:20180424':
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > request > extend:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-lifecycle > node-gyp > request > extend:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > npm-lifecycle > node-gyp > request > extend:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-registry-client > request > extend:
+        patched: '2019-06-11T19:34:23.556Z'
+  'npm:hoek:20180212':
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > request > hawk > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > request > hawk > sntp > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > request > hawk > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-registry-client > request > hawk > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-registry-client > request > hawk > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-registry-client > request > hawk > sntp > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > request > hawk > cryptiles > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-lifecycle > node-gyp > request > hawk > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > npm-lifecycle > node-gyp > request > hawk > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-registry-client > request > hawk > cryptiles > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-lifecycle > node-gyp > request > hawk > sntp > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-lifecycle > node-gyp > request > hawk > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > npm-lifecycle > node-gyp > request > hawk > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-lifecycle > node-gyp > request > hawk > cryptiles > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > npm-lifecycle > node-gyp > request > hawk > sntp > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > npm-lifecycle > node-gyp > request > hawk > cryptiles > boom > hoek:
+        patched: '2019-06-11T19:34:23.556Z'
+  'npm:lodash:20180130':
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > cli-table2 > lodash:
+        patched: '2019-06-11T19:34:23.556Z'
+  'npm:stringstream:20180511':
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > request > stringstream:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-registry-client > request > stringstream:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-lifecycle > node-gyp > request > stringstream:
+        patched: '2019-06-11T19:34:23.556Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > npm-lifecycle > node-gyp > request > stringstream:
+        patched: '2019-06-11T19:34:23.556Z'
