@@ -89,7 +89,7 @@
     "semantic-release": "15.13.12",
     "testdouble": "3.11.0",
     "to-string-loader": "1.1.5",
-    "tslint": "5.9.0",
+    "tslint": "5.17.0",
     "tslint-config-standard": "8.0.1",
     "typescript": "2.5.3",
     "webpack": "3.10.0",
