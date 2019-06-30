@@ -15,7 +15,7 @@ ENV VERSION_BUILD_DATE $VERSION_BUILD_DATE
 
 # Create app directory
 ENV HOME /opt/$NAME
-RUN mkdir -p $HOME
+RUN mkdir $HOME
 WORKDIR $HOME
 
 # Install app runtime and build dependencies
