@@ -53,7 +53,8 @@
     "sharp": "0.20.3",
     "sqlite3": "4.0.9",
     "tinder-wrapper": "1.0.15",
-    "zone.js": "0.8.20"
+    "zone.js": "0.8.20",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "@angularclass/hmr": "2.1.3",
@@ -162,6 +163,9 @@
     "commit": "./node_modules/.bin/commit-wizard",
     "build": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/build",
     "push": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/push",
-    "start": "node src/app.js"
-  }
+    "start": "node src/app.js",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
+  },
+  "snyk": true
 }

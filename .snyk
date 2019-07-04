@@ -1,0 +1,28 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-450202:
+    - happn-wrapper > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - health-checkup > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - mint-wrapper > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - ng2-charts > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - serverful > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - sequelize > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - request-on-steroids > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - request-on-steroids > perseverance > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - request-on-steroids > random-http-useragent > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
+    - request-on-steroids > perseverance > random-http-useragent > lodash:
+        patched: '2019-07-04T06:46:04.025Z'
