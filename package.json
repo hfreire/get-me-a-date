@@ -85,7 +85,7 @@
     "raw-loader": "1.0.0",
     "style-loader": "0.23.1",
     "testdouble-jest": "1.0.1",
-    "sass-loader": "7.0.1",
+    "sass-loader": "7.2.0",
     "semantic-release": "15.13.16",
     "testdouble": "3.11.0",
     "to-string-loader": "1.1.5",
