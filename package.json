@@ -87,7 +87,7 @@
     "testdouble-jest": "1.0.1",
     "sass-loader": "7.0.1",
     "semantic-release": "15.13.16",
-    "testdouble": "3.11.0",
+    "testdouble": "3.12.4",
     "to-string-loader": "1.1.5",
     "tslint": "5.17.0",
     "tslint-config-standard": "8.0.1",
