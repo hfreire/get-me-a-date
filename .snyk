@@ -1,0 +1,20 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - facebook-login-for-robots > puppeteer > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
+    - happn-wrapper > request-on-steroids > socks5-http-client > npm > pacote > make-fetch-happen > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > pacote > make-fetch-happen > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
+    - happn-wrapper > request-on-steroids > socks5-http-client > npm > npm-profile > make-fetch-happen > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > npm-profile > make-fetch-happen > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
+    - happn-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > pacote > make-fetch-happen > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
+    - mint-wrapper > request-on-steroids > socks5-http-client > npm > libcipm > pacote > make-fetch-happen > https-proxy-agent:
+        patched: '2019-10-04T06:46:16.870Z'
