@@ -72,7 +72,7 @@
     "eslint-plugin-node": "9.1.0",
     "eslint-plugin-promise": "4.1.0",
     "eslint-plugin-standard": "4.0.0",
-    "eslint-plugin-unicorn": "8.0.2",
+    "eslint-plugin-unicorn": "14.0.1",
     "file-loader": "4.0.0",
     "html-loader": "0.5.4",
     "html-webpack-plugin": "3.0.8",
