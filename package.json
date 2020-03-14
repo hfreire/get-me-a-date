@@ -46,7 +46,7 @@
     "modern-logger": "1.5.17",
     "moment": "2.22.1",
     "ng2-charts": "2.2.2",
-    "request-on-steroids": "1.1.56",
+    "request-on-steroids": "1.1.70",
     "rxjs": "5.5.6",
     "sequelize": "5.8.9",
     "serverful": "1.4.45",
