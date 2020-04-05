@@ -1,7 +1,9 @@
 # :heart_eyes: Help me get a :cupid: date tonight :first_quarter_moon_with_face:
 
-[![Build Status](https://travis-ci.org/hfreire/get-me-a-date.svg?branch=master)](https://travis-ci.org/hfreire/get-me-a-date)
+[![](https://github.com/hfreire/get-me-a-date/workflows/ci/badge.svg)](https://github.com/hfreire/get-me-a-date/actions?workflow=ci)
+[![](https://github.com/hfreire/get-me-a-date/workflows/cd/badge.svg)](https://github.com/hfreire/get-me-a-date/actions?workflow=cd)
 [![Coverage Status](https://coveralls.io/repos/github/hfreire/get-me-a-date/badge.svg?branch=master)](https://coveralls.io/github/hfreire/get-me-a-date?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/hfreire/get-me-a-date/badge.svg)](https://snyk.io/test/github/hfreire/get-me-a-date)
 [![](https://img.shields.io/github/release/hfreire/get-me-a-date.svg)](https://github.com/hfreire/get-me-a-date/releases)
 [![Docker Stars](https://img.shields.io/docker/stars/hfreire/get-me-a-date.svg)](https://hub.docker.com/r/hfreire/get-me-a-date/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/hfreire/get-me-a-date.svg)](https://hub.docker.com/r/hfreire/get-me-a-date/)
@@ -62,7 +64,7 @@ npm run build
 ```
 
 ### How to contribute
-You can contribute either with code (e.g., new features, bug fixes and documentation) or by [donating 5 EUR](https://paypal.me/hfreire/5). You can read the [contributing guidelines](CONTRIBUTING.md) for instructions on how to contribute with code. 
+You can contribute either with code (e.g., new features, bug fixes and documentation) or by [donating 5 EUR](https://paypal.me/hfreire/5). You can read the [contributing guidelines](CONTRIBUTING.md) for instructions on how to contribute with code.
 
 All donation proceedings will go to the [Sverige för UNHCR](https://sverigeforunhcr.se), a swedish partner of the [UNHCR - The UN Refugee Agency](http://www.unhcr.org), a global organisation dedicated to saving lives, protecting rights and building a better future for refugees, forcibly displaced communities and stateless people.
 

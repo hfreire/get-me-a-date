@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+coverage
+node_modules
+test
+tmp
+*.iml
+
+**/.terraform
+**/terraform.*

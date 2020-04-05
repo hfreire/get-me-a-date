@@ -1,0 +1,36 @@
+name: ci
+
+on: [push]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      VERSION_COMMIT: ${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.14
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Build source code
+        run: npm run build --if-present
+      - name: Test source code
+        run: npm test
+      - name: Build docker image
+        run: npm run docker:build
+      - name: Test docker image
+        run: npm run docker:test
+      - name: Submit coveralls test coverage report
+        run: npm run coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      - name: Check if release should be created
+        run: npm run semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}

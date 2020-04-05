@@ -1,0 +1,17 @@
+version: 1
+
+update_configs:
+  - package_manager: "javascript"
+    directory: "/"
+    update_schedule: "live"
+    commit_message:
+      prefix: "fix"
+      prefix_development: "chore"
+      include_scope: true
+  - package_manager: "docker"
+    directory: "share/docker/"
+    update_schedule: "daily"
+    commit_message:
+      prefix: "fix"
+      prefix_development: "chore"
+      include_scope: true

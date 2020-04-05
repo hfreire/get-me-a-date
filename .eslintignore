@@ -3,3 +3,5 @@ node_modules
 coverage
 share
 src/web/*
+package*.json
+

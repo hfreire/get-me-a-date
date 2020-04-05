@@ -1,5 +1,5 @@
 # Contributing
-This GitHub repo follows the [GitHub Flow](https://guides.github.com/introduction/flow/) git workflow. In essence, you contribute by making changes in your fork and then generating a pull request of those changes to be merged with the upstream. 
+This GitHub repo follows the [GitHub Flow](https://guides.github.com/introduction/flow/) git workflow. In essence, you contribute by making changes in your fork and then generating a pull request of those changes to be merged with the upstream.
 
 ### How to fork this repo
 You can read more about forking a GitHub repo [here](https://help.github.com/articles/fork-a-repo). Once you've forked this repo, you're now ready to clone the repo in your computer and start hacking and tinkering with its code.
@@ -73,9 +73,9 @@ npm run commit
 You can read more about creating a GitHub pull request from a fork [here](https://help.github.com/articles/creating-a-pull-request-from-a-fork).
 
 ### How to get your pull request accepted
-Every pull request is welcomed, but it's important, as well, to have maintainable code and avoid regression bugs while adding features or fixing other bugs. 
+Every pull request is welcomed, but it's important, as well, to have maintainable code and avoid regression bugs while adding features or fixing other bugs.
 
-Once you generate a pull request, GitHub and third-party apps will verify if the changes are suitable to be merged with upstream. [Travis](https://travis-ci.org/hfreire/get-me-a-date) will verify your changes for style guide violations and failing test cases, while, [Coveralls](https://coveralls.io/github/hfreire/get-me-a-date) will verify the coverage of the automated test cases against the code.
+Once you generate a pull request, GitHub and third-party apps will verify if the changes are suitable to be merged with upstream. [GitHub Actions CI workflow](https://github.com/hfreire/get-me-a-date/actions?workflow=ci) will verify your changes for style guide violations and failing test cases, while, [Coveralls](https://coveralls.io/github/hfreire/get-me-a-date) will verify the coverage of the automated test cases against the code.
 
 You are encouraged to verify your changes by testing the code locally.
 

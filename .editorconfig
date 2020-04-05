@@ -7,3 +7,9 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 indent_style = space
 indent_size = 2
+max_line_length = 80
+
+[{*.cjs,*.js}]
+ij_javascript_spaces_within_brackets = false
+ij_javascript_space_before_function_left_parenth = false
+ij_javascript_space_before_method_parentheses = false

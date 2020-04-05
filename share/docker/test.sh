@@ -4,7 +4,7 @@
 
 sleep 10
 
-$(which curl) \
+curl \
 --silent \
 --fail \
 --connect-timeout 5 \

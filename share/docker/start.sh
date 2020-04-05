@@ -1,3 +1,3 @@
 #!/bin/sh
 
-$(which npm) start
+exec su-exec node node src/app.js
