@@ -45,7 +45,7 @@ class Rekognition {
     const { region, accessKeyId, secretAccessKey } = this._options
     AWS.config.update({ region, accessKeyId, secretAccessKey })
 
-    this._rekognition = Promise.promisifyAll(new AWS.Rekognition())
+    this._rekognition = new AWS.Rekognition()
 
     this._circuitBreaker = new Brakes(this._options.breaker)
 

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec su-exec node node src/app.js
+exec gosu node node src/app.js
