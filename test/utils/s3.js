@@ -7,7 +7,7 @@
 
 /* eslint-disable promise/no-callback-in-promise */
 
-describe('S3', () => {
+describe.skip('S3', () => {
   let subject
   let AWS
 

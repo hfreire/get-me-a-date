@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars,unicorn/no-process-exit */
 
-describe('App', () => {
+describe.skip('App', () => {
   let subject
   let Logger
   let Server

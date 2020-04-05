@@ -33,11 +33,11 @@ class Recommendation {
 
         if (recommendation.lastCheckedOutDate) {
           if (recommendation.isLike || recommendation.isPass) {
-            return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
+            throw new AlreadyCheckedOutEarlierError(recommendation)
           }
 
           if (moment().isBefore(moment(recommendation.lastCheckedOutDate).add(1, 'day'))) {
-            return Promise.reject(new AlreadyCheckedOutEarlierError(recommendation))
+            throw new AlreadyCheckedOutEarlierError(recommendation)
           }
         }
 

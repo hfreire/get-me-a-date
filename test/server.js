@@ -37,7 +37,7 @@ describe('Server', () => {
     })
 
     it('should be instance of serverful', () => {
-      subject.should.be.instanceOf(serverful.Serverful)
+      expect(subject).toBeInstanceOf(serverful.Serverful)
     })
   })
 })

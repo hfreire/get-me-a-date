@@ -26,6 +26,7 @@ const Request = require('request-on-steroids')
 
 const sharp = require('sharp')
 
+// eslint-disable-next-line node/no-deprecated-api
 const { parse } = require('url')
 
 const deleteFaces = function (faces) {

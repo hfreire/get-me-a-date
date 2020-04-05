@@ -127,9 +127,10 @@
   },
   "snyk": true,
   "jest": {
+    "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "./test/helper.js",
     "testMatch": [
-      "<rootDir>/test/**.js"
+      "<rootDir>/test/**/*.js"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
@@ -155,8 +156,8 @@
     "jest": "./node_modules/.bin/jest",
     "snyk:test": "./node_modules/.bin/snyk test",
     "snyk:protect": "./node_modules/.bin/snyk protect",
-    "docker:build": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/build",
-    "docker:push": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/hooks/push",
+    "docker:build": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/scripts/build",
+    "docker:push": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/scripts/push",
     "docker:test": "DOCKER_REPO=hfreire NAME=$npm_package_name ./share/docker/scripts/test",
     "webpack:build": "./node_modules/.bin/webpack -p",
     "webpack:start": "./node_modules/.bin/webpack-dev-server --config ./webpack.start.js --progress --hot --content-base src/web",

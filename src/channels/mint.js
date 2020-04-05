@@ -149,10 +149,6 @@ class Mint extends Channel {
         })
     }
 
-    const _getUnreadMessages = (id) => {
-      return Promise.resolve()
-    }
-
     const _getUpdates = () => {
       return Database.channels.find({ where: { name: this._name } })
         .then(({ lastActivityDate, userId }) => {
@@ -167,7 +163,7 @@ class Mint extends Channel {
                   return Promise.props({
                     matches: Promise.mapSeries(matches, ({ id }) => _getMatch(id)),
                     likes: Promise.mapSeries(likes, ({ id }) => _getLike(id)),
-                    theirLikes: Promise.mapSeries([ theirLikes[0] ], ({ id }) => _getTheirLike(id))
+                    theirLikes: Promise.mapSeries([ theirLikes[ 0 ] ], ({ id }) => _getTheirLike(id))
                   }, { concurrency: 1 })
                     .then(({ matches, likes, theirLikes }) => _.merge(matches, likes, theirLikes))
                     .mapSeries((recommendation) => {
