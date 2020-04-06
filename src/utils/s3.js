@@ -26,7 +26,7 @@ class S3 {
     const { region, accessKeyId, secretAccessKey } = this._options
     AWS.config.update({ region, accessKeyId, secretAccessKey })
 
-    this._s3 = Promise.promisifyAll(new AWS.S3())
+    this._s3 = new AWS.S3()
 
     this._circuitBreaker = new Brakes(this._options.breaker)
 
