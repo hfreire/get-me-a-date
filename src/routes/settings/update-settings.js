@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ * Copyright (c) 2020, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
  * LICENSE.md file in the root directory of this source tree.
@@ -9,7 +9,7 @@ const { Route } = require('serverful')
 
 const Promise = require('bluebird')
 
-const Boom = require('boom')
+const Boom = require('@hapi/boom')
 
 const Logger = require('modern-logger')
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ * Copyright (c) 2020, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
  * LICENSE.md file in the root directory of this source tree.
@@ -9,8 +9,8 @@ const { Route } = require('serverful')
 
 const Logger = require('modern-logger')
 
-const Joi = require('joi')
-const Boom = require('boom')
+const Joi = require('@hapi/joi')
+const Boom = require('@hapi/boom')
 
 const Database = require('../../database')
 const { Recommendation, Stats, Channel } = require('../../dates')
@@ -66,11 +66,11 @@ class PassRecommendation extends Route {
 
   validate () {
     return {
-      params: {
+      params: Joi.object({
         id: Joi.string()
           .required()
           .description('recommendation id')
-      }
+      })
     }
   }
 }

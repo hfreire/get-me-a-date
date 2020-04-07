@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ * Copyright (c) 2020, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
  * LICENSE.md file in the root directory of this source tree.
@@ -10,15 +10,15 @@ const { Route } = require('serverful')
 const _ = require('lodash')
 const Promise = require('bluebird')
 
-const Joi = require('joi')
-const Boom = require('boom')
+const Joi = require('@hapi/joi')
+const Boom = require('@hapi/boom')
 
 const Logger = require('modern-logger')
 
 const Database = require('../../database')
 
 class GetRecommendations extends Route {
-  constructor () {
+  constructor() {
     super('GET', '/recommendations', 'Recommendations', 'Returns all recommendations')
   }
 
@@ -64,7 +64,7 @@ class GetRecommendations extends Route {
 
   validate () {
     return {
-      query: {
+      query: Joi.object({
         page: Joi.string()
           .optional()
           .description('recommendations page number'),
@@ -80,7 +80,7 @@ class GetRecommendations extends Route {
         sort: Joi.string()
           .optional()
           .description('recommendations sort')
-      }
+      })
     }
   }
 }

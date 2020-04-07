@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ * Copyright (c) 2020, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
  * LICENSE.md file in the root directory of this source tree.
@@ -9,8 +9,8 @@ const { Route } = require('serverful')
 
 const Promise = require('bluebird')
 
-const Joi = require('joi')
-const Boom = require('boom')
+const Joi = require('@hapi/joi')
+const Boom = require('@hapi/boom')
 
 const Logger = require('modern-logger')
 
@@ -18,7 +18,7 @@ const Database = require('../../database')
 const { Dates } = require('../../dates')
 
 class UpdateChannel extends Route {
-  constructor () {
+  constructor() {
     super('PUT', '/channels/{name}', 'Channels', 'Update channel')
   }
 
@@ -55,11 +55,11 @@ class UpdateChannel extends Route {
 
   validate () {
     return {
-      params: {
+      params: Joi.object({
         name: Joi.string()
           .required()
           .description('channel name')
-      }
+      })
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Hugo Freire <hugo@exec.sh>.
+ * Copyright (c) 2020, Hugo Freire <hugo@exec.sh>.
  *
  * This source code is licensed under the license found in the
  * LICENSE.md file in the root directory of this source tree.
@@ -9,17 +9,17 @@ const { Route } = require('serverful')
 
 const Logger = require('modern-logger')
 
-const Joi = require('joi')
-const Boom = require('boom')
+const Joi = require('@hapi/joi')
+const Boom = require('@hapi/boom')
 
 const Database = require('../database')
 
 class Stats extends Route {
-  constructor () {
+  constructor() {
     super('GET', '/stats', 'Stats', 'Returns stats')
   }
 
-  handler ({ query }, reply) {
+  handler({ query }, reply) {
     const { page = 1, limit = 25 } = query
 
     Database.stats.findAndCountAll({ offset: (page - 1) * limit, limit, order: [ [ 'date', 'DESC' ] ] })
@@ -49,14 +49,14 @@ class Stats extends Route {
 
   validate () {
     return {
-      query: {
+      query: Joi.object({
         page: Joi.string()
           .optional()
           .description('page number'),
         limit: Joi.string()
           .optional()
           .description('page results limit')
-      }
+      })
     }
   }
 }
