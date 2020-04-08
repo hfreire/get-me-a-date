@@ -15,11 +15,11 @@ const Boom = require('@hapi/boom')
 const Database = require('../database')
 
 class Stats extends Route {
-  constructor() {
+  constructor () {
     super('GET', '/stats', 'Stats', 'Returns stats')
   }
 
-  handler({ query }, reply) {
+  handler ({ query }, reply) {
     const { page = 1, limit = 25 } = query
 
     Database.stats.findAndCountAll({

@@ -18,7 +18,7 @@ const Logger = require('modern-logger')
 const Database = require('../../database')
 
 class GetRecommendations extends Route {
-  constructor() {
+  constructor () {
     super('GET', '/recommendations', 'Recommendations', 'Returns all recommendations')
   }
 

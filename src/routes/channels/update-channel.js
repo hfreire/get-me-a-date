@@ -18,7 +18,7 @@ const Database = require('../../database')
 const { Dates } = require('../../dates')
 
 class UpdateChannel extends Route {
-  constructor() {
+  constructor () {
     super('PUT', '/channels/{name}', 'Channels', 'Update channel')
   }
 
