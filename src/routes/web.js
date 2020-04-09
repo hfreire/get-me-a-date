@@ -31,10 +31,12 @@ class Web extends Route {
         .merge({
           method: 'GET',
           path: '/{param*}',
-          handler: {
-            directory: {
-              path: join(__dirname, '../../tmp/web'),
-              index: true
+          options: {
+            handler: {
+              directory: {
+                path: join(__dirname, '../../tmp/web'),
+                index: true
+              }
             }
           }
         })
