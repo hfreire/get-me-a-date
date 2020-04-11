@@ -148,7 +148,7 @@ class Database {
     return Promise.resolve()
       .then(() => {
         if (!existsSync(this._options.database.pathDir)) {
-          return mkdirAsync(this._options.database.pathDir)
+          return mkdirAsync(this._options.database.pathDir, { recursive: true })
         }
       })
       .then(() => this._sequelize.authenticate())
