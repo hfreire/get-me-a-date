@@ -90,7 +90,7 @@
     "testdouble": "3.11.0",
     "testdouble-jest": "1.0.1",
     "to-string-loader": "1.1.5",
-    "tslint": "5.17.0",
+    "tslint": "5.20.1",
     "tslint-config-standard": "8.0.1",
     "typescript": "2.5.3",
     "webpack": "^3.12.0",
