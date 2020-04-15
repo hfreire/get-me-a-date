@@ -82,7 +82,7 @@
     "node-sass": "4.12.0",
     "null-loader": "0.1.1",
     "pre-git": "3.17.1",
-    "raw-loader": "1.0.0",
+    "raw-loader": "4.0.1",
     "sass-loader": "7.0.1",
     "semantic-release": "17.0.4",
     "snyk": "1.305.0",
