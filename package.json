@@ -87,7 +87,7 @@
     "semantic-release": "17.0.6",
     "snyk": "1.305.0",
     "style-loader": "0.23.1",
-    "testdouble": "3.11.0",
+    "testdouble": "3.13.1",
     "testdouble-jest": "2.0.0",
     "to-string-loader": "1.1.5",
     "tslint": "5.20.1",
