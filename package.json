@@ -45,7 +45,7 @@
     "mint-wrapper": "1.0.40",
     "modern-logger": "1.5.57",
     "moment": "2.24.0",
-    "ng2-charts": "2.2.2",
+    "ng2-charts": "2.3.0",
     "request-on-steroids": "1.1.70",
     "rxjs": "5.5.6",
     "sequelize": "5.21.6",
