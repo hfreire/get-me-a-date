@@ -83,7 +83,7 @@
     "null-loader": "0.1.1",
     "pre-git": "3.17.1",
     "raw-loader": "4.0.1",
-    "sass-loader": "7.0.1",
+    "sass-loader": "8.0.2",
     "semantic-release": "17.0.6",
     "snyk": "1.306.0",
     "style-loader": "0.23.1",
