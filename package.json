@@ -86,7 +86,7 @@
     "sass-loader": "8.0.2",
     "semantic-release": "17.0.7",
     "snyk": "1.314.0",
-    "style-loader": "1.2.0",
+    "style-loader": "1.2.1",
     "testdouble": "3.13.1",
     "testdouble-jest": "2.0.0",
     "to-string-loader": "1.1.6",
