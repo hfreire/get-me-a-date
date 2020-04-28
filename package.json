@@ -75,7 +75,7 @@
     "eslint-plugin-unicorn": "19.0.1",
     "file-loader": "6.0.0",
     "html-loader": "1.1.0",
-    "html-webpack-plugin": "4.2.0",
+    "html-webpack-plugin": "4.2.1",
     "istanbul": "0.4.5",
     "jest": "25.4.0",
     "mocha": "7.1.2",
