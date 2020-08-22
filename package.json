@@ -77,7 +77,7 @@
     "html-loader": "1.2.1",
     "html-webpack-plugin": "4.3.0",
     "istanbul": "0.4.5",
-    "jest": "26.4.1",
+    "jest": "26.4.2",
     "mocha": "8.1.1",
     "node-sass": "4.14.1",
     "null-loader": "4.0.0",
