@@ -85,7 +85,7 @@
     "raw-loader": "4.0.1",
     "sass-loader": "10.0.2",
     "semantic-release": "17.1.1",
-    "snyk": "1.389.0",
+    "snyk": "1.391.1",
     "style-loader": "1.2.1",
     "testdouble": "3.16.1",
     "testdouble-jest": "2.0.0",
