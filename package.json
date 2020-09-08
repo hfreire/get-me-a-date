@@ -64,7 +64,7 @@
     "coveralls": "3.1.0",
     "css-loader": "4.3.0",
     "eslint": "6.8.0",
-    "eslint-config-hfreire": "2.0.7",
+    "eslint-config-hfreire": "3.0.39",
     "eslint-plugin-import": "2.22.0",
     "eslint-plugin-jest": "24.0.0",
     "eslint-plugin-json": "2.1.2",
