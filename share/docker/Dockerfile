@@ -1,4 +1,4 @@
-FROM node:14.9.0 AS node
+FROM node:14.10.0 AS node
 
 # Install base utils
 RUN set -x \
