@@ -84,7 +84,7 @@
     "pre-git": "3.17.1",
     "raw-loader": "4.0.2",
     "sass-loader": "10.0.4",
-    "semantic-release": "17.2.1",
+    "semantic-release": "17.2.2",
     "snyk": "1.421.0",
     "style-loader": "2.0.0",
     "testdouble": "3.16.1",
