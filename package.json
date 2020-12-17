@@ -95,7 +95,7 @@
     "typescript": "3.9.7",
     "webpack": "^5.10.3",
     "webpack-dev-server": "3.11.0",
-    "webpack-merge": "5.7.0"
+    "webpack-merge": "5.7.2"
   },
   "greenkeeper": {
     "ignore": [
