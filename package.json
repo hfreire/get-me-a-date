@@ -52,7 +52,7 @@
     "serverful": "1.4.90",
     "sharp": "^0.27.1",
     "sqlite3": "5.0.2",
-    "tinder-wrapper": "1.0.81",
+    "tinder-wrapper": "1.0.83",
     "zone.js": "0.8.29"
   },
   "devDependencies": {
