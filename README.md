@@ -58,6 +58,11 @@ Change current directory
 cd get-me-a-date
 ```
 
+Run the NPM install
+```
+npm install
+```
+
 Run the NPM script that will build the Docker image
 ```
 npm run build
