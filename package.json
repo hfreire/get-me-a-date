@@ -61,7 +61,7 @@
     "angular2-template-loader": "0.6.2",
     "awesome-typescript-loader": "5.2.1",
     "copy-webpack-plugin": "^7.0.0",
-    "css-loader": "5.1.0",
+    "css-loader": "6.3.0",
     "eslint": "6.8.0",
     "eslint-config-hfreire": "2.0.7",
     "eslint-plugin-import": "2.22.1",
