@@ -44,7 +44,7 @@
     "lodash": "4.17.21",
     "mint-wrapper": "1.0.84",
     "modern-logger": "1.5.86",
-    "moment": "2.29.1",
+    "moment": "2.29.4",
     "ng2-charts": "2.4.2",
     "request-on-steroids": "1.1.110",
     "rxjs": "5.5.12",
