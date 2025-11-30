@@ -18,7 +18,7 @@
   "dependencies": {
     "@angular/animations": "4.4.4",
     "@angular/cdk": "2.0.0-beta.11",
-    "@angular/common": "4.4.4",
+    "@angular/common": "19.2.16",
     "@angular/compiler": "11.2.3",
     "@angular/core": "4.4.4",
     "@angular/forms": "4.4.4",
@@ -48,7 +48,7 @@
     "ng2-charts": "2.4.2",
     "request-on-steroids": "1.1.110",
     "rxjs": "5.5.12",
-    "sequelize": "5.21.13",
+    "sequelize": "6.6.5",
     "serverful": "1.4.90",
     "sharp": "^0.27.2",
     "sqlite3": "5.0.2",
